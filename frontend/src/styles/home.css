@@ -1,0 +1,419 @@
+
+/* ==========================================
+   PROJECT: AI CAREER
+   FILE: home.css
+   PURPOSE: Home Page layout and design
+========================================== */
+
+
+/* ==========================================
+   01. MAIN PAGE CONTAINER
+========================================== */
+
+.home-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fafbfe;
+  color: #071b60;
+  overflow-x: hidden;
+}
+
+
+/* ==========================================
+   02. MAIN CONTENT
+========================================== */
+
+.home-content {
+  width: 100%;
+  position: relative;
+  flex: 1;
+}
+
+
+/* ==========================================
+   03. HERO SECTION
+========================================== */
+
+.hero-section {
+  /* Two-column desktop layout */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+
+  padding: 60px 8%;
+  gap: 40px;
+  min-height: 65vh;
+}
+
+
+/* Left side: text content */
+
+.hero-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+
+/* ==========================================
+   04. INTRODUCTORY LABEL
+========================================== */
+
+.hero-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  background: #fce4f5;
+  color: var(--secondary);
+
+  padding: 8px 16px;
+  border-radius: 50px;
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+
+/* ==========================================
+   05. MAIN SLOGAN
+========================================== */
+
+.hero-title {
+  font-family: "Snell Roundhand", cursive;
+  font-size: clamp(48px, 6vw, 90px);
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--secondary);
+}
+
+/* Display each sentence on a new line */
+
+.hero-title span {
+  display: block;
+}
+
+/* Highlighted sentence */
+
+.hero-highlight {
+  position: relative;
+  width: fit-content;
+  color: var(--primary);
+}
+
+/* Yellow decorative underline */
+
+.hero-highlight::after {
+  content: "";
+  position: absolute;
+
+  left: 0;
+  bottom: -5px;
+
+  width: 100%;
+  height: 8px;
+
+  background: var(--yellow);
+  border-radius: 50%;
+  transform: rotate(-2deg);
+}
+
+
+/* ==========================================
+   06. PLATFORM DESCRIPTION
+========================================== */
+
+.hero-description {
+  max-width: 460px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+
+/* ==========================================
+   07. GET STARTED BUTTON
+========================================== */
+
+.hero-button {
+  background: var(--primary);
+  color: var(--white);
+
+  padding: 14px 36px;
+  border: none;
+  border-radius: 50px;
+
+  font-size: 16px;
+  font-weight: 500;
+
+  transition: transform 0.2s ease,
+              background 0.2s ease;
+}
+
+/* Button hover animation */
+
+.hero-button:hover {
+  background: #0045db;
+  transform: translateY(-3px);
+}
+
+/* Button click animation */
+
+.hero-button:active {
+  transform: scale(0.97);
+}
+
+
+/* ==========================================
+   08. DECORATIVE YELLOW RAYS
+========================================== */
+
+.hero-button-wrapper {
+  position: relative;
+  display: inline-flex;
+  width: fit-content;
+}
+
+/* Yellow rays next to the button */
+
+.hero-button-wrapper .decorative-rays {
+  position: absolute;
+
+  width: 40px;
+  height: 40px;
+
+  top: -20px;
+  right: -30px;
+
+  fill: none;
+  stroke: #ffbe00;
+  stroke-width: 4;
+  stroke-linecap: round;
+
+  z-index: 2;
+  pointer-events: none;
+
+  animation: raysPulse 2s ease-in-out infinite;
+}
+
+/* Yellow rays animation */
+
+@keyframes raysPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(0.8);
+    opacity: 0.6;
+  }
+}
+
+
+/* ==========================================
+   09. AI CAREER MASCOT
+========================================== */
+
+/* Right side of the Hero Section */
+
+.hero-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+/* Mascot container */
+
+.mascot-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  top: -38px;
+}
+
+/* Mascot image */
+
+.mascot-image {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  object-fit: contain;
+
+  animation: mascotFloat 4s ease-in-out infinite;
+}
+
+/* Smooth floating movement */
+
+@keyframes mascotFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+
+/* ==========================================
+   10. DECORATIVE BOTTOM WAVES
+========================================== */
+
+.wave-background {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 240px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Full-width SVG */
+
+.wave-background svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Position waves inside the Home Page */
+.home-page {
+  position: relative;
+}
+
+/* Keep the main content above the waves */
+.home-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Prevent waves from overlapping content on mobile */
+@media (max-width: 768px) {
+  .wave-background {
+    position: relative;
+    height: 120px;
+  }
+}
+
+/* ==========================================
+   11. RESPONSIVE DESIGN - TABLET
+========================================== */
+
+@media (max-width: 1024px) {
+
+  .wave-background {
+    height: 120px;
+  }
+
+}
+
+
+/* ==========================================
+   12. RESPONSIVE DESIGN - MOBILE
+========================================== */
+
+@media (max-width: 768px) {
+
+  /* Single-column layout */
+
+  .hero-section {
+    grid-template-columns: 1fr;
+    padding: 40px 6%;
+    gap: 30px;
+  }
+
+  /* Center the text */
+
+  .hero-text {
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .hero-title {
+    font-size: clamp(42px, 10vw, 64px);
+  }
+
+  .hero-description {
+    font-size: 15px;
+  }
+
+  .hero-label {
+    font-size: 12px;
+  }
+
+  .hero-button {
+    padding: 12px 30px;
+  }
+
+  /* Smaller mascot */
+
+  .mascot-image {
+    max-width: 320px;
+  }
+
+  /* Smaller decorative rays */
+
+  .hero-button-wrapper .decorative-rays {
+    width: 28px;
+    height: 28px;
+    right: -22px;
+    top: -12px;
+  }
+
+  /* Smaller bottom waves */
+
+  .wave-background {
+    height: 80px;
+  }
+
+}
+
+
+/* ==========================================
+   13. ACCESSIBILITY - REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .mascot-image {
+    animation: none;
+  }
+
+  .hero-button-wrapper .decorative-rays {
+    animation: none;
+  }
+
+  .hero-button {
+    transition: none;
+  }
+
+  .hero-button:hover,
+  .hero-button:active {
+    transform: none;
+  }
+
+}
+
+/* ==========================================
+MOBILE LAYOUT ADJUSTMENTS
+========================================== */
+
+@media (max-width: 768px) {
+
+  /* Move the mascot down */
+  .mascot-container {
+    top: 20px;
+    margin-top: 20px;
+  }
+
+}

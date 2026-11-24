@@ -1,0 +1,217 @@
+
+/* ==========================================
+   PROJECT: AI CAREER
+   FILE: commandbar.css
+   PURPOSE: Global search component styles
+========================================== */
+
+
+/* 01. MAIN CONTAINER */
+
+.command-container {
+  /* Position below the navigation bar */
+  position: relative;
+  margin: 32px 4% 0;
+
+  /* Keep search results above other elements */
+  z-index: 20;
+}
+
+
+/* 02. SEARCH BAR */
+
+.command-bar {
+  /* Align all elements horizontally */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  /* Size and spacing */
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 18px;
+
+  /* Background and rounded shape */
+  background: #e3ecfc;
+  border-radius: 50px;
+
+  /* Icon and text color */
+  color: var(--secondary);
+}
+
+
+/* 03. SEARCH INPUT */
+
+.command-bar input {
+  /* Fill the available space */
+  flex: 1;
+  min-width: 0;
+
+  /* Remove default input appearance */
+  border: none;
+  outline: none;
+  background: transparent;
+
+  /* Text style */
+  font-size: 14px;
+  color: var(--secondary);
+}
+
+.command-bar input::placeholder {
+  color: #64748b;
+}
+
+/* Highlight the search bar when focused */
+.command-bar:focus-within {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+
+/* 04. KEYBOARD SHORTCUT */
+
+.command-shortcut {
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 12px;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.command-clear {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+}
+
+
+/* 05. SEARCH RESULTS */
+
+.command-results {
+  /* Display directly below the search bar */
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+
+  /* Limit height and allow scrolling */
+  max-height: 350px;
+  overflow-y: auto;
+
+  /* Dropdown appearance */
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 10px;
+
+  /* Soft shadow */
+  box-shadow: 0 12px 35px rgba(7, 27, 96, 0.12);
+}
+
+
+/* 06. RESULTS TITLE */
+
+.command-results-title {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+
+/* 07. INDIVIDUAL SEARCH RESULTS */
+
+.command-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  width: 100%;
+  padding: 10px 12px;
+
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+
+  color: var(--secondary);
+  text-align: left;
+}
+
+/* Highlight the selected result */
+.command-item:hover,
+.command-item.active {
+  background: #edf3ff;
+}
+
+
+/* 08. RESULT ICON */
+
+.command-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+
+  background: #e3ecfc;
+  color: var(--primary);
+  border-radius: 10px;
+}
+
+
+/* 09. RESULT TEXT */
+
+.command-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.command-item-text span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.command-item-text small {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+
+/* 10. EMPTY SEARCH RESULTS */
+
+.command-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+
+/* 11. RESPONSIVE DESIGN - MOBILE */
+
+@media (max-width: 768px) {
+
+  .command-container {
+    margin: 20px 5% 0;
+  }
+
+  .command-bar {
+    padding: 10px 14px;
+  }
+
+  /* Hide keyboard shortcut on small screens */
+  .command-shortcut {
+    display: none;
+  }
+
+  .command-results {
+    max-height: 280px;
+  }
+
+  .command-item-text small {
+    font-size: 11px;
+  }
+}
