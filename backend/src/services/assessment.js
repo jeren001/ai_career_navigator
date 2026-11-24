@@ -396,6 +396,7 @@ function recommendations(roles, signals) {
       name,
       score,
       match_percent: percent(score, [...directionMap.values()].map(({ scores }) => scores.reduce((total, item) => total + item, 0) / scores.length)),
+      score_basis: 'relative_to_top_direction',
       reason: directionReason(name, value.roles, signals),
       };
     })
@@ -416,6 +417,7 @@ function recommendations(roles, signals) {
     .map(([name, value]) => ({
       name,
       match_percent: percent(value.score, scores),
+      score_basis: 'relative_to_top_profession',
       reason: `This specialization connects to your strongest matching profession, ${value.role}.`,
     }))
     .sort((left, right) => right.match_percent - left.match_percent || left.name.localeCompare(right.name))
@@ -430,6 +432,7 @@ function recommendations(roles, signals) {
     niche_pivot_friendly: role.niche_pivot_friendly,
     market_pulse: role.market_pulse,
     match_percent: percent(score, scores),
+    score_basis: 'relative_to_top_profession',
     reason: reasonForRole(role, signals),
   }));
 

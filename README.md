@@ -6,6 +6,8 @@ AI-powered career guidance project.
 
 The Express API lives in `backend`. It reads `DATABASE_URL` from `backend/.env` and exposes active career roles at `GET /api/careers`. Optional query parameters are `cluster`, `category`, and `niche_pivot_friendly=true|false`. `cluster` filters `career_roles.cluster`. `category` filters the `career_field` metadata in `market_pulse`. The response uses the database column names, including `slug`, `title`, `cluster`, `summary`, and `is_active`.
 
+The assessment uses the official Google Gen AI SDK to generate optional personalized explanations, strengths, skills to develop, and a three-step roadmap. Set `GEMINI_API_KEY` in `backend/.env` and optionally set `GEMINI_MODEL`. The default is `gemini-3.8-flash`, selected from the Flash models available to the configured key. Keys remain server-side. When Gemini is unavailable, quota-limited, or returns invalid JSON, the deterministic assessment response is returned.
+
 PostgreSQL must be installed and running locally. First inspect existing databases and tables so you can reuse the intended database without disturbing existing data:
 
 ```sh
@@ -74,6 +76,8 @@ Content-Type: application/json
 ```
 
 The response returns the next adaptive question until question 18. The final response has `complete: true` and a `result` containing `trait_scores`, `directions`, `specializations`, and `professions`. Each recommendation includes a match percentage and a reason. The completed result is stored in `quiz_sessions`.
+
+`match_percent` is a relative ranking score normalized to the strongest candidate in the returned set. A value of `100` means the top relative match for these answers, not a probability of success or an absolute measure of career suitability. `score_basis` states whether a value is relative to the top profession or direction. Gemini may add `ai_explanation` and a top-level `personalization` object, but cannot reorder careers or change scores.
 
 For clients that already collect the full answer list, `POST /api/quiz/evaluate` accepts 15–18 validated answers in the same `{ question_id, option_id, note }` shape and returns the completed result immediately. The same endpoint is also available at `/api/assessment/evaluate`.
 
@@ -161,3 +165,5 @@ Example completed response shape:
 ```
 
 Validation returns HTTP 400 for unknown questions, invalid options, duplicate questions, missing required fields, malformed answer arrays, and notes longer than 1000 characters. Assessment state is process-local until completion, so a restart invalidates unfinished assessments. The persisted completed session remains in PostgreSQL.
+
+Gemini is called once after assessment completion, never per question. Requests are limited to 10 per minute with a three-second minimum interval, and identical assessment inputs are cached for five minutes. Generation is constrained to JSON, at most 900 output tokens, and the five deterministic top professions. If enrichment is rate-limited or unavailable, `personalization.status` is `fallback`; deterministic rankings, percentages, and explanations remain available.

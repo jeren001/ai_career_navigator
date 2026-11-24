@@ -8,6 +8,7 @@ import {
   selectNextQuestion,
   validateAnswers,
 } from '../services/assessment.js';
+import { addEnrichment, enrichRecommendations } from '../services/gemini.js';
 
 const sessions = new Map();
 
@@ -83,13 +84,18 @@ async function finish(database, state) {
   }
   const evaluation = evaluateAnswers(state.answers, roles);
   const saved = await persistResult(database, state, state.answers, evaluation);
+  const enrichment = await enrichRecommendations({
+    answers: state.answers,
+    traitScores: evaluation.trait_scores,
+    recommendations: evaluation.recommendations,
+  });
   return {
     assessment_id: state.id,
     session_id: saved.id || null,
     user_id: state.userId,
     completed_at: saved.completed_at || new Date().toISOString(),
     trait_scores: evaluation.trait_scores,
-    ...evaluation.recommendations,
+    ...addEnrichment(evaluation.recommendations, enrichment),
   };
 }
 
@@ -181,6 +187,11 @@ export default function createAssessmentRouter(database) {
       const state = createAssessmentState(userId);
       state.answers = answers;
       const saved = await persistResult(database, state, answers, evaluation);
+      const enrichment = await enrichRecommendations({
+        answers,
+        traitScores: evaluation.trait_scores,
+        recommendations: evaluation.recommendations,
+      });
 
       return response.status(201).json({
         assessment_id: state.id,
@@ -188,7 +199,7 @@ export default function createAssessmentRouter(database) {
         user_id: userId,
         completed_at: saved.completed_at || new Date().toISOString(),
         trait_scores: evaluation.trait_scores,
-        ...evaluation.recommendations,
+        ...addEnrichment(evaluation.recommendations, enrichment),
       });
     } catch (error) {
       return next(error);
