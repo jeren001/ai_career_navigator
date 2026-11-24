@@ -1,12 +1,25 @@
+
+// ==========================================
 // PROJECT: AI CAREER
 // PAGE: Dashboard
+// PURPOSE: Main user dashboard
+// ==========================================
+
+// Import dashboard layout
+import DashboardLayout from '../components/dashboard/DashboardLayout'
+
 
 function Dashboard() {
+
   return (
-    <main>
-      <h1>Dashboard</h1>
-      <p>Welcome to your career dashboard.</p>
-    </main>
+    <DashboardLayout>
+
+      {/* Dashboard page content */}
+      <h1 className="dashboard-title">
+        Dashboard
+      </h1>
+
+    </DashboardLayout>
   )
 }
 
