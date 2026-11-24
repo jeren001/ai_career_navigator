@@ -8,6 +8,9 @@
 // Import icon and mascot component
 import { Star } from 'lucide-react'
 import Mascot from './Mascot'
+import { Link } from 'react-router-dom'
+
+
 
 // Decorative yellow rays
 function DecorativeRays() {
@@ -57,10 +60,10 @@ function HeroSection() {
         {/* Main button with yellow decorative rays */}
         <div className="hero-button-wrapper">
 
-          <button className="hero-button">
-            Get Started
-          </button>
-
+          {/* Navigate to the account registration page */}
+        <Link to="/signup" className="hero-button">
+        Get Started
+        </Link>
           <DecorativeRays />
 
         </div>

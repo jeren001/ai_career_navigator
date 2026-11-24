@@ -1,25 +1,27 @@
+// ==========================================
+// PROJECT: AI CAREER
+// COMPONENT: Navbar
+// PURPOSE: Main navigation bar
+// ==========================================
 
+// Import React and navigation tools
 import { useState } from 'react'
-import {
-  Bell,
-  CircleHelp,
-  CircleUserRound,
-  ChevronDown,
-  LogOut,
-  Menu,
-  X
-} from 'lucide-react'
+import { NavLink, Link } from 'react-router-dom'
+import { Menu, X } from 'lucide-react'
 
+// Import navigation styles
 import '../styles/navbar.css'
 
 function Navbar() {
+
+  // Language and mobile menu states
   const [language, setLanguage] = useState('EN')
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
     <header className="navbar">
 
-      {/* Mobile menu */}
+      {/* 01. Mobile menu */}
       <button
         className="mobile-menu"
         aria-label="Toggle navigation"
@@ -29,14 +31,24 @@ function Navbar() {
         {menuOpen ? <X /> : <Menu />}
       </button>
 
-      {/* Navigation links */}
+      {/* 02. Navigation links */}
       <nav className={`nav-links ${menuOpen ? 'open' : ''}`}>
-        <a href="/" className="active">Home</a>
-        <a href="/dashboard">Dashboard</a>
-        <a href="/about">About</a>
+
+        <NavLink to="/" end>
+          Home
+        </NavLink>
+
+        <NavLink to="/dashboard">
+          Dashboard
+        </NavLink>
+
+        <NavLink to="/about">
+          About
+        </NavLink>
+
       </nav>
 
-      {/* Right side */}
+      {/* 03. Right side actions */}
       <div className="nav-actions">
 
         {/* Language selector */}
@@ -52,37 +64,21 @@ function Navbar() {
           ))}
         </div>
 
-        {/* Notifications */}
-        <button className="icon-button" aria-label="Notifications">
-          <Bell size={20} />
-        </button>
+        {/* Sign In link */}
+        <Link to="/signin" className="nav-signin">
+          Sign In
+        </Link>
 
-        {/* Help */}
-        <button className="icon-button" aria-label="Help">
-          <CircleHelp size={20} />
-        </button>
-
-        {/* User profile */}
-        <button className="user-profile">
-          <CircleUserRound size={32} />
-
-          <div className="user-info">
-            <span>Alex</span>
-            <small>Explorer</small>
-          </div>
-
-          <ChevronDown size={14} />
-        </button>
-
-        {/* Sign out */}
-        <button className="sign-out" aria-label="Sign out">
-          <LogOut size={20} />
-          <span>Sign out</span>
-        </button>
+      
 
       </div>
+
     </header>
   )
 }
 
+
+
+
+// Export the navigation component
 export default Navbar

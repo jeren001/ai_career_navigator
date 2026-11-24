@@ -1,0 +1,132 @@
+/* ==========================================
+   PROJECT: AI CAREER
+   FILE: signup.css
+   PURPOSE: Registration page design
+========================================== */
+
+
+/* 01. REGISTRATION CARD */
+
+.signup-card {
+  width: 100%;
+  max-width: 480px;
+  padding: 32px 40px;
+}
+
+
+/* 02. PAGE TITLE */
+
+.signup-card .signin-title {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+
+/* 03. REGISTRATION FORM */
+
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+
+/* 04. INPUT FIELDS */
+
+.signup-form .signin-input {
+  min-height: 46px;
+}
+
+
+/* 05. CREATE ACCOUNT BUTTON */
+
+.signup-form .signin-submit {
+  margin-top: 8px;
+}
+
+
+/* 06. SOCIAL AUTHENTICATION */
+
+.signup-card .signin-divider {
+  margin: 20px 0;
+}
+
+
+/* 07. SIGN IN LINK */
+
+.signup-card .signin-register {
+  margin-top: 20px;
+}
+
+
+/* ==========================================
+   08. RESPONSIVE DESIGN - TABLET
+========================================== */
+
+@media (max-width: 1024px) {
+
+  .signup-card {
+    padding: 28px;
+  }
+
+}
+
+
+/* ==========================================
+   09. RESPONSIVE DESIGN - MOBILE
+========================================== */
+
+@media (max-width: 768px) {
+
+  .signup-card {
+    max-width: 100%;
+    padding: 26px 20px;
+  }
+
+  .signup-card .signin-title {
+    font-size: 26px;
+  }
+
+  .signup-form {
+    gap: 12px;
+  }
+
+  .signup-form .signin-input {
+    min-height: 48px;
+  }
+
+}
+
+/* Align password requirement icons and text */
+.signup-form .password-rule,
+.signup-form .password-match {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+/* Set icon size and alignment */
+.signup-form .password-rule svg,
+.signup-form .password-match svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+/* Default requirement color */
+.signup-form .password-rule {
+  color: #64748b;
+}
+
+/* Completed requirement color */
+.signup-form .password-rule.valid,
+.signup-form .password-match.valid {
+  color: #16a34a;
+}
+
+/* Incorrect password confirmation */
+.signup-form .password-match.invalid {
+  color: #dc2626;
+}
