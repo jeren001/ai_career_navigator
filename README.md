@@ -43,3 +43,121 @@ Verify the seeded data with:
 ```sh
 psql -d career_compass -c "SELECT count(*) AS active_careers, count(DISTINCT cluster) AS clusters FROM career_roles WHERE is_active = TRUE;"
 ```
+
+## Adaptive assessment API
+
+The MVP assessment is rule-based and keeps its in-progress state in the API process. It asks 18 questions, starts with five general questions, then selects follow-up questions using the strongest signals collected so far. Every active career receives a weighted score, so one answer never removes an entire field from consideration.
+
+Start an assessment. `user_id` is optional. When omitted, the API creates a guest in `users`.
+
+```http
+POST /api/assessment/start
+Content-Type: application/json
+
+{ "user_id": 7 }
+```
+
+The response contains `assessment_id`, `user_id`, the first public question, and progress. Public question options include only `id` and `label`.
+
+Submit the currently displayed option. `note` is optional and limited to 1000 characters.
+
+```http
+POST /api/assessment/answer
+Content-Type: application/json
+
+{
+  "assessment_id": "<assessment_id>",
+  "question_id": "q1",
+  "option_id": "q1-analytical",
+  "note": "I enjoy checking assumptions."
+}
+```
+
+The response returns the next adaptive question until question 18. The final response has `complete: true` and a `result` containing `trait_scores`, `directions`, `specializations`, and `professions`. Each recommendation includes a match percentage and a reason. The completed result is stored in `quiz_sessions`.
+
+For clients that already collect the full answer list, `POST /api/quiz/evaluate` accepts 15–18 validated answers in the same `{ question_id, option_id, note }` shape and returns the completed result immediately. The same endpoint is also available at `/api/assessment/evaluate`.
+
+Example start response:
+
+```json
+{
+  "assessment_id": "<assessment_id>",
+  "user_id": 7,
+  "question": {
+    "id": "q1",
+    "dimension": "personality",
+    "text": "Which kind of work feels most energising?",
+    "options": [
+      { "id": "q1-analytical", "label": "Finding patterns, testing ideas, and solving puzzles" },
+      { "id": "q1-creative", "label": "Creating concepts, visuals, or new experiences" }
+    ]
+  },
+  "progress": { "answered": 0, "target": 18 }
+}
+```
+
+Example answer response while the assessment is in progress:
+
+```json
+{
+  "complete": false,
+  "assessment_id": "<assessment_id>",
+  "question": {
+    "id": "q7",
+    "dimension": "skills",
+    "text": "Which technology task would you most like to practise?",
+    "options": [
+      { "id": "q7-software", "label": "Designing and testing software or APIs" }
+    ]
+  },
+  "progress": { "answered": 6, "target": 18 }
+}
+```
+
+Example completed response shape:
+
+```json
+{
+  "complete": true,
+  "result": {
+    "assessment_id": "<assessment_id>",
+    "session_id": 123,
+    "user_id": 7,
+    "trait_scores": {
+      "analytics": 74,
+      "creativity": 17,
+      "people": 17,
+      "structure": 100,
+      "autonomy": 52
+    },
+    "directions": [
+      {
+        "name": "Technology & AI",
+        "match_percent": 100,
+        "reason": "Your answers point to analytics, structure, and coding, which aligns with Technology & AI roles."
+      }
+    ],
+    "specializations": [
+      {
+        "name": "Data warehousing",
+        "match_percent": 86,
+        "reason": "This specialization connects to your strongest matching profession, Data Engineer."
+      }
+    ],
+    "professions": [
+      {
+        "id": 1,
+        "slug": "backend-engineer",
+        "title": "Backend Engineer",
+        "cluster": "Tech & Data",
+        "summary": "Builds APIs, data models, and services that keep applications reliable as usage grows.",
+        "niche_pivot_friendly": false,
+        "match_percent": 100,
+        "reason": "This fits your signals around analytics, structure, and coding and your interest in Technology & AI."
+      }
+    ]
+  }
+}
+```
+
+Validation returns HTTP 400 for unknown questions, invalid options, duplicate questions, missing required fields, malformed answer arrays, and notes longer than 1000 characters. Assessment state is process-local until completion, so a restart invalidates unfinished assessments. The persisted completed session remains in PostgreSQL.

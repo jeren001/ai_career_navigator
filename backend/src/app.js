@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express from 'express';
 import pool from './db/pool.js';
+import assessmentRouter from './routes/assessment.js';
 import careersRouter from './routes/careers.js';
 import healthRouter from './routes/health.js';
 
@@ -11,6 +12,8 @@ export function createApp(database = pool) {
   app.use(express.json());
   app.use('/api', healthRouter);
   app.use('/api/careers', careersRouter(database));
+  app.use('/api/assessment', assessmentRouter(database));
+  app.use('/api/quiz', assessmentRouter(database));
   app.use((request, response) => {
     response.status(404).json({ error: 'Route not found' });
   });
