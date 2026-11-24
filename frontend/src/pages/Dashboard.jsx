@@ -5,8 +5,13 @@
 // PURPOSE: Main user dashboard
 // ==========================================
 
-// Import dashboard layout
+// Import dashboard components
 import DashboardLayout from '../components/dashboard/DashboardLayout'
+import DashboardBackground from '../components/dashboard/DashboardBackground'
+import WelcomeSection from '../components/dashboard/WelcomeSection'
+
+// Import dashboard content styles
+import '../styles/dashboard-content.css'
 
 
 function Dashboard() {
@@ -14,10 +19,15 @@ function Dashboard() {
   return (
     <DashboardLayout>
 
-      {/* Dashboard page content */}
-      <h1 className="dashboard-title">
-        Dashboard
-      </h1>
+      <div className="dashboard-hero">
+
+        {/* 01. Decorative background */}
+        <DashboardBackground />
+
+        {/* 02. Personalized welcome section */}
+        <WelcomeSection userName="Alex" />
+
+      </div>
 
     </DashboardLayout>
   )
