@@ -1,10 +1,13 @@
 import { createHash } from 'node:crypto';
 import { GoogleGenAI } from '@google/genai';
 
-const DEFAULT_MODEL = 'gemini-3.8-flash';
+const DEFAULT_MODEL = 'gemini-3.1-flash-lite';
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const MIN_REQUEST_INTERVAL_MS = 3000;
 const MAX_REQUESTS_PER_MINUTE = 10;
+const MAX_RETRIES = 2;
+const RETRY_BASE_DELAY_MS = 250;
+const RETRY_MAX_DELAY_MS = 2000;
 const cache = new Map();
 const inFlight = new Map();
 let lastRequestAt = 0;
@@ -137,6 +140,60 @@ function consumeRequestSlot(now) {
   return true;
 }
 
+function consumeRetrySlot(now) {
+  requestTimes = requestTimes.filter((time) => now - time < 60_000);
+  if (requestTimes.length >= MAX_REQUESTS_PER_MINUTE) return false;
+  requestTimes.push(now);
+  return true;
+}
+
+function errorStatus(error) {
+  return Number(error?.status || error?.code || error?.response?.status) || undefined;
+}
+
+function isTransientError(error) {
+  const status = errorStatus(error);
+  if (status === 408 || status === 429 || (status >= 500 && status <= 599)) return true;
+  const message = `${error?.message || ''} ${error?.cause?.message || ''}`;
+  return /fetch failed|ECONNRESET|ECONNREFUSED|ENOTFOUND|EAI_AGAIN|ETIMEDOUT|UND_ERR/i.test(message);
+}
+
+function isNetworkError(error) {
+  const message = `${error?.message || ''} ${error?.cause?.message || ''}`;
+  return /fetch failed|ECONNRESET|ECONNREFUSED|ENOTFOUND|EAI_AGAIN|ETIMEDOUT|UND_ERR/i.test(message);
+}
+
+function fallbackReason(error) {
+  const status = errorStatus(error);
+  if (error?.rateLimited) return 'rate_limited';
+  if (status === 429) return 'quota_exceeded';
+  if (status >= 500) return 'service_unavailable';
+  if (isNetworkError(error)) return 'network_error';
+  return 'unavailable';
+}
+
+function wait(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+async function generateWithRetry(client, request) {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await client.models.generateContent(request);
+    } catch (error) {
+      if (attempt >= MAX_RETRIES || !isTransientError(error)) throw error;
+      if (!consumeRetrySlot(Date.now())) {
+        const rateLimitError = new Error('Gemini retry budget exhausted');
+        rateLimitError.status = 429;
+        rateLimitError.rateLimited = true;
+        throw rateLimitError;
+      }
+      const delay = Math.min(RETRY_BASE_DELAY_MS * (2 ** attempt), RETRY_MAX_DELAY_MS);
+      await wait(delay);
+    }
+  }
+}
+
 export async function enrichRecommendations(context) {
   const input = compactInput(context);
   const key = cacheKey(input);
@@ -155,16 +212,16 @@ export async function enrichRecommendations(context) {
 
   const request = (async () => {
     try {
-      const response = await client.models.generateContent({
+      const response = await generateWithRetry(client, {
         model: process.env.GEMINI_MODEL || DEFAULT_MODEL,
         contents: promptFor(input),
         config: {
           responseMimeType: 'application/json',
           responseJsonSchema,
-          maxOutputTokens: 900,
+          maxOutputTokens: 600,
           temperature: 0.3,
         },
-        httpOptions: { timeout: 7000, maxRetries: 0 },
+        httpOptions: { timeout: 15000, maxRetries: 0 },
       });
       const parsed = JSON.parse(response.text || '');
       const allowedSlugs = new Set(input.professions.map((profession) => profession.slug));
@@ -173,8 +230,7 @@ export async function enrichRecommendations(context) {
       cache.set(key, { createdAt: now, value: result });
       return { ...result, status: 'ai', cached: false };
     } catch (error) {
-      const reason = error?.status === 429 || error?.code === 429 ? 'quota_exceeded' : 'unavailable';
-      return statusFallback(reason);
+      return statusFallback(fallbackReason(error));
     }
   })();
   inFlight.set(key, request);

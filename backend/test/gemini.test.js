@@ -55,8 +55,10 @@ test('Gemini enrichment preserves deterministic ordering and percentages', async
   const result = addEnrichment(context.recommendations, enriched);
 
   assert.equal(request.model, GEMINI_DEFAULT_MODEL);
-  assert.equal(request.config.maxOutputTokens, 900);
+  assert.equal(request.config.maxOutputTokens, 600);
   assert.equal(request.config.responseMimeType, 'application/json');
+  assert.equal(request.httpOptions.timeout, 15000);
+  assert.equal(request.httpOptions.maxRetries, 0);
   assert.equal(enriched.status, 'ai');
   assert.deepEqual(result.professions.map((role) => role.slug), ['data-analyst', 'ux-designer']);
   assert.deepEqual(result.professions.map((role) => role.match_percent), [100, 80]);
@@ -102,6 +104,50 @@ test('Gemini quota errors return fallback and invalid slugs are rejected', async
     },
   });
   assert.equal((await enrichRecommendations(context)).reason, 'invalid_response');
+});
+
+test('Gemini retries transient failures with bounded backoff', async () => {
+  let calls = 0;
+  setGeminiClientForTests({
+    models: {
+      async generateContent() {
+        calls += 1;
+        if (calls < 3) {
+          const error = new Error('temporary capacity');
+          error.status = 503;
+          throw error;
+        }
+        return { text: JSON.stringify(validResponse) };
+      },
+    },
+  });
+
+  const result = await enrichRecommendations(context);
+  assert.equal(result.status, 'ai');
+  assert.equal(calls, 3);
+});
+
+test('Gemini classifies exhausted service and network failures for fallback', async () => {
+  setGeminiClientForTests({
+    models: {
+      async generateContent() {
+        const error = new Error('temporary capacity');
+        error.status = 503;
+        throw error;
+      },
+    },
+  });
+  assert.equal((await enrichRecommendations(context)).reason, 'service_unavailable');
+
+  resetGeminiStateForTests();
+  setGeminiClientForTests({
+    models: {
+      async generateContent() {
+        throw new TypeError('fetch failed');
+      },
+    },
+  });
+  assert.equal((await enrichRecommendations(context)).reason, 'network_error');
 });
 
 test('Gemini caches duplicate profiles and applies request frequency limits', async () => {
