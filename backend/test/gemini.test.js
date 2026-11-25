@@ -57,8 +57,8 @@ test('Gemini enrichment preserves deterministic ordering and percentages', async
   assert.equal(request.model, GEMINI_DEFAULT_MODEL);
   assert.equal(request.config.maxOutputTokens, 600);
   assert.equal(request.config.responseMimeType, 'application/json');
-  assert.equal(request.httpOptions.timeout, 15000);
-  assert.equal(request.httpOptions.maxRetries, 0);
+  assert.equal(request.config.httpOptions.timeout, 15000);
+  assert.equal(request.config.httpOptions.retryOptions.attempts, 1);
   assert.equal(enriched.status, 'ai');
   assert.deepEqual(result.professions.map((role) => role.slug), ['data-analyst', 'ux-designer']);
   assert.deepEqual(result.professions.map((role) => role.match_percent), [100, 80]);
@@ -187,6 +187,7 @@ test('Gemini coalesces concurrent requests for the same assessment', async () =>
 
   const first = enrichRecommendations(context);
   const second = enrichRecommendations(context);
+  await Promise.resolve();
   assert.equal(calls, 1);
 
   resolveResponse();
@@ -194,4 +195,79 @@ test('Gemini coalesces concurrent requests for the same assessment', async () =>
   assert.equal(firstResult.status, 'ai');
   assert.equal(secondResult.status, 'ai');
   assert.deepEqual(firstResult, secondResult);
+});
+
+test('daily allowance is reserved only for uncached model requests', async () => {
+  let reservations = 0;
+  let calls = 0;
+  setGeminiClientForTests({
+    models: {
+      async generateContent() {
+        calls += 1;
+        return { text: JSON.stringify(validResponse) };
+      },
+    },
+  });
+
+  const request = { ...context, beforeRequest: async () => { reservations += 1; return true; } };
+  assert.equal((await enrichRecommendations(request)).status, 'ai');
+  assert.equal((await enrichRecommendations(request)).cached, true);
+  assert.equal(reservations, 1);
+  assert.equal(calls, 1);
+
+  resetGeminiStateForTests();
+  setGeminiClientForTests({ models: { async generateContent() { calls += 1; return { text: JSON.stringify(validResponse) }; } } });
+  const limited = await enrichRecommendations({ ...context, beforeRequest: async () => false });
+  assert.equal(limited.reason, 'daily_limit');
+  assert.equal(calls, 1);
+});
+
+test('concurrent quota checks coalesce and process-limited requests leave daily usage alone', async () => {
+  let reservations = 0;
+  let allowRequest;
+  let calls = 0;
+  setGeminiClientForTests({
+    models: {
+      async generateContent() {
+        calls += 1;
+        return { text: JSON.stringify(validResponse) };
+      },
+    },
+  });
+  const request = {
+    ...context,
+    userId: 1,
+    beforeRequest() {
+      reservations += 1;
+      return new Promise((resolve) => { allowRequest = resolve; });
+    },
+  };
+  const first = enrichRecommendations(request);
+  const second = enrichRecommendations(request);
+  assert.equal((await enrichRecommendations({ ...request, userId: 2 })).reason, 'rate_limited');
+  assert.equal(reservations, 1);
+  allowRequest(true);
+  assert.deepEqual(await first, await second);
+  assert.equal(calls, 1);
+});
+
+test('the rolling process quota includes retries', async (t) => {
+  let now = Date.now();
+  let calls = 0;
+  t.mock.method(Date, 'now', () => now);
+  setGeminiClientForTests({
+    models: {
+      async generateContent() {
+        calls += 1;
+        throw Object.assign(new Error('temporary capacity'), { status: 503 });
+      },
+    },
+  });
+
+  for (let userId = 1; userId <= 5; userId += 1) {
+    const result = await enrichRecommendations({ ...context, userId });
+    assert.equal(result.reason, userId < 4 ? 'service_unavailable' : 'rate_limited');
+    now += 3_100;
+  }
+  assert.equal(calls, 10);
 });

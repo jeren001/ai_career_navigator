@@ -2,8 +2,10 @@ import cors from 'cors';
 import express from 'express';
 import pool from './db/pool.js';
 import assessmentRouter from './routes/assessment.js';
+import authRouter from './routes/auth.js';
 import careersRouter from './routes/careers.js';
 import healthRouter from './routes/health.js';
+import profileRouter from './routes/profile.js';
 
 export function createApp(database = pool) {
   const app = express();
@@ -11,6 +13,8 @@ export function createApp(database = pool) {
   app.use(cors());
   app.use(express.json());
   app.use('/api', healthRouter);
+  app.use('/api/auth', authRouter(database));
+  app.use('/api/profile', profileRouter(database));
   app.use('/api/careers', careersRouter(database));
   app.use('/api/assessment', assessmentRouter(database));
   app.use('/api/quiz', assessmentRouter(database));
@@ -18,9 +22,8 @@ export function createApp(database = pool) {
     response.status(404).json({ error: 'Route not found' });
   });
   app.use((error, request, response, next) => {
-    const status = Number.isInteger(error.status) && error.status >= 400 && error.status < 500
-      ? error.status
-      : 500;
+    const clientError = Number.isInteger(error.status) && error.status >= 400 && error.status < 500;
+    const status = clientError || error.status === 503 ? error.status : 500;
     const message = status === 500 ? 'Internal server error' : error.message;
 
     response.status(status).json({ error: message });

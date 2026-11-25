@@ -6,6 +6,16 @@ CREATE TABLE users (
     display_name text,
     background text,
     profile_signals jsonb NOT NULL DEFAULT '{}'::jsonb,
+    password_hash text,
+    is_guest boolean NOT NULL DEFAULT true,
+    country text,
+    preferred_language text NOT NULL DEFAULT 'en' CHECK (preferred_language IN ('en', 'zh-CN')),
+    age_group text CHECK (age_group IS NULL OR age_group IN ('under_18', '18_24', '25_34', '35_44', '45_plus', 'prefer_not_to_say')),
+    education text,
+    work_experience text,
+    interests text[] NOT NULL DEFAULT ARRAY[]::text[],
+    skills text[] NOT NULL DEFAULT ARRAY[]::text[],
+    career_goals text,
     created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT users_email_nonblank CHECK (email IS NULL OR btrim(email) <> ''),
     CONSTRAINT users_profile_signals_object CHECK (jsonb_typeof(profile_signals) = 'object')
@@ -47,6 +57,14 @@ CREATE TABLE quiz_sessions (
 
 -- Recommendation snapshots preserve the original order, scores, and explanations.
 CREATE INDEX quiz_sessions_user_history_idx ON quiz_sessions (user_id, completed_at DESC, id DESC);
+
+CREATE TABLE ai_usage_daily (
+    user_id integer NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    usage_date date NOT NULL DEFAULT CURRENT_DATE,
+    request_count smallint NOT NULL DEFAULT 0 CHECK (request_count >= 0),
+    request_limit smallint NOT NULL CHECK (request_limit > 0),
+    PRIMARY KEY (user_id, usage_date)
+);
 
 -- Each row tracks a day in the single saved challenge for a user and role.
 CREATE TABLE challenge_progress (

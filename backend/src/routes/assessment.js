@@ -9,6 +9,9 @@ import {
   validateAnswers,
 } from '../services/assessment.js';
 import { addEnrichment, enrichRecommendations } from '../services/gemini.js';
+import { assertAuthConfigured, createAccessToken, optionalAuthentication } from '../services/auth.js';
+import { reserveDailyAiRequest } from '../services/ai-limits.js';
+import { buildUserContext } from '../services/user-context.js';
 
 const sessions = new Map();
 
@@ -16,13 +19,6 @@ function validationError(message) {
   const error = new Error(message);
   error.status = 400;
   return error;
-}
-
-function positiveInteger(value, field) {
-  if (!Number.isInteger(value) || value < 1) {
-    throw validationError(`${field} must be a positive integer`);
-  }
-  return value;
 }
 
 function bodyObject(body) {
@@ -34,23 +30,11 @@ function bodyObject(body) {
 
 async function createGuest(database) {
   const result = await database.query(
-    `INSERT INTO users (display_name, background)
-     VALUES ('Guest', 'Career assessment participant')
+    `INSERT INTO users (display_name, background, is_guest)
+     VALUES ('Guest', 'Career assessment participant', TRUE)
      RETURNING id`,
   );
   return result.rows[0].id;
-}
-
-async function resolveUser(database, rawUserId) {
-  if (rawUserId === undefined) return createGuest(database);
-  const userId = positiveInteger(rawUserId, 'user_id');
-  const result = await database.query('SELECT id FROM users WHERE id = $1', [userId]);
-  if (result.rows.length === 0) {
-    const error = new Error('User not found');
-    error.status = 404;
-    throw error;
-  }
-  return userId;
 }
 
 async function loadRoles(database) {
@@ -75,6 +59,24 @@ async function persistResult(database, state, answers, evaluation) {
   return result.rows[0] || {};
 }
 
+async function enrichForUser(database, userId, isGuest, answers, evaluation) {
+  let userContext;
+  try {
+    userContext = await buildUserContext(database, userId);
+  } catch {
+    userContext = undefined;
+  }
+  return enrichRecommendations({
+    userId,
+    answers,
+    traitScores: evaluation.trait_scores,
+    recommendations: evaluation.recommendations,
+    userContext,
+    isGuest,
+    beforeRequest: () => reserveDailyAiRequest(database, userId),
+  });
+}
+
 async function finish(database, state) {
   const roles = await loadRoles(database);
   if (roles.length === 0) {
@@ -84,11 +86,7 @@ async function finish(database, state) {
   }
   const evaluation = evaluateAnswers(state.answers, roles);
   const saved = await persistResult(database, state, state.answers, evaluation);
-  const enrichment = await enrichRecommendations({
-    answers: state.answers,
-    traitScores: evaluation.trait_scores,
-    recommendations: evaluation.recommendations,
-  });
+  const enrichment = await enrichForUser(database, state.userId, state.isGuest, state.answers, evaluation);
   return {
     assessment_id: state.id,
     session_id: saved.id || null,
@@ -101,17 +99,23 @@ async function finish(database, state) {
 
 export default function createAssessmentRouter(database) {
   const router = Router();
+  router.use(optionalAuthentication(database));
 
   router.post('/start', async (request, response, next) => {
     try {
       const body = bodyObject(request.body || {});
-      const userId = await resolveUser(database, body.user_id);
+      if ('user_id' in body) throw validationError('user_id is assigned by the authentication token');
+      if (!request.auth) assertAuthConfigured();
+      const userId = request.auth?.userId || await createGuest(database);
+      const isGuest = request.auth?.isGuest ?? true;
       const state = createAssessmentState(userId);
+      state.isGuest = isGuest;
       sessions.set(state.id, state);
 
       return response.status(201).json({
         assessment_id: state.id,
         user_id: state.userId,
+        ...(!request.auth ? { access_token: createAccessToken({ id: userId, is_guest: true }), token_type: 'Bearer' } : {}),
         question: initialQuestion(),
         progress: { answered: 0, target: MAX_QUESTIONS },
       });
@@ -133,6 +137,11 @@ export default function createAssessmentRouter(database) {
       if (!state) {
         const error = new Error('Assessment not found or expired');
         error.status = 404;
+        throw error;
+      }
+      if (!request.auth || request.auth.userId !== state.userId) {
+        const error = new Error('Assessment requires its owner bearer token');
+        error.status = 403;
         throw error;
       }
 
@@ -182,21 +191,22 @@ export default function createAssessmentRouter(database) {
         error.status = 503;
         throw error;
       }
-      const userId = await resolveUser(database, body.user_id);
+      if ('user_id' in body) throw validationError('user_id is assigned by the authentication token');
+      if (!request.auth) assertAuthConfigured();
+      const userId = request.auth?.userId || await createGuest(database);
+      const isGuest = request.auth?.isGuest ?? true;
       const evaluation = evaluateAnswers(answers, roles);
       const state = createAssessmentState(userId);
       state.answers = answers;
+      state.isGuest = isGuest;
       const saved = await persistResult(database, state, answers, evaluation);
-      const enrichment = await enrichRecommendations({
-        answers,
-        traitScores: evaluation.trait_scores,
-        recommendations: evaluation.recommendations,
-      });
+      const enrichment = await enrichForUser(database, userId, isGuest, answers, evaluation);
 
       return response.status(201).json({
         assessment_id: state.id,
         session_id: saved.id || null,
         user_id: userId,
+        ...(!request.auth ? { access_token: createAccessToken({ id: userId, is_guest: true }), token_type: 'Bearer' } : {}),
         completed_at: saved.completed_at || new Date().toISOString(),
         trait_scores: evaluation.trait_scores,
         ...addEnrichment(evaluation.recommendations, enrichment),
@@ -204,6 +214,13 @@ export default function createAssessmentRouter(database) {
     } catch (error) {
       return next(error);
     }
+  });
+
+  router.use((error, request, response, next) => {
+    if (error.code === '42703' || error.code === '42P01') {
+      return response.status(503).json({ error: 'Assessment database schema is out of date' });
+    }
+    return next(error);
   });
 
   return router;

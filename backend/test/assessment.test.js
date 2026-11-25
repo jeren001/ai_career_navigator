@@ -50,15 +50,24 @@ const roles = [
 ];
 
 let sessionId;
+let guestToken;
 let server;
 let baseUrl;
 let nextSessionId = 42;
+let guestInsertError;
 const database = {
   async query(query, values = []) {
+    if (query.startsWith('SELECT id, is_guest FROM users')) return { rows: [{ id: values[0], is_guest: true }] };
     if (query.startsWith('SELECT id FROM users')) return { rows: values[0] === 7 ? [{ id: 7 }] : [] };
+    if (query.startsWith('INSERT INTO ai_usage_daily')) return { rows: [{ request_count: 1, request_limit: 1 }] };
+    if (query.includes('FROM users WHERE id = $1')) return { rows: [{ id: values[0], is_guest: true, interests: [], skills: [] }] };
+    if (query.includes('FROM quiz_sessions WHERE user_id = $1')) return { rows: [] };
     if (query.startsWith('SELECT * FROM career_roles')) return { rows: roles };
     if (query.startsWith('INSERT INTO quiz_sessions')) return { rows: [{ id: nextSessionId++, completed_at: '2026-11-24T00:00:00.000Z' }] };
-    if (query.startsWith('INSERT INTO users')) return { rows: [{ id: 7 }] };
+    if (query.startsWith('INSERT INTO users')) {
+      if (guestInsertError) throw guestInsertError;
+      return { rows: [{ id: 7 }] };
+    }
     throw new Error(`Unexpected query: ${query}`);
   },
 };
@@ -82,13 +91,15 @@ test('assessment starts with a general question', async () => {
   const response = await fetch(`${baseUrl}/api/assessment/start`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ user_id: 7 }),
+    body: JSON.stringify({}),
   });
   const result = await response.json();
   sessionId = result.assessment_id;
+  guestToken = result.access_token;
 
   assert.equal(response.status, 201);
   assert.equal(result.user_id, 7);
+  assert.equal(typeof guestToken, 'string');
   assert.equal(result.question.id, 'q1');
   assert.equal(result.question.options[0].weights, undefined);
   assert.deepEqual(result.progress, { answered: 0, target: 18 });
@@ -101,6 +112,17 @@ test('optional notes add rule-based hobby and skill signals', () => {
 
   assert.equal(signals.tags.creativity, 2);
   assert.equal(signals.tags['visual-design'], 2);
+});
+
+test('assessment start reports an outdated database schema as unavailable', async () => {
+  guestInsertError = Object.assign(new Error('column is_guest does not exist'), { code: '42703' });
+  try {
+    const response = await fetch(`${baseUrl}/api/assessment/start`, { method: 'POST' });
+    assert.equal(response.status, 503);
+    assert.deepEqual(await response.json(), { error: 'Assessment database schema is out of date' });
+  } finally {
+    guestInsertError = undefined;
+  }
 });
 
 test('adaptive selection uses general answers before focusing on a signal', () => {
@@ -125,7 +147,7 @@ test('weighted scoring keeps non-leading fields available', async () => {
   const response = await fetch(`${baseUrl}/api/quiz/evaluate`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ user_id: 7, answers }),
+    body: JSON.stringify({ answers }),
   });
   const result = await response.json();
 
@@ -141,7 +163,7 @@ test('weighted scoring keeps non-leading fields available', async () => {
 test('assessment rejects an answer for a question that is not current', async () => {
   const response = await fetch(`${baseUrl}/api/assessment/answer`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${guestToken}` },
     body: JSON.stringify({ assessment_id: sessionId, question_id: 'q6', option_id: 'q6-query' }),
   });
 
@@ -157,7 +179,7 @@ test('assessment adapts after general answers and completes with three recommend
     const option = question.options[0];
     const response = await fetch(`${baseUrl}/api/assessment/answer`, {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${guestToken}` },
       body: JSON.stringify({ assessment_id: sessionId, question_id: questionId, option_id: option.id }),
     });
     result = await response.json();
@@ -185,7 +207,7 @@ test('quiz evaluate validates answers and persists a completed result', async ()
   const response = await fetch(`${baseUrl}/api/quiz/evaluate`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ user_id: 7, answers }),
+    body: JSON.stringify({ answers }),
   });
   const result = await response.json();
 
