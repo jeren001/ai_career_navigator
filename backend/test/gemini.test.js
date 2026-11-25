@@ -23,7 +23,7 @@ const context = {
 
 const validResponse = {
   overview: 'Your evidence-first approach fits analytical roles.',
-  strengths: ['Pattern recognition', 'Structured problem solving'],
+  strengths: ['q1'],
   skills_to_develop: ['SQL practice', 'Communicating uncertainty'],
   roadmap: [
     { phase: 'Explore', action: 'Complete a small data exercise.', outcome: 'A short analysis.' },
@@ -64,6 +64,57 @@ test('Gemini enrichment preserves deterministic ordering and percentages', async
   assert.deepEqual(result.professions.map((role) => role.match_percent), [100, 80]);
   assert.equal(result.professions[0].ai_explanation, validResponse.profession_explanations[0].explanation);
   assert.equal(result.personalization.roadmap.length, 3);
+  assert.match(result.personalization.strengths[0], /^You selected “Finding patterns/);
+});
+
+test('unsupported claims in an overview or role explanation do not discard a grounded roadmap', async () => {
+  setGeminiClientForTests({
+    models: { async generateContent() {
+      return { text: JSON.stringify({ ...validResponse, strengths: ['certified engineer', 'q1'] }) };
+    } },
+  });
+  assert.equal((await enrichRecommendations(context)).strengths.length, 1);
+
+  resetGeminiStateForTests();
+  setGeminiClientForTests({
+    models: { async generateContent() {
+      return { text: JSON.stringify({
+        ...validResponse,
+        overview: 'You are a certified architect.',
+        profession_explanations: [
+          { slug: 'data-analyst', explanation: 'You are a qualified statistician.' },
+          validResponse.profession_explanations[1],
+        ],
+      }) };
+    } },
+  });
+  const result = await enrichRecommendations({ ...context, maxAttempts: 1 });
+  assert.equal(result.status, 'ai');
+  assert.equal(result.overview, 'The roadmap draws on your answers, interests, and career goals.');
+  assert.deepEqual(result.filtered_fields, { overview: true, profession_explanations: 1 });
+  assert.equal(result.profession_explanations['data-analyst'], undefined);
+  assert.deepEqual(result.roadmap, validResponse.roadmap);
+});
+
+test('Simplified Chinese guidance filters inferred ability and preserves attributed strengths', async () => {
+  setGeminiClientForTests({
+    models: { async generateContent() {
+      return { text: JSON.stringify({
+        ...validResponse,
+        strengths: ['skill-0'],
+        profession_explanations: [{
+          slug: 'data-analyst',
+          explanation: '该职业与你在志愿服务中展现的倾听与沟通能力相契合。',
+        }],
+      }) };
+    } },
+  });
+  const result = await enrichRecommendations({
+    ...context, language: 'zh-CN', userContext: { profile: { skills: ['活动组织'] } },
+  });
+  assert.equal(result.status, 'ai');
+  assert.deepEqual(result.strengths, ['你自述过 “活动组织”']);
+  assert.equal(result.filtered_fields.profession_explanations, 1);
 });
 
 test('Gemini fallback works when no API key is configured', async () => {

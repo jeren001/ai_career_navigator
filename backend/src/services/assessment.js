@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
-const GENERAL_QUESTION_IDS = ['q1', 'q2', 'q3', 'q4', 'q5'];
+export const GENERAL_QUESTION_IDS = ['q1', 'q2', 'q3', 'q4', 'q5', 'q19'];
+export const CLARIFICATION_START = GENERAL_QUESTION_IDS.length + 8;
 const MAX_QUESTIONS = 18;
 const NOTE_SIGNALS = {
   analysis: ['analytics', 'research'],
@@ -251,6 +252,17 @@ const QUESTIONS = [
       { id: 'q18-process', label: 'Improve a real process and document the result', weights: { structure: 2, operations: 2, communication: 1 } },
     ],
   },
+  {
+    id: 'q19',
+    dimension: 'career_stage',
+    text: 'Which stage best describes your career search today?',
+    options: [
+      { id: 'q19-exploring', label: 'Exploring options before choosing a first direction' },
+      { id: 'q19-entering', label: 'Preparing for a first job or internship' },
+      { id: 'q19-changing', label: 'Changing direction after working in another area' },
+      { id: 'q19-growing', label: 'Developing further in my current field' },
+    ],
+  },
 ];
 
 const QUESTIONS_BY_ID = new Map(QUESTIONS.map((question) => [question.id, question]));
@@ -288,15 +300,47 @@ export function collectSignals(answers) {
   for (const answer of answers) {
     const question = getQuestion(answer.question_id);
     const option = question?.options.find((candidate) => candidate.id === answer.option_id);
+    if (!question) continue;
+    if (answer.custom_answer) {
+      for (const tag of customKeywordMatches(answer.custom_answer)) addScores(signals.tags, { [tag]: 1 });
+    }
     if (!option) continue;
     addScores(signals.tags, option.weights);
     addScores(signals.fields, option.fieldWeights);
     for (const match of answer.note?.toLowerCase().matchAll(/[a-z]+/g) || []) {
-      addScores(signals.tags, Object.fromEntries((NOTE_SIGNALS[match[0]] || []).map((tag) => [tag, 1])));
+      if (Object.hasOwn(NOTE_SIGNALS, match[0])) {
+        addScores(signals.tags, Object.fromEntries(NOTE_SIGNALS[match[0]].map((tag) => [tag, 1])));
+      }
     }
   }
 
   return signals;
+}
+
+const CHINESE_SIGNALS = [
+  ['数据分析', ['analytics', 'data']], ['统计', ['statistics', 'analytics']],
+  ['编程', ['coding', 'technology']], ['视觉设计', ['creativity', 'visual-design']],
+  ['摄影', ['creativity', 'visual-design']], ['写作', ['writing', 'communication']],
+  ['教学', ['education', 'people']], ['健康科普', ['healthcare', 'communication']],
+  ['公益', ['public-service', 'people']], ['社区活动', ['organization', 'people']],
+];
+
+export function customKeywordMatches(text) {
+  const tags = new Set();
+  for (const clause of text.toLowerCase().split(/[.!?;。！？；\n]/u)) {
+    if (hasExplicitNegation(clause)) continue;
+    for (const word of clause.match(/[a-z]+/g) || []) {
+      if (Object.hasOwn(NOTE_SIGNALS, word)) NOTE_SIGNALS[word].forEach((tag) => tags.add(tag));
+    }
+    for (const [phrase, matches] of CHINESE_SIGNALS) {
+      if (clause.includes(phrase)) matches.forEach((tag) => tags.add(tag));
+    }
+  }
+  return [...tags].slice(0, 3);
+}
+
+export function hasExplicitNegation(text) {
+  return /\b(?:no|not|never|without|avoid|dislike|don['’]t|cannot)\b|不|没有|无意/iu.test(text);
 }
 
 function strongestSignals(signals) {
@@ -313,7 +357,9 @@ export function selectNextQuestion(answers) {
 
   const signals = collectSignals(answers);
   const strongest = strongestSignals(signals);
-  const adaptive = QUESTIONS.filter((question) => !answered.has(question.id));
+  // Keep the adaptive stage from revisiting the same broad preference.
+  const related = { q13: 'q5', q17: 'q4', q12: 'q15', q15: 'q12' };
+  const adaptive = QUESTIONS.filter(({ id }) => !answered.has(id) && !answered.has(related[id]));
   const candidate = adaptive
     .map((question, index) => ({
       question,
@@ -358,7 +404,7 @@ function roleScore(role, signals) {
   return 1 + tagScore + (fieldScore * 8);
 }
 
-function reasonForRole(role, signals) {
+function reasonForRole(role, signals, language) {
   const matched = roleTags(role)
     .map((tag) => ({ tag, score: signals.tags[tag] || 0 }))
     .filter(({ score }) => score > 0)
@@ -366,6 +412,10 @@ function reasonForRole(role, signals) {
     .slice(0, 3)
     .map(({ tag }) => tag.replaceAll('-', ' '));
   const field = roleField(role);
+  if (language === 'zh-CN') {
+    const evidence = matched.length ? `你的回答中提到的相关方向（${matched.join('、')}）` : '你的总体偏好';
+    return `此职业与${evidence}相符${signals.fields[field] ? `，也与你对 ${field} 的兴趣有关` : ''}。`;
+  }
   const evidence = matched.length ? matched.join(', ') : 'your broad preferences';
   return `This fits your signals around ${evidence}${signals.fields[field] ? ` and your interest in ${field}` : ''}.`;
 }
@@ -375,7 +425,7 @@ function percent(score, scores) {
   return Math.max(1, Math.round((score / max) * 100));
 }
 
-function recommendations(roles, signals) {
+function recommendations(roles, signals, language) {
   const scored = roles
     .map((role) => ({ role, score: roleScore(role, signals) }))
     .sort((left, right) => right.score - left.score || left.role.id - right.role.id);
@@ -397,7 +447,7 @@ function recommendations(roles, signals) {
       score,
       match_percent: percent(score, [...directionMap.values()].map(({ scores }) => scores.reduce((total, item) => total + item, 0) / scores.length)),
       score_basis: 'relative_to_top_direction',
-      reason: directionReason(name, value.roles, signals),
+      reason: directionReason(name, value.roles, signals, language),
       };
     })
     .sort((left, right) => right.score - left.score)
@@ -418,7 +468,8 @@ function recommendations(roles, signals) {
       name,
       match_percent: percent(value.score, scores),
       score_basis: 'relative_to_top_profession',
-      reason: `This specialization connects to your strongest matching profession, ${value.role}.`,
+      reason: language === 'zh-CN' ? `此专业方向与你匹配度最高的职业之一（${value.role}）相关。`
+        : `This specialization connects to your strongest matching profession, ${value.role}.`,
     }))
     .sort((left, right) => right.match_percent - left.match_percent || left.name.localeCompare(right.name))
     .slice(0, 5);
@@ -433,13 +484,13 @@ function recommendations(roles, signals) {
     market_pulse: role.market_pulse,
     match_percent: percent(score, scores),
     score_basis: 'relative_to_top_profession',
-    reason: reasonForRole(role, signals),
+    reason: reasonForRole(role, signals, language),
   }));
 
   return { directions, specializations, professions };
 }
 
-function directionReason(field, roles, signals) {
+function directionReason(field, roles, signals, language) {
   const matchedTags = new Map();
   for (const role of roles) {
     for (const tag of roleTags(role)) {
@@ -451,18 +502,22 @@ function directionReason(field, roles, signals) {
     .slice(0, 3)
     .map(([tag]) => tag.replaceAll('-', ' '));
   const reason = evidence.length ? evidence.join(', ') : 'your broad preferences';
+  if (language === 'zh-CN') {
+    const preferences = evidence.length ? `相关方向（${evidence.join('、')}）` : '总体偏好';
+    return `你的回答体现了${preferences}，与 ${field} 领域的职业相符。`;
+  }
   return `Your answers point to ${reason}, which aligns with ${field} roles.`;
 }
 
-export function evaluateAnswers(answers, roles) {
+export function evaluateAnswers(answers, roles, language = 'en') {
   const signals = collectSignals(answers);
   return {
     trait_scores: traitScores(signals),
-    recommendations: recommendations(roles, signals),
+    recommendations: recommendations(roles, signals, language),
   };
 }
 
-function validateAnswersInternal(rawAnswers, { minimum = 1, maximum = MAX_QUESTIONS } = {}) {
+function validateAnswersInternal(rawAnswers, { minimum = 1, maximum = MAX_QUESTIONS, questionFor = getQuestion } = {}) {
   if (!Array.isArray(rawAnswers) || rawAnswers.length < minimum || rawAnswers.length > maximum) {
     throw new Error(`answers must contain between ${minimum} and ${maximum} items`);
   }
@@ -471,18 +526,28 @@ function validateAnswersInternal(rawAnswers, { minimum = 1, maximum = MAX_QUESTI
     if (!answer || typeof answer !== 'object' || Array.isArray(answer)) {
       throw new Error('Each answer must be an object');
     }
-    const { question_id: questionId, option_id: optionId, note } = answer;
-    const question = getQuestion(questionId);
+    const { question_id: questionId, option_id: optionId, custom_answer: customAnswer, note } = answer;
+    const question = questionFor(questionId);
     if (!question) throw new Error(`Unknown question_id: ${questionId}`);
     if (seen.has(questionId)) throw new Error(`Question answered more than once: ${questionId}`);
     seen.add(questionId);
-    if (!question.options.some((option) => option.id === optionId)) {
+    if (customAnswer !== undefined && (typeof customAnswer !== 'string' || !customAnswer.trim() || customAnswer.length > 1000)) {
+      throw new Error('custom_answer must be a non-empty string with at most 1000 characters');
+    }
+    if (customAnswer !== undefined && optionId !== undefined) {
+      throw new Error('Provide either option_id or custom_answer');
+    }
+    if (customAnswer === undefined && !question.options.some((option) => option.id === optionId)) {
       throw new Error(`Invalid option_id for ${questionId}`);
     }
     if (note !== undefined && (typeof note !== 'string' || note.length > 1000)) {
       throw new Error('note must be a string with at most 1000 characters');
     }
-    return { question_id: questionId, option_id: optionId, ...(note ? { note: note.trim() } : {}) };
+    return {
+      question_id: questionId,
+      ...(customAnswer !== undefined ? { custom_answer: customAnswer.trim() } : { option_id: optionId }),
+      ...(note ? { note: note.trim() } : {}),
+    };
   });
 }
 

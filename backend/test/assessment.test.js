@@ -101,6 +101,8 @@ test('assessment starts with a general question', async () => {
   assert.equal(result.user_id, 7);
   assert.equal(typeof guestToken, 'string');
   assert.equal(result.question.id, 'q1');
+  assert.equal(result.question.allows_custom_answer, true);
+  assert.equal(result.stage, 'general');
   assert.equal(result.question.options[0].weights, undefined);
   assert.deepEqual(result.progress, { answered: 0, target: 18 });
 });
@@ -132,6 +134,7 @@ test('adaptive selection uses general answers before focusing on a signal', () =
     { question_id: 'q3', option_id: 'q3-deep-focus' },
     { question_id: 'q4', option_id: 'q4-clear' },
     { question_id: 'q5', option_id: 'q5-insight' },
+    { question_id: 'q19', option_id: 'q19-exploring' },
   ];
   const next = selectNextQuestion(generalAnswers);
 
@@ -172,31 +175,81 @@ test('assessment rejects an answer for a question that is not current', async ()
 });
 
 test('assessment adapts after general answers and completes with three recommendation levels', async () => {
-  let questionId = 'q1';
+  let question = QUESTIONS[0];
   let result;
+  const ids = new Set();
+  const stages = { general: 1, adaptive: 0, clarification: 0 };
   for (let index = 0; index < 18; index += 1) {
-    const question = QUESTIONS.find((candidate) => candidate.id === questionId);
-    const option = question.options[0];
+    ids.add(question.id);
+    const answer = index === 0 ? { custom_answer: 'I enjoy photography.' } : { option_id: question.options[0].id };
     const response = await fetch(`${baseUrl}/api/assessment/answer`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', authorization: `Bearer ${guestToken}` },
-      body: JSON.stringify({ assessment_id: sessionId, question_id: questionId, option_id: option.id }),
+      body: JSON.stringify({ assessment_id: sessionId, question_id: question.id, ...answer }),
     });
     result = await response.json();
     assert.equal(response.status, 200);
     if (index < 17) {
       assert.equal(result.complete, false);
-      questionId = result.question.id;
+      question = result.question;
+      stages[result.stage] += 1;
+      if (result.stage === 'clarification') assert.equal(question.source, 'fallback');
     }
   }
 
   assert.equal(result.complete, true);
+  assert.equal(ids.size, 18);
+  assert.ok(!(ids.has('q12') && ids.has('q15')));
+  assert.ok(!ids.has('q13') && !ids.has('q17'));
+  assert.deepEqual(stages, { general: 6, adaptive: 8, clarification: 4 });
+  assert.deepEqual(result.result.clarifications, { status: 'fallback', ai_questions: 0, reason: 'not_configured' });
+  assert.deepEqual(result.result.custom_analysis, [{
+    question_id: 'q1', source: 'fallback', evidence: null, scoring_keywords: ['creativity', 'visual-design'],
+  }]);
   assert.equal(result.result.user_id, 7);
   assert.equal(typeof result.result.trait_scores.analytics, 'number');
   assert.ok(result.result.directions.length > 0);
   assert.ok(result.result.specializations.length > 0);
   assert.ok(result.result.professions.length > 0);
   assert.equal(result.result.professions[0].reason.endsWith('.'), true);
+});
+
+test('Simplified Chinese questions keep their stable option IDs and custom answers are exclusive', async () => {
+  const response = await fetch(`${baseUrl}/api/assessment/start`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ language: 'zh-CN' }),
+  });
+  const start = await response.json();
+  assert.equal(start.language, 'zh-CN');
+  assert.match(start.question.text, /\p{Script=Han}/u);
+  assert.equal(start.question.options[0].id, 'q1-analytical');
+  const invalid = await fetch(`${baseUrl}/api/assessment/answer`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${start.access_token}` },
+    body: JSON.stringify({ assessment_id: start.assessment_id, question_id: 'q1', custom_answer: '数据分析', option_id: 'q1-analytical' }),
+  });
+  assert.equal(invalid.status, 400);
+  const answer = await fetch(`${baseUrl}/api/assessment/answer`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${start.access_token}` },
+    body: JSON.stringify({ assessment_id: start.assessment_id, question_id: 'q1', custom_answer: '数据分析' }),
+  });
+  const next = await answer.json();
+  assert.equal(answer.status, 200);
+  assert.equal(next.progress.answered, 1);
+  assert.match(next.question.text, /\p{Script=Han}/u);
+});
+
+test('custom text supplies capped keyword signals and skips explicit negation', () => {
+  const answers = [
+    { question_id: 'q1', custom_answer: '我喜欢数据分析。我不喜欢编程。' },
+    { question_id: 'q2', custom_answer: 'I enjoy photography and photography and writing.' },
+  ];
+  assert.deepEqual(collectSignals(answers), {
+    fields: {},
+    tags: { analytics: 1, data: 1, creativity: 1, 'visual-design': 1, writing: 1 },
+  });
 });
 
 test('quiz evaluate validates answers and persists a completed result', async () => {

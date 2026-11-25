@@ -1,16 +1,21 @@
 import { Router } from 'express';
 import {
+  CLARIFICATION_START,
+  customKeywordMatches,
+  GENERAL_QUESTION_IDS,
+  getQuestion,
   MAX_QUESTIONS,
   createAssessmentState,
   evaluateAnswers,
-  initialQuestion,
   publicQuestion,
   selectNextQuestion,
   validateAnswers,
 } from '../services/assessment.js';
+import { prepareClarifications } from '../services/assessment-clarifications.js';
+import { localizeBankQuestion } from '../services/assessment-language.js';
 import { addEnrichment, enrichRecommendations } from '../services/gemini.js';
 import { assertAuthConfigured, createAccessToken, optionalAuthentication } from '../services/auth.js';
-import { reserveDailyAiRequest } from '../services/ai-limits.js';
+import { assessmentAiBudget } from '../services/ai-limits.js';
 import { buildUserContext } from '../services/user-context.js';
 
 const sessions = new Map();
@@ -26,6 +31,50 @@ function bodyObject(body) {
     throw validationError('Request body must be an object');
   }
   return body;
+}
+
+async function assessmentLanguage(database, auth, language) {
+  if (language === 'en' || language === 'zh-CN') return language;
+  if (language === undefined) {
+    if (!auth || auth.isGuest) return 'en';
+    const { rows } = await database.query('SELECT preferred_language FROM users WHERE id = $1', [auth.userId]);
+    return rows[0]?.preferred_language === 'zh-CN' ? 'zh-CN' : 'en';
+  }
+  throw validationError('language must be en or zh-CN');
+}
+
+function publicProgress(state, question) {
+  const answered = state.answers.length;
+  const stage = answered < GENERAL_QUESTION_IDS.length ? 'general'
+    : answered < CLARIFICATION_START ? 'adaptive' : 'clarification';
+  return {
+    question: { ...publicQuestion(question), source: question.source || 'bank', allows_custom_answer: true },
+    progress: { answered, target: MAX_QUESTIONS },
+    stage,
+    language: state.language,
+    ...(state.clarificationPlan ? { clarifications: clarificationSummary(state.clarificationPlan) } : {}),
+  };
+}
+
+function clarificationSummary(plan) {
+  const count = plan.questions.filter(({ source }) => source === 'ai').length;
+  return {
+    status: count === 4 ? 'ai' : count ? 'mixed' : 'fallback',
+    ai_questions: count,
+    ...(plan.provider ? { provider: plan.provider } : {}),
+    ...(plan.reason ? { reason: plan.reason } : {}),
+  };
+}
+
+function customAnalysis(answers, earlierEvidence, enrichment) {
+  const evidence = new Map([...earlierEvidence, ...(enrichment.custom_evidence || [])]
+    .map((item) => [item.question_id, item]));
+  return answers.filter(({ custom_answer }) => custom_answer).map(({ question_id, custom_answer }) => ({
+    question_id,
+    source: evidence.has(question_id) ? 'ai' : 'fallback',
+    evidence: evidence.get(question_id) || null,
+    scoring_keywords: getQuestion(question_id) ? customKeywordMatches(custom_answer) : [],
+  }));
 }
 
 async function createGuest(database) {
@@ -59,7 +108,8 @@ async function persistResult(database, state, answers, evaluation) {
   return result.rows[0] || {};
 }
 
-async function enrichForUser(database, userId, isGuest, answers, evaluation) {
+async function enrichForUser(database, state, evaluation, isGuest, waitForSlot = false) {
+  const { userId, answers, language } = state;
   let userContext;
   try {
     userContext = await buildUserContext(database, userId);
@@ -72,28 +122,32 @@ async function enrichForUser(database, userId, isGuest, answers, evaluation) {
     traitScores: evaluation.trait_scores,
     recommendations: evaluation.recommendations,
     userContext,
-    isGuest,
-    beforeRequest: () => reserveDailyAiRequest(database, userId),
+    language,
+    ...assessmentAiBudget(database, state, isGuest, 'final'),
+    waitForSlot,
   });
 }
 
-async function finish(database, state) {
+async function finish(database, state, isGuest) {
   const roles = await loadRoles(database);
   if (roles.length === 0) {
     const error = new Error('No active career roles are available');
     error.status = 503;
     throw error;
   }
-  const evaluation = evaluateAnswers(state.answers, roles);
+  const evaluation = evaluateAnswers(state.answers, roles, state.language);
   const saved = await persistResult(database, state, state.answers, evaluation);
-  const enrichment = await enrichForUser(database, state.userId, state.isGuest, state.answers, evaluation);
+  const enrichment = await enrichForUser(database, state, evaluation, isGuest, true);
   return {
     assessment_id: state.id,
     session_id: saved.id || null,
     user_id: state.userId,
     completed_at: saved.completed_at || new Date().toISOString(),
     trait_scores: evaluation.trait_scores,
-    ...addEnrichment(evaluation.recommendations, enrichment),
+    language: state.language,
+    clarifications: clarificationSummary(state.clarificationPlan),
+    custom_analysis: customAnalysis(state.answers, state.clarificationPlan.custom_evidence, enrichment),
+    ...addEnrichment(evaluation.recommendations, enrichment, state.language),
   };
 }
 
@@ -105,19 +159,19 @@ export default function createAssessmentRouter(database) {
     try {
       const body = bodyObject(request.body || {});
       if ('user_id' in body) throw validationError('user_id is assigned by the authentication token');
+      const language = await assessmentLanguage(database, request.auth, body.language);
       if (!request.auth) assertAuthConfigured();
       const userId = request.auth?.userId || await createGuest(database);
-      const isGuest = request.auth?.isGuest ?? true;
       const state = createAssessmentState(userId);
-      state.isGuest = isGuest;
+      state.language = language;
+      state.question = localizeBankQuestion(getQuestion(GENERAL_QUESTION_IDS[0]), state.language);
       sessions.set(state.id, state);
 
       return response.status(201).json({
         assessment_id: state.id,
         user_id: state.userId,
         ...(!request.auth ? { access_token: createAccessToken({ id: userId, is_guest: true }), token_type: 'Bearer' } : {}),
-        question: initialQuestion(),
-        progress: { answered: 0, target: MAX_QUESTIONS },
+        ...publicProgress(state, state.question),
       });
     } catch (error) {
       return next(error);
@@ -145,37 +199,45 @@ export default function createAssessmentRouter(database) {
         throw error;
       }
 
-      const nextQuestion = selectNextQuestion(state.answers);
-      if (!nextQuestion || nextQuestion.id !== body.question_id) {
+      if (state.processing) return response.status(409).json({ error: 'Assessment answer is already being processed' });
+      const currentQuestion = state.question;
+      if (currentQuestion.id !== body.question_id) {
         throw validationError('question_id is not the current assessment question');
       }
 
       const [answer] = validateAnswers([{
         question_id: body.question_id,
         option_id: body.option_id,
+        custom_answer: body.custom_answer,
         note: body.note,
-      }]);
+      }], { questionFor: () => currentQuestion });
+      if (currentQuestion.source) answer.question = { ...publicQuestion(currentQuestion), source: currentQuestion.source };
       state.answers.push(answer);
-
-      if (state.answers.length >= MAX_QUESTIONS) {
-        const result = await finish(database, state);
-        sessions.delete(state.id);
-        return response.json({ complete: true, result });
+      state.processing = true;
+      try {
+        if (state.answers.length === MAX_QUESTIONS) {
+          const result = await finish(database, state, request.auth.isGuest);
+          sessions.delete(state.id);
+          return response.json({ complete: true, result });
+        }
+        if (state.answers.length === CLARIFICATION_START) {
+          state.clarificationPlan = await prepareClarifications({
+            userId: state.userId,
+            answers: state.answers,
+            language: state.language,
+            ...assessmentAiBudget(database, state, request.auth.isGuest, 'clarification'),
+          });
+        }
+        state.question = state.clarificationPlan
+          ? state.clarificationPlan.questions[state.answers.length - CLARIFICATION_START]
+          : localizeBankQuestion(selectNextQuestion(state.answers), state.language);
+        return response.json({ complete: false, assessment_id: state.id, ...publicProgress(state, state.question) });
+      } catch (error) {
+        state.answers.pop();
+        throw error;
+      } finally {
+        state.processing = false;
       }
-
-      const question = selectNextQuestion(state.answers);
-      if (!question) {
-        const result = await finish(database, state);
-        sessions.delete(state.id);
-        return response.json({ complete: true, result });
-      }
-
-      return response.json({
-        complete: false,
-        assessment_id: state.id,
-        question: publicQuestion(question),
-        progress: { answered: state.answers.length, target: MAX_QUESTIONS },
-      });
     } catch (error) {
       return next(error);
     }
@@ -185,6 +247,7 @@ export default function createAssessmentRouter(database) {
     try {
       const body = bodyObject(request.body);
       const answers = validateAnswers(body.answers, { minimum: 15, maximum: MAX_QUESTIONS });
+      const language = await assessmentLanguage(database, request.auth, body.language);
       const roles = await loadRoles(database);
       if (roles.length === 0) {
         const error = new Error('No active career roles are available');
@@ -194,13 +257,12 @@ export default function createAssessmentRouter(database) {
       if ('user_id' in body) throw validationError('user_id is assigned by the authentication token');
       if (!request.auth) assertAuthConfigured();
       const userId = request.auth?.userId || await createGuest(database);
-      const isGuest = request.auth?.isGuest ?? true;
-      const evaluation = evaluateAnswers(answers, roles);
+      const evaluation = evaluateAnswers(answers, roles, language);
       const state = createAssessmentState(userId);
       state.answers = answers;
-      state.isGuest = isGuest;
+      state.language = language;
       const saved = await persistResult(database, state, answers, evaluation);
-      const enrichment = await enrichForUser(database, userId, isGuest, answers, evaluation);
+      const enrichment = await enrichForUser(database, state, evaluation, request.auth?.isGuest ?? true);
 
       return response.status(201).json({
         assessment_id: state.id,
@@ -209,7 +271,9 @@ export default function createAssessmentRouter(database) {
         ...(!request.auth ? { access_token: createAccessToken({ id: userId, is_guest: true }), token_type: 'Bearer' } : {}),
         completed_at: saved.completed_at || new Date().toISOString(),
         trait_scores: evaluation.trait_scores,
-        ...addEnrichment(evaluation.recommendations, enrichment),
+        language,
+        custom_analysis: customAnalysis(answers, [], enrichment),
+        ...addEnrichment(evaluation.recommendations, enrichment, language),
       });
     } catch (error) {
       return next(error);
