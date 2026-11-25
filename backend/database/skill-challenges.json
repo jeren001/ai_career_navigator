@@ -1,0 +1,2049 @@
+{
+  "schemaVersion": 1,
+  "title": {
+    "en": "Practical career skill challenges",
+    "zh-CN": "职业能力实践挑战"
+  },
+  "locales": [
+    "en",
+    "zh-CN"
+  ],
+  "defaultLocale": "en",
+  "careerCatalog": {
+    "professionCount": 250,
+    "professionKey": "career_roles.slug",
+    "careerFieldKey": "career_roles.market_pulse.career_field"
+  },
+  "careerFields": [
+    "Technology & AI",
+    "Art & Design",
+    "Law & Legal",
+    "Medicine & Healthcare",
+    "Psychology & Mental Health",
+    "Business & Finance",
+    "Education & Research",
+    "Engineering & Architecture",
+    "Media & Communication",
+    "Environment & Social Impact"
+  ],
+  "executionGuidance": {
+    "en": "Use only supplied fictional materials, paper sketches, or local computations. No outside accounts, live systems, real personal data, clinical work, legal advice, physical engineering work, or third-party participants are needed. Use either language unless the deliverable explicitly evaluates bilingual work.",
+    "zh-CN": "仅使用给定的虚构材料、纸面草图或本地计算。无需外部账户、在线生产系统、真实个人信息、临床操作、法律建议、实体工程作业或第三方参与。除明确考查双语能力的交付物外，可任选一种语言作答。"
+  },
+  "rubricPolicy": {
+    "scale": [
+      0,
+      1
+    ],
+    "scoring": {
+      "en": "Award one point per criterion when the submitted artifact meets the entire stated condition and zero when evidence is missing or the condition is unmet. Score each criterion independently and sum within the challenge. Neither time taken nor presentation format changes scores unless included in a criterion.",
+      "zh-CN": "提交成果完全满足某项标准时给一分，缺少证据或未满足时给零分。各项独立评分，按单题合计。除非标准明确要求，否则完成用时或呈现形式不影响分数。"
+    },
+    "interpretation": {
+      "en": "Scores describe the submitted exercise only. Timing is an editorial estimate. These challenges do not establish professional qualifications, validated proficiency levels, or eligibility for a career.",
+      "zh-CN": "分数仅描述该次练习的提交成果，时间为编辑估算。本练习不能证明专业资质、经过验证的能力水平或从业资格。"
+    }
+  },
+  "challenges": [
+    {
+      "id": "sc-ta-query-library",
+      "careerField": "Technology & AI",
+      "professionSlugs": ["data-analyst","database-administrator"],
+      "skills": ["sql","data-analysis"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Library loan counts","zh-CN":"图书借阅统计"},
+      "description": {"en":"Toy loans (branch, status): East ok; East void; West ok; East ok; North void.","zh-CN":"模拟借阅（分馆、状态）：东馆有效；东馆作废；西馆有效；东馆有效；北馆作废。"},
+      "instructions": {"en":"Write SQL over a VALUES table to count valid loans per branch, including branches with zero valid loans. Sort by count descending then branch ascending.","zh-CN":"使用 VALUES 构造表，编写 SQL 按分馆统计有效借阅，保留有效数量为零的分馆。先按数量降序，再按分馆名升序。"},
+      "expectedDeliverable": {"en":"SQL and its result table.","zh-CN":"SQL 和查询结果表。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All three branches retained","zh-CN":"保留三个分馆"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"East 2, West 1, North 0","zh-CN":"东馆 2、西馆 1、北馆 0"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Rows follow the specified order","zh-CN":"结果按指定顺序排列"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ta-clean-donor-file",
+      "careerField": "Technology & AI",
+      "professionSlugs": ["data-engineer","scientific-software-developer"],
+      "skills": ["data-quality","coding"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Clean a toy contributor file","zh-CN":"清洗模拟捐助者文件"},
+      "description": {"en":"CSV rows (id, amount): A1,5; A1,5; A2,blank; A3,9; A4,-2. IDs are unique after deduplication and donations must be positive.","zh-CN":"CSV 记录（编号、金额）：A1,5；A1,5；A2,空；A3,9；A4,-2。去重后编号应唯一，捐款必须为正数。"},
+      "instructions": {"en":"Write a script or spreadsheet workflow that keeps the first valid occurrence, separates rejected rows with reasons, and reports accepted total.","zh-CN":"编写脚本或电子表格处理流程，保留每个编号首次出现的有效记录，分离拒绝记录并说明原因，报告有效金额合计。"},
+      "expectedDeliverable": {"en":"Runnable workflow, accepted rows, and rejection log.","zh-CN":"可运行的处理流程、有效记录及拒绝日志。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Accepted rows are A1 and A3 and total 14","zh-CN":"只保留 A1 和 A3，合计 14"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Three rejected rows have the correct distinct reasons","zh-CN":"三条拒绝记录分别标明正确原因"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"A rerun on the same input yields the same outputs","zh-CN":"相同输入重复运行得到一致输出"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ta-design-offline-states",
+      "careerField": "Technology & AI",
+      "professionSlugs": ["mobile-developer","accessibility-engineer"],
+      "skills": ["accessibility","user-experience"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Design three offline states","zh-CN":"设计三种离线状态"},
+      "description": {"en":"A fictional bus app has no live departures, has cached data from 08:15, and reconnecting can fail.","zh-CN":"某模拟公交应用无法获取实时班次，有 08:15 的缓存数据，重新连接可能失败。"},
+      "instructions": {"en":"Create screens for offline, reconnecting, and failed retry. Carry the cached timestamp across applicable states and specify visible status text and focus after retry.","zh-CN":"设计离线、重新连接中和重试失败三个界面。在适用状态下显示缓存时间，并注明状态提示及重试后焦点的位置。"},
+      "expectedDeliverable": {"en":"Three annotated wireframes.","zh-CN":"三张带注释的线框图。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All three states can be distinguished from their text alone","zh-CN":"仅根据文字即可区分三个状态"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Cached time is labeled as stale wherever shown","zh-CN":"显示缓存时间处清楚标注数据非实时"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Retry is actionable and focus on failure is specified","zh-CN":"重试操作可执行，且注明失败后的焦点"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ta-evaluate-routing",
+      "careerField": "Technology & AI",
+      "professionSlugs": ["ai-evaluation-specialist","machine-learning-engineer"],
+      "skills": ["model-evaluation","error-analysis"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Evaluate ticket routing","zh-CN":"评估工单分类"},
+      "description": {"en":"Six fictional tickets have gold labels B,T,T,B,B,T and predicted labels B,B,T,T,B,T, where B is billing and T is technical.","zh-CN":"六条虚构工单的标准标签为 B、T、T、B、B、T，预测标签为 B、B、T、T、B、T。B 代表账单，T 代表技术。"},
+      "instructions": {"en":"Build a labeled confusion matrix, calculate accuracy, and write one test-case idea targeting a pattern visible in the errors.","zh-CN":"制作带标签的混淆矩阵，计算准确率，并根据可见错误提出一条针对性测试用例。"},
+      "expectedDeliverable": {"en":"Confusion matrix, accuracy, and test case.","zh-CN":"混淆矩阵、准确率和测试用例。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Matrix has two correct predictions and one error in each true-label row","zh-CN":"每个真实类别所在行均为两个正确预测、一个错误"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Accuracy is 4/6 or 66.7% rounded","zh-CN":"准确率为 4/6，或四舍五入后为 66.7%"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Test case specifies an input and expected label for a billing-technical ambiguity","zh-CN":"用例给出一个账单与技术边界模糊的输入及预期标签"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ta-weather-units-function",
+      "careerField": "Technology & AI",
+      "professionSlugs": ["backend-engineer","scientific-software-developer"],
+      "skills": ["coding","automated-testing"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 30,
+      "title": {"en":"Implement a unit conversion","zh-CN":"实现单位换算"},
+      "description": {"en":"An internal display accepts finite numeric Celsius values and returns Fahrenheit rounded to one decimal. Booleans and strings must be rejected.","zh-CN":"一个内部显示模块接收有限的摄氏数值，返回保留一位小数的华氏温度，拒绝布尔值及字符串。"},
+      "instructions": {"en":"Implement F = C × 9/5 + 32. Add automated checks for -40, 0, 37, a numeric string, a boolean, and an infinite number.","zh-CN":"实现 F = C × 9/5 + 32，为 -40、0、37、数字字符串、布尔值及无穷值编写自动化测试。"},
+      "expectedDeliverable": {"en":"Function and runnable tests.","zh-CN":"函数及可运行的测试。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Valid values return -40.0, 32.0, and 98.6","zh-CN":"有效输入返回 -40.0、32.0、98.6"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"All specified invalid inputs, including booleans, are rejected","zh-CN":"拒绝包括布尔值在内的所有指定无效输入"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Tests cover three valid and three invalid examples","zh-CN":"测试覆盖三个有效和三个无效示例"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ta-analyse-cache-latency",
+      "careerField": "Technology & AI",
+      "professionSlugs": ["site-reliability-engineer","cloud-platform-engineer"],
+      "skills": ["observability","data-analysis"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 55,
+      "title": {"en":"Separate latency from traffic mix","zh-CN":"区分延迟与流量组成"},
+      "description": {"en":"Before: 90 cache hits at 10 ms, 10 misses at 100 ms. After: 50 hits at 8 ms, 50 misses at 90 ms. Target is overall mean below 30 ms.","zh-CN":"变更前：90 次命中，每次 10 毫秒；10 次未命中，每次 100 毫秒。变更后：50 次命中，每次 8 毫秒；50 次未命中，每次 90 毫秒。目标为总体平均低于 30 毫秒。"},
+      "instructions": {"en":"Compute both observed means and the after mean using the before mix. Present a recommendation and identify one missing measure relevant to service reliability.","zh-CN":"计算两组实际平均值，并以变更前的流量构成计算变更后的反事实平均值。提出建议，并指出一项与服务可靠性相关的缺失指标。"},
+      "expectedDeliverable": {"en":"Calculation sheet and short reliability memo.","zh-CN":"计算表和简短的可靠性备忘录。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Observed means are 19 and 49 ms","zh-CN":"实际平均值分别为 19 和 49 毫秒"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Fixed-mix mean is 16.2 ms","zh-CN":"固定流量结构下的平均值为 16.2 毫秒"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Recommendation addresses miss rate and names an unmeasured indicator such as p95","zh-CN":"建议回应未命中比例，并指出一项未测量指标，如 p95"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ta-specify-returns-workflow",
+      "careerField": "Technology & AI",
+      "professionSlugs": ["enterprise-systems-analyst","solutions-engineer"],
+      "skills": ["requirements-analysis","process-mapping"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Specify a returns workflow","zh-CN":"明确退货流程"},
+      "description": {"en":"A fictional shop allows returns up to and including day 30. No receipt requires review. Damaged returns go to review regardless of receipt if timely.","zh-CN":"模拟商店允许在第 30 天及之前退货。无小票需要审核，且在时限内的破损退货不论有无小票都需要审核。"},
+      "instructions": {"en":"Draw a decision table with outcomes accept, reject, or review, placing the time rule first. Supply examples for days 30 and 31 and a timely damaged item.","zh-CN":"制作决策表，输出接受、拒绝或审核，并优先判断时限。提供第 30 天、第 31 天以及时限内破损商品的示例。"},
+      "expectedDeliverable": {"en":"Decision table and three worked examples.","zh-CN":"决策表及三个演算示例。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Day 31 always rejects and day 30 can pass the time rule","zh-CN":"第 31 天一律拒绝，第 30 天可通过时限判断"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"No receipt or damage triggers review on eligible days","zh-CN":"满足时限时，无小票或破损触发审核"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Examples include all three requested boundary cases with expected outcomes","zh-CN":"示例包含三个指定边界情况并写明预期结果"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ta-manual-sorting-checks",
+      "careerField": "Technology & AI",
+      "professionSlugs": ["qa-automation-engineer","frontend-engineer"],
+      "skills": ["test-design","quality"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Verify a sort specification","zh-CN":"验证排序规范"},
+      "description": {"en":"A toy task list sorts incomplete tasks first and then by earliest due date. Equal dates preserve input order.","zh-CN":"模拟任务列表先显示未完成任务，再按截止日期从早到晚排序。日期相同时保持输入顺序。"},
+      "instructions": {"en":"Create six synthetic tasks that exercise completion, different dates, and tied dates. Hand-calculate the order and write checks suitable for an automated test.","zh-CN":"创建六条模拟任务，覆盖完成状态、不同日期及日期相同的情况。手工计算顺序，并编写便于自动化的检查。"},
+      "expectedDeliverable": {"en":"Fixture, expected ID order, and three test assertions.","zh-CN":"测试样例、预期编号顺序及三条测试断言。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Exactly six unique task IDs present","zh-CN":"包含六个不同的任务编号"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Expected order respects both sort keys and stability","zh-CN":"预期顺序满足两个排序键及稳定排序"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Assertions isolate completion, date order, and ties","zh-CN":"断言分别覆盖完成状态、日期排序及日期相同"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ta-document-access-change",
+      "careerField": "Technology & AI",
+      "professionSlugs": ["it-auditor","it-service-manager"],
+      "skills": ["control-testing","documentation"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Audit fictional access records","zh-CN":"审查虚构访问权限记录"},
+      "description": {"en":"Toy record A has approval and timestamps; B lacks approval; C shows approval after access began. Internal policy requires approval before access.","zh-CN":"模拟记录 A 有审批和时间戳；B 缺审批；C 的审批晚于访问开始。内部规则要求先审批再开通访问。"},
+      "instructions": {"en":"Make an exception log and propose one procedural control with an accountable owner and verification evidence. Use only the supplied records.","zh-CN":"制作例外日志，提出一项程序控制措施，注明负责人和验证证据。只使用题目提供的记录。"},
+      "expectedDeliverable": {"en":"Three-row audit log and short control proposal.","zh-CN":"三行审计日志及简短控制措施建议。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"A passes and B and C are separately flagged","zh-CN":"A 合格，B 和 C 分别标记为异常"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Evidence cited for B and C distinguishes missing from late approval","zh-CN":"分别注明 B 缺少审批和 C 审批滞后的证据"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Proposal names an owner and a checkable audit artifact","zh-CN":"建议明确负责人及可检查的审计记录"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ta-rank-map-sites",
+      "careerField": "Technology & AI",
+      "professionSlugs": ["geospatial-software-developer","business-intelligence-developer"],
+      "skills": ["spatial-sql","analytics"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 55,
+      "title": {"en":"Rank service sites on a grid","zh-CN":"给网格上的服务点排序"},
+      "description": {"en":"Demand points: (0,0) weight 3, (2,0) weight 2, (0,2) weight 4. Candidate sites: P (0,1), Q (2,1), R (1,0).","zh-CN":"需求点：(0,0) 权重 3，(2,0) 权重 2，(0,2) 权重 4。候选点：P (0,1)，Q (2,1)，R (1,0)。"},
+      "instructions": {"en":"Implement weighted Manhattan distance, rank candidates, then change the weight of (0,2) to 1 and rerun. Report both rankings and state why this is a toy model.","zh-CN":"计算加权曼哈顿距离并给候选点排序，再把 (0,2) 的权重改为 1 后重新计算。报告两个排序并说明该模型为何仅供练习。"},
+      "expectedDeliverable": {"en":"Reusable calculations and two ranked tables.","zh-CN":"可复用的计算过程及两张排序表。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Baseline score by P, Q, R is 13, 23, 17","zh-CN":"基线中 P、Q、R 的分值分别是 13、23、17"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Changed scores are 10, 14, 8 in P, Q, R order","zh-CN":"调整权重后 P、Q、R 的分值分别是 10、14、8"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Lower score sorts first and one real-world omission is named","zh-CN":"按分值从小到大排序，并指出一项现实中未纳入的因素"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ad-poster-hierarchy",
+      "careerField": "Art & Design",
+      "professionSlugs": ["graphic-designer","art-director"],
+      "skills": ["typography","layout"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Create a readable event poster","zh-CN":"制作易读的活动海报"},
+      "description": {"en":"A fictional repair fair is on May 18, 10:00–13:00, at Hall B. Entry is free and visitors should bring one broken object.","zh-CN":"模拟维修集市于 5 月 18 日 10:00 至 13:00 在 B 厅举行，免费入场，来访者应携带一件待修物品。"},
+      "instructions": {"en":"Make a poster with a text-only reading order. Use a clear title, timing and location block, and action line.","zh-CN":"制作海报并附纯文字阅读顺序，包含清晰的标题、时间地点区和行动提示。"},
+      "expectedDeliverable": {"en":"One poster and a text transcription.","zh-CN":"一张海报和一份文字转录。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Date, hours, and Hall B match the brief","zh-CN":"日期、时间和 B 厅与题目一致"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Free entry and one broken object are both stated","zh-CN":"注明免费入场及携带一件待修物品"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Transcript places title before event details and action","zh-CN":"文字转录依次呈现标题、活动详情和行动提示"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ad-shape-language",
+      "careerField": "Art & Design",
+      "professionSlugs": ["illustrator","book-designer"],
+      "skills": ["drawing","visual-composition"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 30,
+      "title": {"en":"Illustrate three actions without words","zh-CN":"用无字插图表达三个动作"},
+      "description": {"en":"An imaginary handbook needs icons for add, pause, and return. Each must also work as a single-color silhouette.","zh-CN":"虚构手册需要三个图标，分别表示添加、暂停和返回。每个图标还需适用于单色剪影。"},
+      "instructions": {"en":"Draw three icons on matching grids and provide a monochrome variant. Document which visual cue represents each action.","zh-CN":"在规格一致的网格上画出三个图标并提供单色版本，说明每个动作对应的视觉线索。"},
+      "expectedDeliverable": {"en":"Six icon tiles and three cue notes.","zh-CN":"六个图标图块和三条线索说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All three actions each have a normal and monochrome icon","zh-CN":"三个动作均有普通版和单色版图标"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Icons share the same drawing bounds","zh-CN":"图标的绘制边界规格一致"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Each note points to a different feature visible in its silhouette","zh-CN":"每条说明都对应剪影中可见且不同的特征"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ad-exhibition-route",
+      "careerField": "Art & Design",
+      "professionSlugs": ["exhibition-designer","museum-curator"],
+      "skills": ["visitor-flow","interpretive-design"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Plan a compact exhibit route","zh-CN":"规划小型展览动线"},
+      "description": {"en":"A fictional room has entry and exit at opposite corners, three numbered objects, and a bench. A compact route must leave one optional stop.","zh-CN":"虚构展厅的入口与出口位于对角，有三件编号展品和一张长椅。简洁的参观动线需保留一个可选停留点。"},
+      "instructions": {"en":"Draw a route past all objects including the optional stop and show a direct alternative to the exit. Write one short label (up to 20 English words or 40 Chinese characters) for object 1, a paper map of an old market.","zh-CN":"绘制参观全部展品的动线，包括可选停留点，并画出直接前往出口的替代路线。为 1 号展品（一张旧市场纸质地图）写一条不超过 20 个英文词或 40 个汉字的说明。"},
+      "expectedDeliverable": {"en":"Annotated room plan and object label.","zh-CN":"带注释的展厅平面图和展品说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Plan labels entry, exit, three objects, and bench","zh-CN":"平面图标明入口、出口、三件展品和长椅"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Optional stop and direct exit route are clearly different","zh-CN":"可选停留点与直达出口路线清楚可区分"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Label identifies the market map without adding unprovided facts","zh-CN":"展品说明指出这是市场地图，不加入题目未提供的事实"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ad-repeat-pattern",
+      "careerField": "Art & Design",
+      "professionSlugs": ["textile-designer","fashion-designer"],
+      "skills": ["repeat-design","material-sampling"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Design a seamless repeat tile","zh-CN":"设计无缝重复图案"},
+      "description": {"en":"A made-up fabric brief asks for a two-color pattern based on leaves and simple lines.","zh-CN":"虚构面料设计要求采用双色图案，以叶片和简洁线条为元素。"},
+      "instructions": {"en":"Create a square repeat unit. Match motifs crossing opposite edges and show a 2×2 preview without extra edit between tiles.","zh-CN":"制作一个方形重复单元，使越出边界的元素与对边对应，并展示无须额外调整的 2×2 拼接预览。"},
+      "expectedDeliverable": {"en":"Tile, 2×2 tiled preview, and color swatches.","zh-CN":"重复单元、2×2 拼接预览和色样。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Exactly two foreground/background colors in the tile","zh-CN":"重复单元的前景和背景合计只用两种颜色"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"At least one motif crosses and aligns on each axis","zh-CN":"横向与纵向至少各有一个跨边缘且对齐的元素"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Four preview tiles are unchanged copies","zh-CN":"预览中四个图块为未经修改的相同副本"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ad-motion-beats",
+      "careerField": "Art & Design",
+      "professionSlugs": ["animator","choreographer"],
+      "skills": ["storyboarding","motion-principles"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Storyboard a change of pace","zh-CN":"为节奏变化绘制分镜"},
+      "description": {"en":"In a six-second scene a paper boat drifts, bumps a dock, and changes direction.","zh-CN":"在六秒场景中，纸船漂浮、碰到船坞后改变方向。"},
+      "instructions": {"en":"Draw six frames with timestamps and direction arrows. Use close spacing before or after impact to show an intentional timing contrast.","zh-CN":"绘制六帧，标注时间和方向箭头。在碰撞前后用较密的帧间时间体现有意的节奏反差。"},
+      "expectedDeliverable": {"en":"Six-frame storyboard and timing notes.","zh-CN":"六帧分镜和节奏说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Six ordered timestamps are between zero and six seconds","zh-CN":"六个依次递增的时间戳均在 0 至 6 秒之间"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Frames visibly show drift, contact, and changed direction","zh-CN":"画面清楚表现漂浮、接触及改向"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Notes identify two intervals with different lengths and connect them to the action","zh-CN":"说明指出两个不同时长的间隔，并解释与动作之间的联系"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ad-fold-carton",
+      "careerField": "Art & Design",
+      "professionSlugs": ["industrial-designer","set-designer"],
+      "skills": ["prototyping","model-making"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Prototype a fold-flat holder","zh-CN":"制作可折平展示架原型"},
+      "description": {"en":"A fictional table display needs a holder for a paper card 10 cm wide and 7 cm high. Use only paper or a drawing tool.","zh-CN":"虚构桌面展陈需要支撑一张宽 10 厘米、高 7 厘米的纸卡。只使用纸张或绘图工具。"},
+      "instructions": {"en":"Draw or fold a holder with a stable base. Mark dimensions and fold lines, and show its flat and assembled states.","zh-CN":"绘制或折叠一个有稳固底座的支架，标注尺寸及折线，展示平铺和组装两种状态。"},
+      "expectedDeliverable": {"en":"Annotated flat pattern and assembled sketch or image.","zh-CN":"带注释的平铺纸样和组装草图或图像。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Both states are present and correspond to one design","zh-CN":"两种状态齐全且属于同一设计"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Card dimensions and contact points are explicit","zh-CN":"明确标明纸卡尺寸及接触点"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"The base is shown supporting the card without an added fastener","zh-CN":"图示说明底座无须额外紧固件即可支撑纸卡"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ad-revise-wayfinding",
+      "careerField": "Art & Design",
+      "professionSlugs": ["ux-designer","interior-designer"],
+      "skills": ["accessibility","wayfinding"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 55,
+      "title": {"en":"Revise a confusing wayfinding system","zh-CN":"改进令人困惑的导视系统"},
+      "description": {"en":"A fictional clinic lobby has check-in straight ahead, restrooms left, and an elevator right. The old signs read services, facilities, and access.","zh-CN":"虚构诊所大厅中，正前方是登记处，左侧是洗手间，右侧是电梯。旧标牌分别写着服务、设施和通行。"},
+      "instructions": {"en":"Design entrance and decision-point signs. Trace a restroom trip and an elevator trip, then describe a paper test using assumed responses only.","zh-CN":"设计入口与分岔点的标牌，描绘前往洗手间和电梯的路线，并用假设回应描述纸面测试方法。"},
+      "expectedDeliverable": {"en":"Sign mockups, two route traces, and a paper test plan.","zh-CN":"标牌样稿、两条路线及纸面测试计划。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All three destinations use direct consistent labels","zh-CN":"三处目的地均使用直接且一致的名称"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Both routes use correct direction and reachable decision points","zh-CN":"两条路线方向正确，并通过可到达的判断点"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Plan has a prompt and a defined pass condition without invented test results","zh-CN":"计划含测试提示和明确的通过条件，不虚构测试结果"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ad-sound-cues",
+      "careerField": "Art & Design",
+      "professionSlugs": ["sound-designer","composer"],
+      "skills": ["audio-implementation","storytelling"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Plan cues for a quiet scene","zh-CN":"为安静场景设计声音提示"},
+      "description": {"en":"A wordless scene lasts 20 seconds: doorway at 3 seconds, letter opened at 10, cut to exterior at 17.","zh-CN":"无台词场景持续 20 秒：第 3 秒到达门口，第 10 秒打开信件，第 17 秒切到室外。"},
+      "instructions": {"en":"Build a cue sheet with sound sources, onset, and change in loudness or texture. Mark one deliberate moment of silence.","zh-CN":"制作提示表，标明声源、起始时刻和音量或声音质感的变化，并标记一处有意留白。"},
+      "expectedDeliverable": {"en":"Four-row cue sheet with timeline.","zh-CN":"带时间轴的四行声音提示表。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Three cues align with the specified events","zh-CN":"三条声音提示对应指定事件"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"A fourth row denotes silence with start and end times","zh-CN":"第四行注明静默起止时间"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Each non-silent cue specifies a distinct source or a transition","zh-CN":"每条非静默提示均注明不同声源或过渡方式"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ad-label-condition-log",
+      "careerField": "Art & Design",
+      "professionSlugs": ["art-conservator","museum-curator"],
+      "skills": ["condition-assessment","object-research"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Make a mock condition log","zh-CN":"制作模拟藏品状况记录"},
+      "description": {"en":"A paper facsimile is described as having a crease on the top edge, a gray mark on the back, and a missing corner at bottom left.","zh-CN":"一件纸质复制品被描述为上边缘有折痕、背面有灰色痕迹、左下角缺损。"},
+      "instructions": {"en":"Sketch front and back views. Label observations and give each one an ID that matches a short log. Record appearance only; do not propose treatment.","zh-CN":"绘制正反面示意图，为每项观察编号并对应简短记录。只记录外观，不提出处理方案。"},
+      "expectedDeliverable": {"en":"Two-view sketch and observation log.","zh-CN":"正反面示意图和观察日志。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All three observations recorded at the described location","zh-CN":"三处状况均记录在指定位置"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Each sketch ID maps to one unique log row","zh-CN":"图中每个编号唯一对应一行日志"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Log distinguishes observations from unknown causes","zh-CN":"记录区分观察事实和未知成因"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ad-edition-layout",
+      "careerField": "Art & Design",
+      "professionSlugs": ["book-designer","letterpress-printer"],
+      "skills": ["typography","prepress"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 55,
+      "title": {"en":"Lay out a two-page bilingual spread","zh-CN":"设计跨两页的双语版式"},
+      "description": {"en":"Use two invented paragraphs of three short lines each in both languages for a mock booklet with room for one caption.","zh-CN":"为模拟小册子自拟两段短文，每段用两种语言分别写三短行，版面需留出一条图注的位置。"},
+      "instructions": {"en":"Lay out two facing pages with matching heading levels and a caption slot. Document grid and margins, and show how a longer translation fits without covering content.","zh-CN":"设计对页，统一标题层级并预留图注位置。标注网格与页边距，说明较长译文如何排入而不遮挡内容。"},
+      "expectedDeliverable": {"en":"Two-page mockup, grid sketch, and expansion example.","zh-CN":"双页样稿、网格草图和文本扩展示例。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Both languages have corresponding heading and paragraph positions","zh-CN":"两种语言的标题和段落位置清楚对应"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Margins and caption area are numerically labeled or grid-marked","zh-CN":"页边距和图注区域有数值或网格标识"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Longer sample remains readable on the grid without overlap","zh-CN":"较长文本仍在网格内清晰显示且不重叠"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ll-record-deadlines",
+      "careerField": "Law & Legal",
+      "professionSlugs": ["court-clerk","legal-secretary"],
+      "skills": ["calendaring","case-documentation"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Reconcile a mock docket","zh-CN":"核对模拟案件台账"},
+      "description": {"en":"Simulated office log: A due Apr 8 and filed Apr 8; B due Apr 8 and filed Apr 9; C due Apr 11 and not filed. Review as of Apr 10. Same-day filing is timely under the fictional rule.","zh-CN":"模拟办公室日志：A 的截止日和提交日均为 4 月 8 日；B 截止 4 月 8 日，提交于 4 月 9 日；C 截止 4 月 11 日且未提交。于 4 月 10 日检查。虚构规则允许当日提交。"},
+      "instructions": {"en":"Assign timely, late, or pending to each entry and flag the next item to monitor.","zh-CN":"将各记录标为按期、逾期或待提交，并标记下一项需跟进的事项。"},
+      "expectedDeliverable": {"en":"Three-row docket table with status and reason.","zh-CN":"含状态及理由的三行台账。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"A timely and B late, with dates cited","zh-CN":"A 按期、B 逾期，并引用相应日期"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"C identified as pending on the review date","zh-CN":"C 在检查日标为待提交"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"C is listed with its April 11 follow-up date","zh-CN":"C 列明 4 月 11 日的跟进日期"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ll-source-trail",
+      "careerField": "Law & Legal",
+      "professionSlugs": ["law-librarian","paralegal"],
+      "skills": ["legal-indexing","legal-research"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Build a source trail","zh-CN":"建立资料溯源路径"},
+      "description": {"en":"A fictional archive has a current rule R2, repealed rule R1, explainer E citing R1, and minutes M describing why R2 changed.","zh-CN":"虚构档案库有现行规则 R2、已废止的 R1、引用 R1 的解说 E，以及记述 R2 修改原因的纪要 M。"},
+      "instructions": {"en":"Build a source map for someone researching the current wording and history. Label primary versus explanatory records and flag stale citations.","zh-CN":"为查找现行条文及沿革的人绘制资料图，区分原始记录和解释性资料，并标记过时引用。"},
+      "expectedDeliverable": {"en":"Source map with a two-sentence reading order.","zh-CN":"资料关系图及两句话的阅读顺序。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"R2 comes first for current wording","zh-CN":"查找现行条文时优先阅读 R2"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"R1 and E are marked historical or stale","zh-CN":"R1 和 E 标记为历史资料或已过时"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"M is linked to the reason for the change without treating it as the current rule","zh-CN":"M 与修改原因关联，但不视为现行规则"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ll-compare-clause-versions",
+      "careerField": "Law & Legal",
+      "professionSlugs": ["contract-administrator","legal-operations-manager"],
+      "skills": ["contract-tracking","documentation"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Compare fictional service clauses","zh-CN":"比较虚构服务条款"},
+      "description": {"en":"Version A: send weekly usage reports Monday; keep reports 12 fictional periods. Version B: send reports Tuesday; keep them 6 periods; add an owner field.","zh-CN":"版本 A：每周一发送使用报告，保留 12 个虚构周期。版本 B：每周二发送报告，保留 6 个周期，新增负责人字段。"},
+      "instructions": {"en":"Record every factual change and translate each into a proposed tracking check, using only the brief.","zh-CN":"记录所有事实变化，并将每项变化转化为一条拟议的跟踪检查，只使用题目资料。"},
+      "expectedDeliverable": {"en":"Three-entry change log and tracking checklist.","zh-CN":"三项变更日志及跟踪核对表。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All three changes accurately captured","zh-CN":"准确记录全部三项变化"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Old and new values remain distinguishable","zh-CN":"旧值和新值清楚可区分"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Each check names an observable record, field, or timestamp","zh-CN":"每条检查指明可观察的记录、字段或时间戳"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ll-sort-evidence-index",
+      "careerField": "Law & Legal",
+      "professionSlugs": ["litigation-support-analyst","paralegal"],
+      "skills": ["document-management","data-quality-checks"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Build a document index","zh-CN":"建立文件索引"},
+      "description": {"en":"Invented export: E1 email May 1; E2 receipt May 3; E3 email May 1 marked duplicate of E1; E4 note date unknown.","zh-CN":"虚构导出数据：E1 为 5 月 1 日邮件；E2 为 5 月 3 日收据；E3 为 5 月 1 日邮件，标明与 E1 重复；E4 为日期不明的笔记。"},
+      "instructions": {"en":"Make an index preserving all source IDs. Link duplicates, put undated entries last, and produce a distinct-document count without discarding anything.","zh-CN":"制作索引，保留所有来源编号。关联重复项，将无日期记录放在最后，并统计不重复文件数，不丢弃记录。"},
+      "expectedDeliverable": {"en":"Four-row index plus document count.","zh-CN":"四行索引及文件数量。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All IDs preserved with E3 linked to E1","zh-CN":"保留全部编号，且 E3 链接至 E1"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Dated rows precede undated E4","zh-CN":"有日期记录均在无日期的 E4 之前"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Distinct-document count is 3","zh-CN":"不重复文件数为 3"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ll-redact-mock-record",
+      "careerField": "Law & Legal",
+      "professionSlugs": ["data-protection-officer","records-and-information-manager"],
+      "skills": ["information-classification","privacy"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 50,
+      "title": {"en":"Prepare a minimized mock release","zh-CN":"准备最小披露的模拟公开记录"},
+      "description": {"en":"Fictional record fields: case code X17, waiting days 9, category transfer, contact token P55, private note K62. An invented release policy permits only case code, waiting days, and category.","zh-CN":"虚构记录字段：案件编号 X17、等待天数 9、类别转介、联系方式代号 P55、私密备注 K62。虚构公开规则只允许案件编号、等待天数和类别。"},
+      "instructions": {"en":"Produce a safe copy and a redaction log that identifies removed field names without copying values. Add one review check and a simple version label.","zh-CN":"制作可公开副本和遮盖日志，日志注明删除的字段名但不复制其内容。增加一道复核检查和简单版本标签。"},
+      "expectedDeliverable": {"en":"Release table, redaction log and review step.","zh-CN":"公开表、遮盖日志和复核步骤。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Released copy includes all and only the three permitted fields","zh-CN":"副本包含且仅包含三个允许公开的字段"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Removed values appear nowhere in the log or copy","zh-CN":"删除的字段值不出现在日志和副本中"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Review step checks fields against the supplied release rule","zh-CN":"复核步骤依据给定公开规则核对字段"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ll-neutral-agenda",
+      "careerField": "Law & Legal",
+      "professionSlugs": ["mediator","ombuds-officer"],
+      "skills": ["process-facilitation","active-listening"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Draft a neutral meeting agenda","zh-CN":"起草中立的会议议程"},
+      "description": {"en":"Two fictional groups want the same community-room slot. One needs weekday access; the other needs an uninterrupted rehearsal.","zh-CN":"两个虚构团体都想使用同一社区活动室的时段。一个需要工作日使用，另一个需要不受打扰地排练。"},
+      "instructions": {"en":"Draft a 20-minute agenda that gives equal initial speaking time, separates interests from proposals, and documents next steps without deciding the dispute.","zh-CN":"起草 20 分钟议程，给予双方相同的初始发言时间，区分需求与方案，并记录后续步骤，不替双方裁决。"},
+      "expectedDeliverable": {"en":"Timed agenda and one neutral opening sentence.","zh-CN":"带时间安排的议程及一句中立开场白。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All timings total 20 minutes and each group has equal opening time","zh-CN":"总时长为 20 分钟，双方初始发言时间相等"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Both needs appear in neutral language","zh-CN":"用中立措辞呈现双方需求"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"An explicit next-step checkpoint appears without assigning the slot","zh-CN":"明确列出后续检查点，且不决定时段归属"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ll-apply-invented-policy",
+      "careerField": "Law & Legal",
+      "professionSlugs": ["licensing-examiner","compliance-officer"],
+      "skills": ["eligibility-review","regulatory-interpretation"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 50,
+      "title": {"en":"Test an invented permit rule","zh-CN":"测试虚构许可规则"},
+      "description": {"en":"A fictional club approves a request only with form F and training T; expired T means review; absent F or T means incomplete, taking precedence over review.","zh-CN":"虚构俱乐部仅在表格 F 和培训凭证 T 齐全时审批；T 过期则复核；F 或 T 缺失则标为材料不全，且优先于复核。"},
+      "instructions": {"en":"Create a decision table for F present or absent and T current, expired, or absent. Write a neutral notice for F present and T expired.","zh-CN":"为 F 存在或缺失、T 有效或过期或缺失绘制决策表。为 F 存在且 T 过期的情况写中立通知。"},
+      "expectedDeliverable": {"en":"Six-case decision table and a notice.","zh-CN":"六种情况的决策表及一份通知。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All six input combinations appear exactly once","zh-CN":"六种输入组合各出现一次"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"No absent document passes and only present-F expired-T goes to review","zh-CN":"缺少任一材料均不通过，只有 F 齐全且 T 过期时进入复核"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Notice states review status rather than a final decision","zh-CN":"通知说明进入复核，而非给出最终决定"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ll-plain-language-notice",
+      "careerField": "Law & Legal",
+      "professionSlugs": ["legal-translator","legislative-drafter"],
+      "skills": ["plain-language","bilingual-revision"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Rewrite a fictional notice","zh-CN":"改写虚构通知"},
+      "description": {"en":"An invented procedure says requests received no later than 17:00 Friday are considered Monday; applicants may use email or paper.","zh-CN":"虚构流程规定：周五 17:00 及之前收到的申请将在周一审查；申请人可使用电子邮件或纸质方式。"},
+      "instructions": {"en":"Rewrite as a public notice with a deadline line, clear submission methods, and a boundary example. Do not add advice or a guarantee of approval.","zh-CN":"将其改写为公告，单列截止时间、明确提交方式并提供边界示例。不要添加建议，也不要保证批准。"},
+      "expectedDeliverable": {"en":"Public notice and boundary example.","zh-CN":"公告及边界示例。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Friday 17:00 is explicitly included","zh-CN":"明确包含周五 17:00 这一时点"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Both methods and Monday review are preserved","zh-CN":"保留两种提交方式和周一审查"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Example distinguishes review from approval","zh-CN":"示例正确区分审查与批准"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ll-code-complaints",
+      "careerField": "Law & Legal",
+      "professionSlugs": ["victim-advocate","ombuds-officer"],
+      "skills": ["service-referral","case-documentation"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Triage imaginary service requests","zh-CN":"分流虚构服务请求"},
+      "description": {"en":"Toy routing categories are information, accessibility, and scheduling. Messages are where to find the form, need captions for the orientation, and need a different date.","zh-CN":"模拟分流类别为信息、无障碍和日程。三条消息分别是：哪里可以找到表格、入门说明需要字幕、需要更换日期。"},
+      "instructions": {"en":"Classify each message and write one acknowledgment that reflects its request without promising an outcome.","zh-CN":"为每条消息分类，分别写一句确认语，准确回应需求但不承诺结果。"},
+      "expectedDeliverable": {"en":"Three classifications and acknowledgments.","zh-CN":"三项分类及确认语。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Form, captions, and date map to the corresponding categories","zh-CN":"表格、字幕和日期与相应类别正确匹配"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Each acknowledgment restates its specific request","zh-CN":"每条确认语复述相应的具体需求"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"None guarantees a result","zh-CN":"确认语均不保证结果"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ll-compare-sample-marks",
+      "careerField": "Law & Legal",
+      "professionSlugs": ["trademark-examiner","patent-agent"],
+      "skills": ["classification","evidence-documentation"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Sort fictional label matches","zh-CN":"归类虚构标识匹配结果"},
+      "description": {"en":"For a toy classification exercise, normalize case and ignore hyphens. Reference is SUN-RAY; candidates are sunray, Sun-Ray, sun-rain, and moonray.","zh-CN":"模拟分类练习规定忽略大小写和连字符。参考标识是 SUN-RAY；候选项为 sunray、Sun-Ray、sun-rain、moonray。"},
+      "instructions": {"en":"Build an exact-match table with normalized strings and factual notes. State the exercise uses its own matching rule only.","zh-CN":"制作精确匹配表，列出规范化字符串及事实说明。注明练习仅使用题目自定的匹配规则。"},
+      "expectedDeliverable": {"en":"Four-row comparison table and scope sentence.","zh-CN":"四行对照表及一句适用范围说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"sunray and Sun-Ray match, the other two do not","zh-CN":"sunray 和 Sun-Ray 匹配，另两项不匹配"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"All normalized forms follow the same case and hyphen rules","zh-CN":"全部规范化结果遵循相同的大小写及连字符规则"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Scope statement does not claim a legal result","zh-CN":"范围说明不宣称得出法律结论"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mh-label-toy-schedule",
+      "careerField": "Medicine & Healthcare",
+      "professionSlugs": ["health-informatics-analyst","health-information-technician"],
+      "skills": ["data-quality","clinical-documentation"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Reconcile a fictional appointment log","zh-CN":"核对虚构预约日志"},
+      "description": {"en":"Mock visit codes: A 09:00 arrived; A 09:00 duplicate; B 09:30 canceled; C 10:00 blank. Never use real records.","zh-CN":"模拟就诊编号：A 09:00 已到；A 09:00 重复；B 09:30 取消；C 10:00 状态缺失。不得使用真实记录。"},
+      "instructions": {"en":"Build a cleaned schedule preserving the missing value, flag the duplicate, and count arrived, canceled, and unknown visits.","zh-CN":"制作保留缺失值的清洗后日程表，标记重复项，并统计已到、取消和未知的数量。"},
+      "expectedDeliverable": {"en":"Schedule, duplicate flag, and counts.","zh-CN":"日程表、重复标记和统计结果。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"A appears once in the cleaned schedule","zh-CN":"清洗后的日程中 A 仅出现一次"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"C remains unknown rather than assigned a status","zh-CN":"C 保持未知，不填写推断出的状态"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Each of the three count categories totals one","zh-CN":"三个类别的数量各为一"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mh-orient-visitor",
+      "careerField": "Medicine & Healthcare",
+      "professionSlugs": ["registered-nurse","child-life-specialist"],
+      "skills": ["patient-education","communication"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Create a mock arrival card","zh-CN":"制作模拟到访指引卡"},
+      "description": {"en":"A fictional center asks visitors to check in at desk 2, wait in room A, and request interpretation at the desk if wanted.","zh-CN":"虚构中心要求来访者到 2 号柜台登记，在 A 室等候，并可按需要在柜台申请口译。"},
+      "instructions": {"en":"Write an arrival card with three actions in plain language and one question the visitor can use to confirm where to wait.","zh-CN":"用通俗语言写一张含三个步骤的到访卡，并提供一个可用于确认等候地点的问题。"},
+      "expectedDeliverable": {"en":"One-page arrival card.","zh-CN":"一页到访指引卡。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Desk 2 and room A appear with the correct action","zh-CN":"2 号柜台及 A 室分别对应正确的操作"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Interpretation is optional and requested at the desk","zh-CN":"在柜台按需申请口译"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Confirmation question asks about the waiting location","zh-CN":"确认问题明确询问等候地点"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mh-supply-count",
+      "careerField": "Medicine & Healthcare",
+      "professionSlugs": ["pharmacy-technician","health-information-technician"],
+      "skills": ["inventory-management","records-quality"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 30,
+      "title": {"en":"Balance office-supply stock","zh-CN":"核对办公室物资库存"},
+      "description": {"en":"Fictional clinic administration stocks envelopes: opening 24, received 6, issued 11, physical count 18. This is stationery only.","zh-CN":"虚构诊所行政办公室的信封库存：期初 24 个，收到 6 个，领用 11 个，实物盘点 18 个。仅涉及文具。"},
+      "instructions": {"en":"Calculate expected stock and variance using physical minus expected. Create one follow-up entry without assuming the cause.","zh-CN":"计算预期库存及实物减预期的差异。制作一条跟进记录，不推断原因。"},
+      "expectedDeliverable": {"en":"Stock equation and exception entry.","zh-CN":"库存计算式及差异记录。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Expected stock is 19","zh-CN":"预期库存为 19"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Variance is minus one","zh-CN":"差异为负一"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Follow-up requests a recount or log check and labels cause unknown","zh-CN":"跟进要求复盘或核对记录，并标明原因未知"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mh-mock-recruitment-chart",
+      "careerField": "Medicine & Healthcare",
+      "professionSlugs": ["clinical-research-coordinator","health-informatics-analyst"],
+      "skills": ["data-analysis","protocol-tracking"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Chart fictional appointment attendance","zh-CN":"绘制虚构预约出席图"},
+      "description": {"en":"A mock information session records invited and attended counts: A 8/6, B 5/5, C 10/4. No individual data are included.","zh-CN":"模拟说明会记录邀请人数及到场人数：A 为 8/6，B 为 5/5，C 为 10/4。不含个人数据。"},
+      "instructions": {"en":"Calculate rates, plot them, and label sample sizes. Explain why the high rate at B should not be interpreted without its denominator.","zh-CN":"计算并绘制到场率，标注样本量。说明为什么不能脱离分母解读 B 的高到场率。"},
+      "expectedDeliverable": {"en":"Labeled rate chart and interpretation note.","zh-CN":"带标注的到场率图表及解读说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Rates are 75%, 100%, and 40%","zh-CN":"到场率分别为 75%、100% 和 40%"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Chart labels each group and each denominator","zh-CN":"图表标注每组和各组分母"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Note references B’s denominator of five and avoids causal claims","zh-CN":"说明引用 B 的分母 5，且不作因果推断"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mh-match-fake-items",
+      "careerField": "Medicine & Healthcare",
+      "professionSlugs": ["surgical-technologist","medical-laboratory-scientist"],
+      "skills": ["quality-control","documentation"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Trace toy kit identifiers","zh-CN":"追踪模拟物品包编号"},
+      "description": {"en":"Package manifest expects red R01, blue B02, green G03. A simulated scan returns red R01, blue B20, green G03, and yellow Y04. No clinical items are involved.","zh-CN":"物品包清单要求红 R01、蓝 B02、绿 G03。模拟扫码结果为红 R01、蓝 B20、绿 G03 及黄 Y04。不涉及临床用品。"},
+      "instructions": {"en":"Compare manifest with scan. List every discrepancy and decide whether to mark this toy package ready under the rule that all IDs must match exactly.","zh-CN":"比较清单与扫码结果，列出全部差异，并依据编号必须完全匹配的规则判断此模拟包是否可标为就绪。"},
+      "expectedDeliverable": {"en":"Comparison table and readiness flag.","zh-CN":"对照表及就绪标记。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"R01 and G03 match","zh-CN":"R01 和 G03 匹配"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"B02 versus B20 and extra Y04 both flagged","zh-CN":"标出 B02 与 B20 的差异以及额外的 Y04"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Toy package marked not ready","zh-CN":"模拟物品包标为未就绪"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mh-access-form-rewrite",
+      "careerField": "Medicine & Healthcare",
+      "professionSlugs": ["speech-language-pathologist","health-information-technician"],
+      "skills": ["accessibility","patient-education"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Simplify a nonclinical form","zh-CN":"简化非临床表格"},
+      "description": {"en":"A mock visitor form asks for preferred display name, preferred contact method, and whether an interpreter is wanted. All fields are optional.","zh-CN":"模拟访客表询问希望使用的称呼、首选联系渠道及是否需要口译。所有字段均为选填。"},
+      "instructions": {"en":"Rewrite the labels and help text for a text-only form. Preserve optional status and make the interpreter question answerable without sharing a medical reason.","zh-CN":"为纯文字表格改写标签和帮助文字，保留选填说明，并确保口译问题无须透露医疗理由即可回答。"},
+      "expectedDeliverable": {"en":"Three fields and short help text.","zh-CN":"三个表单字段及简短帮助文字。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All three original purposes remain in the revised labels","zh-CN":"改写后的标签保留三项原始用途"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Optional status is explicit for every field","zh-CN":"每个字段均明确标为选填"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Interpreter prompt does not ask for any health history","zh-CN":"口译问题不要求提供健康史"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mh-queue-tradeoffs",
+      "careerField": "Medicine & Healthcare",
+      "professionSlugs": ["occupational-health-and-safety-specialist","health-informatics-analyst"],
+      "skills": ["analytics","process-mapping"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 50,
+      "title": {"en":"Compare mock administrative queues","zh-CN":"比较模拟行政排队方案"},
+      "description": {"en":"Six exhibit-registration visitors take 2, 2, 8, 8, 2, 2 minutes at a single desk, arriving together. No health prioritization applies.","zh-CN":"六位展览登记访客同时到达一个柜台，所需时间依次为 2、2、8、8、2、2 分钟。不涉及医疗优先级。"},
+      "instructions": {"en":"Calculate individual waits in listed order and shortest-service-first, keeping ties in original order. Compare mean and maximum wait and name one fairness concern.","zh-CN":"计算按列出顺序和按服务时间最短优先时每人的等待时长，时长相同则保持原顺序。比较平均及最大等待时长，并指出一项公平性问题。"},
+      "expectedDeliverable": {"en":"Two wait tables and comparison note.","zh-CN":"两张等待时间表及对比说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Listed-order waits are 0, 2, 4, 12, 20, 22","zh-CN":"原顺序的等待时长为 0、2、4、12、20、22"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Shortest-first waits in service order are 0, 2, 4, 6, 8, 16","zh-CN":"最短优先策略按服务顺序的等待时长为 0、2、4、6、8、16"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Means and maxima are correctly compared and concern addresses long tasks","zh-CN":"正确比较均值与最大值，并指出长任务可能受到的影响"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mh-version-procedures",
+      "careerField": "Medicine & Healthcare",
+      "professionSlugs": ["registered-nurse","clinical-research-coordinator"],
+      "skills": ["care-coordination","documentation"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Build a routing handover","zh-CN":"制作转交交接单"},
+      "description": {"en":"Toy equipment-booking log: Room A transferred to team Blue at 10:00; B remains with team Green until 14:00; C has no recorded owner.","zh-CN":"模拟设备预约日志：A 室于 10:00 转交蓝队；B 室由绿队负责至 14:00；C 室未记录负责人。"},
+      "instructions": {"en":"Record confirmed owners, times, and an unresolved follow-up. Include an explicit review time for C without assigning it to any team as fact.","zh-CN":"记录已确认的负责人、时间及未决跟进事项。为 C 室明确复核时间，但不把任何团队写成已确认负责人。"},
+      "expectedDeliverable": {"en":"Three-line handover and follow-up entry.","zh-CN":"三行交接单和一条跟进记录。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"A and B owners and times match the scenario","zh-CN":"A 和 B 的负责人及时间与题目一致"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"C is expressly marked unknown","zh-CN":"C 明确标为未知"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"C has a follow-up action and review time","zh-CN":"C 有跟进措施和复核时间"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mh-compare-summary-sources",
+      "careerField": "Medicine & Healthcare",
+      "professionSlugs": ["dietitian","clinical-research-coordinator"],
+      "skills": ["evidence-synthesis","research"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 50,
+      "title": {"en":"Synthesize fictional study summaries","zh-CN":"综合虚构研究摘要"},
+      "description": {"en":"Two mock cafeteria signage studies report tray returns: S1 before 40/100, after 55/100 with no control; S2 test 12/20 and control 10/20 on one day.","zh-CN":"两项模拟食堂标牌研究报告餐盘归还情况：S1 前 40/100、后 55/100，无对照；S2 一天内实验组 12/20、对照组 10/20。"},
+      "instructions": {"en":"Compute percentage-point differences and write a short summary that distinguishes the two study designs and notes one limitation each.","zh-CN":"计算百分点差异，写简短摘要区分两种研究设计，并各写一项局限。"},
+      "expectedDeliverable": {"en":"Two-row evidence table and summary.","zh-CN":"两行证据表及摘要。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"S1 difference is 15 percentage points","zh-CN":"S1 相差 15 个百分点"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"S2 difference is 10 percentage points","zh-CN":"S2 相差 10 个百分点"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Summary notes uncontrolled S1 and limited scope or sample size in S2","zh-CN":"摘要指出 S1 无对照，以及 S2 时间范围或样本量有限"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mh-handover-label-check",
+      "careerField": "Medicine & Healthcare",
+      "professionSlugs": ["diagnostic-medical-sonographer","radiologic-technologist"],
+      "skills": ["quality-control","documentation"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Reconcile image filenames","zh-CN":"核对图像文件名"},
+      "description": {"en":"A fictional library expects neutral training images named X1-front, X1-side, X2-front, X2-side. Received: X1-front, X1-side, X2-front, X3-side. No clinical images are used.","zh-CN":"虚构资料库要求使用中性训练图像文件名 X1-front、X1-side、X2-front、X2-side。收到的是 X1-front、X1-side、X2-front、X3-side。不使用临床图像。"},
+      "instructions": {"en":"Write a repeatable filename check and run it against the inventory. Report missing and unexpected items without modifying originals.","zh-CN":"编写可重复执行的文件名核对方法并应用于清单。报告缺失和意外项，不修改原文件。"},
+      "expectedDeliverable": {"en":"Check procedure and exception report.","zh-CN":"检查步骤及差异报告。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Three expected names correctly marked present","zh-CN":"正确标明三个应有文件已存在"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"X2-side is missing and X3-side unexpected","zh-CN":"X2-side 缺失，X3-side 为意外项"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Procedure can be rerun using the same exact-match rules","zh-CN":"检查步骤可按相同精确匹配规则复用"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-pm-code-observations",
+      "careerField": "Psychology & Mental Health",
+      "professionSlugs": ["behavior-analyst","behavioral-scientist"],
+      "skills": ["behavior-measurement","behavioral-observation"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Code a toy activity log","zh-CN":"编码模拟活动日志"},
+      "description": {"en":"Fictional event sequence: points, asks, points, walks, asks, points. Codes P, A, W correspond in that order to the three actions.","zh-CN":"虚构活动序列：指向、提问、指向、行走、提问、指向。三种动作依次对应 P、A、W。"},
+      "instructions": {"en":"Code each event in order and tally counts. State one thing these observations cannot establish.","zh-CN":"按顺序为每项事件编码并统计次数，说明观察本身无法证明的一件事。"},
+      "expectedDeliverable": {"en":"Coded sequence, tally, and scope note.","zh-CN":"编码序列、计数及范围说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Sequence is P,A,P,W,A,P","zh-CN":"序列为 P、A、P、W、A、P"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Counts are P 3, A 2, W 1","zh-CN":"计数为 P 3、A 2、W 1"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Note identifies an inference not supported, such as motive","zh-CN":"说明指出无法支持的推断，例如行为动机"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-pm-reflect-listening",
+      "careerField": "Psychology & Mental Health",
+      "professionSlugs": ["peer-support-specialist","rehabilitation-counselor"],
+      "skills": ["active-listening","client-discovery"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Draft a reflective response","zh-CN":"起草反映式回应"},
+      "description": {"en":"An invented colleague says an optional club meeting moves every week and they feel left out. This is a workplace communication simulation.","zh-CN":"一位虚构同事说，自愿参加的俱乐部会议每周换时间，自己觉得被排除在外。这是沟通模拟。"},
+      "instructions": {"en":"Write a reflection and two open questions, one about scheduling and one about preferred participation. Do not diagnose or give advice.","zh-CN":"写一句反映式回应及两个开放问题，一个关于日程，另一个关于希望如何参与。不作诊断或提出建议。"},
+      "expectedDeliverable": {"en":"Three-line dialogue excerpt.","zh-CN":"三行对话节选。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Reflection preserves both the schedule change and exclusion feeling","zh-CN":"回应同时保留时间变化及被排除感"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Two distinct questions allow more than yes or no","zh-CN":"两个不同问题都不能只用是或否回答"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"No diagnosis, advice, or invented detail appears","zh-CN":"没有诊断、建议或虚构细节"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-pm-compare-wording",
+      "careerField": "Psychology & Mental Health",
+      "professionSlugs": ["industrial-organizational-psychologist","behavioral-scientist"],
+      "skills": ["survey-design","experimental-design"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Repair a double-barreled survey item","zh-CN":"修正双重问题式调查题"},
+      "description": {"en":"A mock item states: the volunteer portal is fast and makes me feel included; strongly disagree to strongly agree.","zh-CN":"模拟题项写着：志愿者门户响应很快，而且让我感到被接纳；选项从非常不同意到非常同意。"},
+      "instructions": {"en":"Split speed and belonging into neutral items. Give both a five-point scale and include a not applicable choice outside it.","zh-CN":"把速度及归属感拆成中立题项。为两个问题提供五级量表，并另设不适用选项。"},
+      "expectedDeliverable": {"en":"Two survey items and shared response scale.","zh-CN":"两个调查题项及共用选项量表。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Items separately measure speed and belonging","zh-CN":"题项分别测量速度及归属感"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Five ordered scale points have balanced opposite endpoints","zh-CN":"五个有序量表点的两端对称"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Not applicable is separate from the middle response","zh-CN":"不适用与中间选项分开"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-pm-check-observer-agreement",
+      "careerField": "Psychology & Mental Health",
+      "professionSlugs": ["psychometrist","developmental-psychologist"],
+      "skills": ["scoring-accuracy","data-analysis"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Calculate coding agreement","zh-CN":"计算编码一致率"},
+      "description": {"en":"Two readers tag six toy photos as A or B. Reader one: A,A,B,B,A,B. Reader two: A,B,B,B,A,A.","zh-CN":"两名读者把六张模拟照片标为 A 或 B。读者一：A、A、B、B、A、B；读者二：A、B、B、B、A、A。"},
+      "instructions": {"en":"Make a per-item comparison, calculate simple agreement, and write a concrete rule the readers could clarify before a second pass.","zh-CN":"逐项比较并计算简单一致率，提出一条重新编码前应澄清的具体规则。"},
+      "expectedDeliverable": {"en":"Comparison table and clarification note.","zh-CN":"对照表和澄清说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Only items 2 and 6 disagree","zh-CN":"只有第 2、6 项不一致"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Agreement is 4/6 or 66.7% rounded","zh-CN":"一致率为 4/6，或四舍五入后为 66.7%"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Clarification defines how an ambiguous case will be handled","zh-CN":"规则说明如何处理边界模糊的情况"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-pm-mock-activity-adaptation",
+      "careerField": "Psychology & Mental Health",
+      "professionSlugs": ["recreational-therapist","child-life-specialist"],
+      "skills": ["activity-adaptation","accessibility"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Adapt a paper sorting activity","zh-CN":"调整纸片分类活动"},
+      "description": {"en":"A fictional library game uses tiny red and green circles and a short timer. The organizer wants a table version usable without color discrimination or fast movement.","zh-CN":"虚构图书馆游戏使用红绿小圆片和短计时器。组织者希望设计桌面版，无须分辨颜色或快速移动。"},
+      "instructions": {"en":"Redesign the game using a second visual cue and a non-speed success rule. Write demo instructions using fictional participants only.","zh-CN":"用第二种视觉线索和不依赖速度的成功规则重新设计游戏。仅用虚构参与者编写演示说明。"},
+      "expectedDeliverable": {"en":"Game sketch and three to five instruction lines.","zh-CN":"活动草图及三至五行说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Two categories can be told apart without color","zh-CN":"不依赖颜色即可区分类别"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Success is independent of speed","zh-CN":"成功条件不依赖速度"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Instructions identify materials, action, and endpoint","zh-CN":"说明明确材料、操作及完成条件"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-pm-evaluate-program-reach",
+      "careerField": "Psychology & Mental Health",
+      "professionSlugs": ["mental-health-program-evaluator","behavioral-health-case-manager"],
+      "skills": ["outcome-measurement","analytics"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 50,
+      "title": {"en":"Audit attendance denominators","zh-CN":"检查出席率的分母"},
+      "description": {"en":"Toy workshop records: site A invited 100, registered 50, attended 30; B invited 60, registered 48, attended 24.","zh-CN":"模拟活动记录：A 邀请 100、登记 50、到场 30；B 邀请 60、登记 48、到场 24。"},
+      "instructions": {"en":"Report attendance by invitations and by registrations. Explain the ranking reversal and propose a measure to check a missing access factor.","zh-CN":"按邀请人数及登记人数分别计算到场率，解释排序反转，并提出一个用于检查未知参与障碍的指标。"},
+      "expectedDeliverable": {"en":"Rate table and interpretation memo.","zh-CN":"到场率表及解读备忘录。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Invitation rates A 30%, B 40%","zh-CN":"按邀请人数计算为 A 30%、B 40%"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Registration rates A 60%, B 50%","zh-CN":"按登记人数计算为 A 60%、B 50%"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Memo distinguishes reach and follow-through and names a measurable missing factor","zh-CN":"备忘录区分覆盖和实际到场，并提出可测量的未知因素"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-pm-nonclinical-referral-board",
+      "careerField": "Psychology & Mental Health",
+      "professionSlugs": ["behavioral-health-case-manager","peer-support-specialist"],
+      "skills": ["referral-coordination","resource-navigation"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Build a nonclinical resource board","zh-CN":"制作非临床资源板"},
+      "description": {"en":"Three invented events: library language group Tue, transit orientation Wed, craft circle Thu. Requests are conversation practice, route planning, and making crafts.","zh-CN":"三项虚构活动：周二图书馆语言小组、周三交通入门、周四手工小组。需求为练习交流、规划路线及制作手工。"},
+      "instructions": {"en":"Match each request and write a single confirmation question about access or timing. Do not collect contact or health information.","zh-CN":"匹配每个需求，并写一个关于参与条件或时间的确认问题。不收集联系方式或健康信息。"},
+      "expectedDeliverable": {"en":"Three-row resource board and one question.","zh-CN":"三行资源板及一个问题。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All three needs match the intended event","zh-CN":"三项需求分别正确匹配活动"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Each day is copied correctly","zh-CN":"日期均准确转录"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Question concerns participation logistics and requests no private data","zh-CN":"问题仅关于参与安排，不索取私密信息"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-pm-choose-study-design",
+      "careerField": "Psychology & Mental Health",
+      "professionSlugs": ["behavioral-scientist","developmental-psychologist"],
+      "skills": ["experimental-design","program-evaluation"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 50,
+      "title": {"en":"Design a simulated signage comparison","zh-CN":"设计模拟标牌比较"},
+      "description": {"en":"A toy exhibit has two entrances with different volumes. Staff want to compare a new map with an old one using simulated counts only.","zh-CN":"模拟展览有两个客流量不同的入口。工作人员想只用模拟计数比较新版和旧版地图。"},
+      "instructions": {"en":"Draw a four-period counterbalanced assignment where each entrance sees each map twice. Define a navigational outcome and explain one possible confound.","zh-CN":"设计四时段平衡安排，使各入口分别使用每种地图两次。定义一个找路结果并说明一个可能的混杂因素。"},
+      "expectedDeliverable": {"en":"Assignment table and outcome measurement plan.","zh-CN":"分配表及结果测量计划。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Each entrance has two old and two new assignments","zh-CN":"每个入口各安排两次旧地图和两次新地图"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Each period has one old and one new assignment","zh-CN":"每个时段都分别使用一张旧地图和一张新地图"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Outcome is observable and confound is distinct from outcome","zh-CN":"结果可观察，且混杂因素与结果不同"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-pm-review-neutral-note",
+      "careerField": "Psychology & Mental Health",
+      "professionSlugs": ["psychiatric-rehabilitation-specialist","psychometrist"],
+      "skills": ["documentation","behavioral-observation"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Separate observation from inference","zh-CN":"区分观察与推断"},
+      "description": {"en":"Mock note: Pat left the paper unfinished after two minutes, looked away twice, and obviously disliked the session.","zh-CN":"模拟记录：帕特两分钟后离开，纸面任务未完成，曾两次移开视线，显然不喜欢这场活动。"},
+      "instructions": {"en":"Rewrite the note using observations only, then write one neutral way to verify preferences in the fictional scenario.","zh-CN":"只用可观察事实改写记录，再写一种在虚构场景中中立确认偏好的方式。"},
+      "expectedDeliverable": {"en":"Revised note and one verification question.","zh-CN":"修订记录及一个确认问题。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Two minutes, unfinished task, and two glances away retained","zh-CN":"保留两分钟、未完成、两次移开视线"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Dislike is removed as a factual claim","zh-CN":"不再把不喜欢当成事实"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Question asks the person about experience without presuming a preference","zh-CN":"询问个人体验，不预设其偏好"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-pm-layout-choice-card",
+      "careerField": "Psychology & Mental Health",
+      "professionSlugs": ["art-therapist","positive-behaviour-support-practitioner"],
+      "skills": ["creative-facilitation","accessibility"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Design an opt-in activity card","zh-CN":"设计自愿参与的活动卡"},
+      "description": {"en":"An imaginary community workshop offers drawing, collage, or observing. Anyone can stop or switch. This is a recreation activity, with no therapy.","zh-CN":"虚构社区活动提供绘画、拼贴或旁观选项，任何人可退出或更换。这是休闲活动，不涉及治疗。"},
+      "instructions": {"en":"Design a plain-language choice card and an alternative text-only layout. Include a neutral invitation and equal visibility for stopping.","zh-CN":"设计通俗的选择卡及纯文字替代版。加入中立邀请语，并让退出选项同等醒目。"},
+      "expectedDeliverable": {"en":"Two card versions and invitation sentence.","zh-CN":"两个卡片版本及一句邀请语。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Both show drawing, collage, and observing","zh-CN":"两版均含绘画、拼贴、旁观"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Stop and switch choices are explicit in both versions","zh-CN":"两版均明确可退出及更换"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Invite avoids pressure and promises no wellbeing outcome","zh-CN":"邀请语不施压且不承诺健康成效"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-bf-cash-reconcile",
+      "careerField": "Business & Finance",
+      "professionSlugs": ["accountant","treasury-analyst"],
+      "skills": ["reconciliation","cash-forecasting"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Reconcile a toy petty-cash log","zh-CN":"核对模拟备用金日志"},
+      "description": {"en":"Opening 80; replenished 25; spent 18 and 32; counted 54. Use fictional units.","zh-CN":"期初 80；补充 25；支出 18 和 32；盘点 54。单位为虚构货币。"},
+      "instructions": {"en":"Compute book balance and physical-minus-book variance. Draft a follow-up that does not infer wrongdoing.","zh-CN":"计算账面余额及实物减账面的差异。起草跟进措施，不推定违规。"},
+      "expectedDeliverable": {"en":"Reconciliation and follow-up note.","zh-CN":"对账过程及跟进说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Book balance is 55","zh-CN":"账面余额为 55"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Variance is minus one","zh-CN":"差异为负一"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Follow-up cites a specific record or recount","zh-CN":"跟进指出具体要核对的记录或要求复盘"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-bf-choose-vendor",
+      "careerField": "Business & Finance",
+      "professionSlugs": ["procurement-specialist","project-manager"],
+      "skills": ["supplier-evaluation","bid-comparison"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Compare quotes under a delivery rule","zh-CN":"按交付规则比较报价"},
+      "description": {"en":"For 50 boxes, A charges 4 each plus 30 shipping, arrives day 3; B 4.4 with free shipping, day 5; C 4.1 plus 20, day 4. Delivery by day 4 is mandatory.","zh-CN":"购买 50 个箱子：A 单价 4、运费 30、第 3 天到；B 单价 4.4、免运费、第 5 天到；C 单价 4.1、运费 20、第 4 天到。必须在第 4 天前或当天到达。"},
+      "instructions": {"en":"Calculate landed cost, exclude late quotes, and recommend the lowest feasible option. Note one supplier question.","zh-CN":"计算到货总价，排除逾期报价，推荐最低可行报价，并提出一个供应商问题。"},
+      "expectedDeliverable": {"en":"Quote comparison and recommendation.","zh-CN":"报价对照表及推荐。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"A 230, B 220, C 225","zh-CN":"正确结果：A 230、B 220、C 225"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"B explicitly ineligible for delivery timing","zh-CN":"明确 B 因交付日期不合格"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"C recommended and one unresolved practical check named","zh-CN":"推荐 C，并指出一项有待确认的实际问题"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-bf-break-even-stall",
+      "careerField": "Business & Finance",
+      "professionSlugs": ["financial-analyst","food-service-manager"],
+      "skills": ["financial-modeling","cost-control"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Model a fictional stall’s break-even point","zh-CN":"模拟摊位的盈亏平衡点"},
+      "description": {"en":"Fixed charge 120 units, price 8 per item, variable cost 5. Alternative variable cost is 6. No other costs.","zh-CN":"固定支出 120，单价 8，每件变动成本 5。备选情景的变动成本为 6。无其他费用。"},
+      "instructions": {"en":"Compute break-even units for both cases and net result at 45 sales. Show formulas.","zh-CN":"计算两种情景的盈亏平衡销量和卖出 45 件时的净结果，列出公式。"},
+      "expectedDeliverable": {"en":"Two-scenario calculation table.","zh-CN":"两情景计算表。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Base contribution is 3 and break-even 40","zh-CN":"基准情景单位贡献为 3、平衡销量为 40"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Alternative contribution 2 and break-even 60","zh-CN":"备选单位贡献为 2、平衡销量为 60"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"At 45 items results are +15 and -30","zh-CN":"销售 45 件时结果分别为 +15 和 -30"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-bf-compare-cohorts",
+      "careerField": "Business & Finance",
+      "professionSlugs": ["marketing-manager","market-research-analyst"],
+      "skills": ["audience-analysis","statistics"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 50,
+      "title": {"en":"Compare outreach conversion fairly","zh-CN":"公平比较推广转化率"},
+      "description": {"en":"Campaign A: returning 32/40, new 6/20. B: returning 18/20, new 14/40. Numerators are sign-ups.","zh-CN":"推广 A：回访人群 32/40，新人群 6/20。B：分别为 18/20 和 14/40。分子为报名人数。"},
+      "instructions": {"en":"Calculate overall and segment rates. Show equal-segment weighted rates and explain the difference in conclusions.","zh-CN":"计算总体和分组转化率，再等权合并两个分组，并解释结论差异。"},
+      "expectedDeliverable": {"en":"Rates table and two-sentence analysis.","zh-CN":"转化率表和两句分析。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Overall A 38/60, B 32/60","zh-CN":"总体 A 38/60、B 32/60"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Segment rates are A 80% and 30%, B 90% and 35%","zh-CN":"A 分组 80% 和 30%，B 分组 90% 和 35%"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Equal-weight A 55%, B 62.5% and explanation cites mix","zh-CN":"等权 A 55%、B 62.5%，解释涉及人群构成"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-bf-plan-reorder",
+      "careerField": "Business & Finance",
+      "professionSlugs": ["supply-chain-analyst","merchandise-planner"],
+      "skills": ["inventory-analysis","forecasting"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Plan a toy reorder","zh-CN":"规划模拟补货"},
+      "description": {"en":"On hand 28, reserved 6, arriving before target 5. Lead-time demand forecast 23 and desired safety buffer 7. Orders in multiples of 4.","zh-CN":"现有库存 28、已预留 6、目标前到货 5。提前期预测需求 23，目标安全库存 7。订购量为 4 的倍数。"},
+      "instructions": {"en":"Compute usable stock, gap, and smallest valid order that covers the gap; show what remains after demand.","zh-CN":"计算可用库存、缺口及覆盖缺口的最小有效订货量，并展示需求扣除后的库存。"},
+      "expectedDeliverable": {"en":"Reorder worksheet.","zh-CN":"补货工作表。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Usable stock is 27 and gap is 3","zh-CN":"可用库存 27，缺口 3"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Recommended order is 4","zh-CN":"建议订购 4"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Expected remaining stock is 8","zh-CN":"预计剩余库存 8"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-bf-schedule-booths",
+      "careerField": "Business & Finance",
+      "professionSlugs": ["event-planner","hotel-manager"],
+      "skills": ["scheduling","vendor-coordination"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 30,
+      "title": {"en":"Schedule three booth setups","zh-CN":"安排三个展位布置"},
+      "description": {"en":"One cart available 09:00–10:00. A takes 20 min and must finish by 09:30; B takes 15 min and can start at 09:20; C takes 15 min and starts no earlier than 09:35.","zh-CN":"09:00–10:00 只有一辆车。A 需 20 分钟，须在 09:30 前或准时完成；B 需 15 分钟，09:20 起可开始；C 需 15 分钟，最早 09:35 开始。"},
+      "instructions": {"en":"Schedule nonoverlapping cart use and mark remaining capacity in minutes.","zh-CN":"安排互不重叠的用车时段，并标注剩余分钟数。"},
+      "expectedDeliverable": {"en":"Three-row timetable and free-slot summary.","zh-CN":"三行时间表及空闲时段汇总。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Each setup receives the required duration","zh-CN":"每项布置获得规定时长"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"All start and deadline limits met; no overlap","zh-CN":"满足开始和截止限制，且无重叠"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Total unallocated time is 10 minutes","zh-CN":"未分配时长合计 10 分钟"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-bf-audit-expense-rule",
+      "careerField": "Business & Finance",
+      "professionSlugs": ["internal-auditor","grants-finance-officer"],
+      "skills": ["control-evaluation","grant-reporting"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Review a fictional grant ledger","zh-CN":"审核虚构资助项目台账"},
+      "description": {"en":"Toy grant allows printing and room rental only, each with a receipt. Entries: print 20 with receipt; room 70 without; food 35 with; print 15 with.","zh-CN":"模拟资助只支持印刷及场地租金，并要求收据。记录为：印刷 20 有收据；场地 70 无；餐饮 35 有；印刷 15 有。"},
+      "instructions": {"en":"Classify eligible, pending documentation, and excluded spend. Calculate eligible total and specify the next action for the pending entry.","zh-CN":"分类为合规、待补材料、排除三类。计算合规合计，说明待补材料项的下一步。"},
+      "expectedDeliverable": {"en":"Four-row ledger and reconciliation.","zh-CN":"四行台账及对账结果。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Both print entries eligible, totaling 35","zh-CN":"两项印刷合规，合计 35"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Rental 70 pending and food 35 excluded","zh-CN":"租金 70 待补材料，餐饮 35 排除"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Action requests rental receipt without counting it as eligible","zh-CN":"跟进要求补租金收据，且未把该项计入合规总额"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-bf-mock-adoption-plan",
+      "careerField": "Business & Finance",
+      "professionSlugs": ["customer-success-manager","sales-operations-analyst"],
+      "skills": ["adoption-planning","crm-reporting"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Prioritize onboarding follow-ups","zh-CN":"设置入门跟进优先级"},
+      "description": {"en":"Synthetic accounts A trained and no use in 14 days; B untrained and use yesterday; C trained and use yesterday. Priority 1 is no use for 14+ days; next is untrained active.","zh-CN":"模拟客户 A 已培训且 14 天未使用；B 未培训且昨日使用；C 已培训且昨日使用。优先级 1 为 14 天及以上未用，其次是活跃但未培训。"},
+      "instructions": {"en":"Rank accounts, assign a distinct next action, and define one checkable metric for the next week.","zh-CN":"给客户排序，分别安排后续行动，并定义一项下周可核验指标。"},
+      "expectedDeliverable": {"en":"Priority table and weekly metric.","zh-CN":"优先级表及周度指标。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Order A, B, C follows the supplied rules","zh-CN":"按给定规则排序 A、B、C"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Actions distinguish inactivity from missing training","zh-CN":"行动区别未使用和未培训"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Metric includes time window and observable event","zh-CN":"指标包含时间范围及可观察事件"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-bf-normalize-compensation",
+      "careerField": "Business & Finance",
+      "professionSlugs": ["compensation-analyst","payroll-specialist"],
+      "skills": ["job-leveling","reconciliation"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 55,
+      "title": {"en":"Normalize fictional pay units","zh-CN":"统一虚构薪酬单位"},
+      "description": {"en":"Toy roles: X 240 units/week for 30 hours; Y 270/week for 45 hours; Z 7/hour, 36 hours. No premiums or deductions.","zh-CN":"模拟岗位：X 每周 240、工时 30；Y 每周 270、工时 45；Z 每小时 7、工时 36。无加成或扣款。"},
+      "instructions": {"en":"Convert each to hourly and 40-hour equivalent pay. Summarize why sorting weekly pay alone can be misleading.","zh-CN":"换算各岗位时薪和 40 小时等效薪酬，说明为何只按周薪排序可能误导。"},
+      "expectedDeliverable": {"en":"Conversion table and analytical note.","zh-CN":"换算表及分析说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Hourly X 8, Y 6, Z 7","zh-CN":"时薪 X 8、Y 6、Z 7"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"40-hour equivalents 320, 240, 280","zh-CN":"40 小时等效薪酬 320、240、280"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Notes distinguish paid hours from normalized pay comparison","zh-CN":"说明区分实际计薪工时与标准化薪酬比较"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-bf-segment-feedback",
+      "careerField": "Business & Finance",
+      "professionSlugs": ["management-consultant","market-research-analyst"],
+      "skills": ["survey-analysis","process-analysis"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Turn six comments into a decision brief","zh-CN":"把六条反馈整理成决策简报"},
+      "description": {"en":"Mock comments: two say checkout slow; one says unclear return policy; one says confusing returns sign; two praise item range. Count one code per comment.","zh-CN":"模拟反馈：两条认为结账慢，一条认为退货政策不清，一条认为退货标牌难懂，两条称赞品种丰富。每条只归一类。"},
+      "instructions": {"en":"Create a transparent coding table, recommend one bounded improvement, and state how to compare before and after without claiming this sample is representative.","zh-CN":"制作透明编码表，提出一项范围明确的改进，并说明如何做前后比较，不声称样本有代表性。"},
+      "expectedDeliverable": {"en":"Coding table and short decision brief.","zh-CN":"编码表及简短决策说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All six comments assigned a traceable code without duplication","zh-CN":"六条反馈均有可追溯的唯一编码"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Recommended improvement follows a documented issue","zh-CN":"改进建议针对已记录的问题"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Measure uses the same definition before and after and notes sample limits","zh-CN":"前后使用同一定义的指标，并注明样本局限"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ed-minute-lesson",
+      "careerField": "Education & Research",
+      "professionSlugs": ["elementary-school-teacher","curriculum-specialist"],
+      "skills": ["lesson-planning","formative-assessment"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 30,
+      "title": {"en":"Teach fraction equivalence","zh-CN":"教授分数等值"},
+      "description": {"en":"A fictional class can count and shade squares but has not met equivalent fractions.","zh-CN":"虚构班级会数格子并涂色，但还没学过等值分数。"},
+      "instructions": {"en":"Plan a five-minute lesson using equal-sized rectangles for 1/2 and 2/4. Write an exit prompt and its answer.","zh-CN":"用相同大小的长方形展示 1/2 和 2/4，设计五分钟课程，写一道出口题及答案。"},
+      "expectedDeliverable": {"en":"Lesson outline, diagram, and exit prompt.","zh-CN":"课程提纲、示意图及出口题。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Both diagrams represent equal whole areas","zh-CN":"两幅图的整体面积相同"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Shaded portions correctly show 1/2 and 2/4","zh-CN":"涂色正确表示 1/2 和 2/4"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Exit prompt checks equivalence and includes a key","zh-CN":"出口题检验等值理解并附答案"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ed-assess-map-reading",
+      "careerField": "Education & Research",
+      "professionSlugs": ["assessment-developer","secondary-school-teacher"],
+      "skills": ["item-writing","scoring-rubric-design"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Write a map-reading item","zh-CN":"编写读图试题"},
+      "description": {"en":"A toy instruction says north is up and one grid edge equals 100 units. Points A (0,0) and B (0,3).","zh-CN":"模拟说明：上为北，每格代表 100 单位。A 点为 (0,0)，B 点为 (0,3)。"},
+      "instructions": {"en":"Write one two-part prompt about direction and distance. Provide a two-point marking key and a partial-credit example.","zh-CN":"编写一道两部分试题，分别考查方向及距离。提供两分评分细则和部分得分示例。"},
+      "expectedDeliverable": {"en":"Question, small map, and marking key.","zh-CN":"题目、小地图和评分细则。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Grid includes both points and both scale and north reference","zh-CN":"网格包含两点、比例及北向标识"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Key states north and 300 units","zh-CN":"答案为向北及 300 单位"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"One example earns exactly one point with a reason","zh-CN":"一个示例恰得一分，并说明理由"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ed-adapt-reading",
+      "careerField": "Education & Research",
+      "professionSlugs": ["adult-literacy-instructor","special-education-teacher"],
+      "skills": ["differentiated-instruction","accessibility"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Design two ways to read a notice","zh-CN":"设计两种阅读通知的方式"},
+      "description": {"en":"A fictional bus notice says route 5 pauses Sunday from 09:00 to 11:00. Use stop C for replacement service.","zh-CN":"虚构公交通知写明：周日 09:00 至 11:00，5 路暂停运行；替代服务在 C 站。"},
+      "instructions": {"en":"Make a plain-text version and a table or icon-supported version with equivalent information. Include a question about the alternative stop.","zh-CN":"制作通俗文字版及信息等价的表格或图标辅助版，附一道关于替代站点的问题。"},
+      "expectedDeliverable": {"en":"Two notices and one comprehension check.","zh-CN":"两版通知及一道理解检查题。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Both preserve route, Sunday, times, and C","zh-CN":"两版均保留线路、周日、时间及 C 站"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Icon version has text or alt labels for meaning","zh-CN":"图标版以文字或替代标签表达含义"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Check has a unique answer C","zh-CN":"检查题唯一答案为 C"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ed-tag-source-packet",
+      "careerField": "Education & Research",
+      "professionSlugs": ["school-librarian","archivist"],
+      "skills": ["information-literacy","archival-description"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Organize a source packet","zh-CN":"整理资料包"},
+      "description": {"en":"Three invented sources are a 1930 poster, a 2000 retrospective interview, and an undated scan of the poster.","zh-CN":"三个虚构资料分别为 1930 年海报、2000 年回顾访谈、海报的无日期扫描件。"},
+      "instructions": {"en":"Give each source a stable ID, date field, type, and relationship. Flag uncertainty without guessing.","zh-CN":"为每份资料提供稳定编号、日期字段、类型及相互关系。标明不确定性，不猜测。"},
+      "expectedDeliverable": {"en":"Three-row metadata table.","zh-CN":"三行元数据表。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All three IDs distinct and dates are accurate or unknown","zh-CN":"三个编号均不同，日期准确或标为未知"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Scan is related to the poster without reusing its ID","zh-CN":"扫描件与海报关联，但不共用编号"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Retrospective interview is distinguished from a contemporaneous source","zh-CN":"回顾性访谈与同时代资料区分"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ed-review-learning-data",
+      "careerField": "Education & Research",
+      "professionSlugs": ["education-researcher","research-data-steward"],
+      "skills": ["learning-outcome-analysis","data-management"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 50,
+      "title": {"en":"Handle missing workshop scores","zh-CN":"处理培训分数缺失"},
+      "description": {"en":"Paired mock scores: A 4 to 6, B 5 to missing, C 3 to 4, D 6 to 6.","zh-CN":"模拟配对分数：A 由 4 到 6，B 由 5 到缺失，C 由 3 到 4，D 由 6 到 6。"},
+      "instructions": {"en":"Compute the complete-pair mean change, report missingness, and compare with a sensitivity scenario in which B’s follow-up is 3.","zh-CN":"算出完整配对的平均变化，报告缺失情况，并与 B 的随访值假设为 3 的敏感性情景比较。"},
+      "expectedDeliverable": {"en":"Reproducible calculation and interpretation.","zh-CN":"可复算过程及解读。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Complete-pair mean change is 1","zh-CN":"完整配对平均变化为 1"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Missing follow-up reported as 1 of 4","zh-CN":"报告 4 人中有 1 人随访缺失"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Sensitivity mean is 0.25 and is labeled as assumed","zh-CN":"敏感性情景均值为 0.25，且标为假设"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ed-run-teach-back",
+      "careerField": "Education & Research",
+      "professionSlugs": ["vocational-instructor","teaching-assistant"],
+      "skills": ["practical-demonstration","learning-assessment"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Design a paper-fold teach-back","zh-CN":"设计折纸复述练习"},
+      "description": {"en":"Toy process: fold one sheet in half, open it, fold both outer edges to the center crease. No tools are needed.","zh-CN":"模拟流程：将一张纸对折，打开，再把两个外边分别折到中间折痕。无需工具。"},
+      "instructions": {"en":"Demonstrate in three annotated frames and design one teach-back check for a common step reversal.","zh-CN":"用三幅带注释图示范，并针对常见的步骤顺序错误设计一个复述核对。"},
+      "expectedDeliverable": {"en":"Three frames and one check with expected response.","zh-CN":"三幅图及一道附预期回应的核对题。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Frames preserve the order of the three steps","zh-CN":"三幅图保持三个步骤的顺序"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Final edges meet the original center crease","zh-CN":"最后两个边与原中心折痕对齐"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Check distinguishes a reversal from the correct sequence","zh-CN":"核对能区分步骤颠倒与正确顺序"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ed-schedule-course-path",
+      "careerField": "Education & Research",
+      "professionSlugs": ["academic-advisor","career-counselor"],
+      "skills": ["degree-planning","action-planning"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Fit mock classes into two terms","zh-CN":"把模拟课程排入两学期"},
+      "description": {"en":"A required before C, B may run anytime, D after B. At most two courses each term, each course once.","zh-CN":"A 必须先于 C，B 可在任一学期，D 必须晚于 B。每学期最多两门，每门只修一次。"},
+      "instructions": {"en":"Make a two-term plan and explain feasibility if B moves to term 2.","zh-CN":"制定两学期计划，并解释若 B 移到第 2 学期是否可行。"},
+      "expectedDeliverable": {"en":"Schedule and contingency note.","zh-CN":"课程表及应变说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Term 1 contains A and B","zh-CN":"第 1 学期包含 A 和 B"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Term 2 contains C and D","zh-CN":"第 2 学期包含 C 和 D"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Note explains moving B makes D infeasible within two terms","zh-CN":"说明移动 B 会导致 D 无法在两学期内修完"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ed-triangulate-archive",
+      "careerField": "Education & Research",
+      "professionSlugs": ["historian","archaeologist"],
+      "skills": ["source-criticism","field-documentation"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 50,
+      "title": {"en":"Reconcile conflicting archive traces","zh-CN":"核对冲突的档案线索"},
+      "description": {"en":"A fictional 1902 ledger lists 12 stall permits, a same-year map draws 9 stalls, and a later memoir recalls 15. The sources may count different units.","zh-CN":"虚构的 1902 年台账列出 12 份摊位许可，同年地图画了 9 个摊位，后来的回忆录说有 15 个。来源可能采用不同计数单位。"},
+      "instructions": {"en":"Make a claim-evidence table and write a defensible two-sentence finding with a next-source request.","zh-CN":"制作论点与证据表，写两句可辩护的发现，并提出下一项想查找的资料。"},
+      "expectedDeliverable": {"en":"Evidence matrix and historical note.","zh-CN":"证据矩阵及历史说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All dates, counts, and source types preserved","zh-CN":"保留所有日期、数量及来源类型"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Finding distinguishes permitted, drawn, and recalled counts","zh-CN":"区分许可数、地图绘制数及回忆数"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Requested source could help resolve the specific uncertainty","zh-CN":"拟查找的资料有助于解决所指出的不确定性"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ed-interpret-light-curve",
+      "careerField": "Education & Research",
+      "professionSlugs": ["astronomer","research-data-steward"],
+      "skills": ["observational-astronomy","signal-analysis"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Plot a toy light curve","zh-CN":"绘制模拟光变曲线"},
+      "description": {"en":"At times 0–6 a synthetic sensor reads 100, 100, 98, 96, 98, 100, 100 units.","zh-CN":"在时刻 0 至 6，模拟传感器读数为 100、100、98、96、98、100、100 单位。"},
+      "instructions": {"en":"Plot the series, calculate minimum and percentage dip from 100, and note a plausible nonastronomical alternative for a dip.","zh-CN":"画出序列图，求最小值及相对 100 的下降百分比，说明一种非天文学的可能原因。"},
+      "expectedDeliverable": {"en":"Line plot, calculation, and alternative explanation.","zh-CN":"折线图、计算及替代解释。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Seven observations plotted in the correct order","zh-CN":"按正确顺序绘出七个观测值"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Minimum 96 at time 3; drop 4%","zh-CN":"时刻 3 最低，为 96；下降 4%"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Alternative could produce an apparent dip without attributing a real discovery","zh-CN":"替代解释能造成表观下降，且不宣称真实发现"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ed-choose-feedback-loop",
+      "careerField": "Education & Research",
+      "professionSlugs": ["school-principal","instructional-designer"],
+      "skills": ["school-improvement-planning","learning-assessment"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Design a classroom feedback loop","zh-CN":"设计课堂反馈闭环"},
+      "description": {"en":"A fictional study hall reports three issues: directions unclear, materials run out, and instructions on one wall are hard to see.","zh-CN":"虚构自习课堂报告三个问题：说明不清、材料用完、墙上的说明难以看见。"},
+      "instructions": {"en":"Prioritize one small trial, state its owner and observation window, and design a repeatable check with a threshold for revision.","zh-CN":"选择一项小规模试点，注明负责人及观察期，设计可重复检查并设定触发调整的阈值。"},
+      "expectedDeliverable": {"en":"One-page trial plan with a decision rule.","zh-CN":"一页试点计划及决策规则。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Trial targets a named issue from the brief","zh-CN":"试点针对题目中一项明确问题"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Owner, duration, and observable measure all defined","zh-CN":"定义负责人、时长及可观察指标"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Decision rule says when to keep or revise the trial","zh-CN":"规则说明何时保留或调整试点"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ea-compare-beam-card",
+      "careerField": "Engineering & Architecture",
+      "professionSlugs": ["civil-engineer","mechanical-engineer"],
+      "skills": ["engineering-calculations","structural-analysis"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Compare toy beam deflections","zh-CN":"比较模拟梁的挠度"},
+      "description": {"en":"For a paper-only model use d = load × span³ ÷ stiffness. A: load 2, span 2, stiffness 8. B: 2, 3, 18. Units are arbitrary.","zh-CN":"仅作纸面模型，使用 d = 荷载 × 跨度³ ÷ 刚度。A 的荷载 2、跨度 2、刚度 8；B 分别为 2、3、18。单位为任意单位。"},
+      "instructions": {"en":"Calculate d for both and rank them. Double the span of A and show the effect. Do not use the formula for construction.","zh-CN":"计算两者的 d 值并排序；将 A 的跨度加倍，展示其影响。不得将公式用于施工。"},
+      "expectedDeliverable": {"en":"Calculation sheet and model-scope label.","zh-CN":"计算表及模型范围说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"A is 2 and B is 3","zh-CN":"A 为 2，B 为 3"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"A with doubled span gives 16","zh-CN":"A 跨度加倍后为 16"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Ranking and eightfold change are clear","zh-CN":"清楚列明排序及八倍变化"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ea-room-grid-plan",
+      "careerField": "Engineering & Architecture",
+      "professionSlugs": ["architect","interior-designer"],
+      "skills": ["spatial-planning","space-planning"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 30,
+      "title": {"en":"Arrange a mock reading room","zh-CN":"布置模拟阅览室"},
+      "description": {"en":"Grid width 6, depth 4. Entry is at front center. Two 2×1 desks and a 1×1 shelf must fit, leaving a marked grid path to the shelf.","zh-CN":"网格宽 6、深 4，入口居前侧中央。放入两张 2×1 桌和一个 1×1 架，并标注通向书架的格点路线。"},
+      "instructions": {"en":"Draw a scaled plan. Show a connected one-cell-wide route without traversing furniture. Use no real building codes.","zh-CN":"绘制比例平面图，展示一条连续、宽一格且不穿过家具的路线。不使用实际建筑规范。"},
+      "expectedDeliverable": {"en":"Grid plan and legend.","zh-CN":"网格平面图及图例。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Dimensions and all furniture footprints match the brief","zh-CN":"尺寸及家具占格与题目一致"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Furniture is inside the grid and has no overlap","zh-CN":"家具都在网格内且不重叠"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Route connects entry to a cell adjacent to shelf","zh-CN":"路线连接入口与书架相邻的格子"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ea-assembly-line-balance",
+      "careerField": "Engineering & Architecture",
+      "professionSlugs": ["industrial-engineer","construction-manager"],
+      "skills": ["work-measurement","scheduling"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Balance a mock assembly line","zh-CN":"平衡模拟装配线"},
+      "description": {"en":"Four ordered operations take 2, 4, 3, and 1 minutes. Split at one boundary between two stations. Cycle time is the larger station total.","zh-CN":"四道顺序工序用时 2、4、3、1 分钟。在一个边界处分配给两个工位。节拍为较大工位总时长。"},
+      "instructions": {"en":"Evaluate all three possible splits and choose the shortest cycle time. Label idle time at each station.","zh-CN":"计算三种划分并选出最短节拍，同时标注各工位的空闲时长。"},
+      "expectedDeliverable": {"en":"Three-row analysis with selected allocation.","zh-CN":"三行情景分析及选定分配方案。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Three cycle times are 8, 6, and 9","zh-CN":"三个节拍分别为 8、6、9"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Chosen split after operation 2 yields totals 6 and 4","zh-CN":"选第 2 工序之后划分，工位总时长为 6 和 4"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Idle times reported as 0 and 2","zh-CN":"空闲时长为 0 和 2"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ea-spot-model-clashes",
+      "careerField": "Engineering & Architecture",
+      "professionSlugs": ["bim-coordinator","building-services-engineer"],
+      "skills": ["clash-detection","model-coordination"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Find model coordination issues","zh-CN":"查找模型协调冲突"},
+      "description": {"en":"Toy footprints: duct x=1–4,y=2–3; beam x=3–5,y=2–4; pipe x=0–1,y=0–1. Treat positive-area overlap as a clash.","zh-CN":"模拟投影：风管 x=1–4、y=2–3；梁 x=3–5、y=2–4；管道 x=0–1、y=0–1。只有正面积重叠视为冲突。"},
+      "instructions": {"en":"Draw three footprints, compute overlaps, and log the affected pair and suggested team owner. No physical changes are requested.","zh-CN":"绘制三个投影，计算重叠，并登记涉及对象和拟负责团队。不进行真实改造。"},
+      "expectedDeliverable": {"en":"Plan and clash log.","zh-CN":"平面图及冲突日志。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All three footprints plotted at supplied coordinates","zh-CN":"按给定坐标绘出三个投影"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Only duct and beam overlap with area 1","zh-CN":"仅风管与梁重叠，面积为 1"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Log identifies both disciplines and assigns a review owner","zh-CN":"日志注明涉及专业并指定复核负责人"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ea-tolerance-pass",
+      "careerField": "Engineering & Architecture",
+      "professionSlugs": ["cnc-machinist","materials-engineer"],
+      "skills": ["dimensional-inspection","quality"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Check a mock tolerance sheet","zh-CN":"核查模拟公差表"},
+      "description": {"en":"Target 10.00 mm with inclusive tolerance ±0.05. Measurements 9.94, 9.95, 10.00, 10.05, 10.06. Use these numbers only.","zh-CN":"目标为 10.00 毫米，公差为 ±0.05，包含边界。测量值为 9.94、9.95、10.00、10.05、10.06。只用这些数值。"},
+      "instructions": {"en":"Calculate permitted interval and classify each sample. Identify the two measurements testing inclusive edges.","zh-CN":"计算允许区间并分类每件样品，指出验证边界包含性的两个值。"},
+      "expectedDeliverable": {"en":"Five-row inspection table.","zh-CN":"五行检验表。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Bounds 9.95 and 10.05, inclusive","zh-CN":"上下限为 9.95 和 10.05，均包含"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Only the middle three measurements pass","zh-CN":"只有中间三个测量值通过"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Both endpoints explicitly identified as boundary cases","zh-CN":"明确指出两个端点为边界用例"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ea-run-state-table",
+      "careerField": "Engineering & Architecture",
+      "professionSlugs": ["robotics-engineer","embedded-software-engineer"],
+      "skills": ["control-design","testing"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 55,
+      "title": {"en":"Trace a simulated robot controller","zh-CN":"追踪机器人控制仿真"},
+      "description": {"en":"Toy states idle, move, blocked. Start from idle moves unless obstacle present. An obstacle while moving blocks. Clear from blocked returns to idle; a new start is required.","zh-CN":"模拟状态为空闲、移动、阻塞。空闲时开始且无障碍才移动。移动遇障碍转为阻塞。清除障碍后回到空闲；需重新开始才移动。"},
+      "instructions": {"en":"Write a state table and trace start, obstacle, clear, start. Add tests for start with obstacle and unrelated clear while idle. Use paper or code only.","zh-CN":"编写状态表并追踪开始、障碍、清除、再次开始；给有障碍时开始以及空闲时收到清除事件编写测试。仅用纸笔或代码。"},
+      "expectedDeliverable": {"en":"Transition table and three traces or tests.","zh-CN":"状态转移表和三条追踪或测试。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Main sequence reaches move, blocked, idle, move","zh-CN":"主序列到达移动、阻塞、空闲、移动"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Obstacle at start never permits movement","zh-CN":"开始时有障碍不会进入移动"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Clear while idle leaves idle and no blocked restart is automatic","zh-CN":"空闲时清除仍为空闲，阻塞解除后不会自动重启"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ea-balance-mass",
+      "careerField": "Engineering & Architecture",
+      "professionSlugs": ["chemical-engineer","semiconductor-process-engineer"],
+      "skills": ["mass-balances","process-characterization"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Balance a virtual sorting flow","zh-CN":"平衡虚拟分拣流程"},
+      "description": {"en":"A toy input is 100 units, 40 blue and 60 white. Product takes 32 blue and 12 white; all else goes to reject.","zh-CN":"模拟输入共 100 单位，蓝色 40、白色 60。成品含蓝色 32、白色 12，其余进入淘汰流。"},
+      "instructions": {"en":"Build a two-stream material balance, calculate blue recovery and product blue fraction, and check conservation. No physical procedure is involved.","zh-CN":"制作双流物料平衡，计算蓝色回收率及成品蓝色占比，验证守恒。不涉及实物操作。"},
+      "expectedDeliverable": {"en":"Balance table with two percentages.","zh-CN":"平衡表及两个百分比。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Reject stream has 8 blue and 48 white","zh-CN":"淘汰流含蓝色 8、白色 48"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Blue recovery is 80% and product blue fraction is 32/44","zh-CN":"蓝色回收率为 80%，成品蓝色占比为 32/44"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Both color totals and grand total reconcile","zh-CN":"两种颜色及总量均守恒"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ea-plan-acoustic-comparison",
+      "careerField": "Engineering & Architecture",
+      "professionSlugs": ["acoustical-engineer","materials-engineer"],
+      "skills": ["acoustic-modeling","data-analysis"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Compare simulated sound attenuation","zh-CN":"比较模拟声衰减"},
+      "description": {"en":"A toy sound model gives source and receiver levels: panel A 70 and 55, panel B 72 and 54, baseline 70 and 65, all in dB.","zh-CN":"模拟声学模型给出声源和接收处声级：板 A 为 70、55，板 B 为 72、54，基准为 70、65，单位均为分贝。"},
+      "instructions": {"en":"Calculate each source-minus-receiver difference, compare against baseline, and note one unmodeled variable. Do not generate sound.","zh-CN":"计算每组声源减接收声级的差值，与基准比较，指出一个未建模变量。不要产生声音。"},
+      "expectedDeliverable": {"en":"Attenuation table and scope note.","zh-CN":"衰减表及范围说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Differences are A 15, B 18, baseline 5 dB","zh-CN":"差值分别为 A 15、B 18、基准 5 分贝"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Improvements relative to baseline are 10 and 13 dB","zh-CN":"相对基准改善 10 和 13 分贝"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Note identifies a relevant omitted factor such as frequency","zh-CN":"说明指出相关缺失因素，如频率"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ea-schedule-prototype-build",
+      "careerField": "Engineering & Architecture",
+      "professionSlugs": ["aerospace-engineer","industrial-maintenance-technician"],
+      "skills": ["planning","technical-inspection"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 55,
+      "title": {"en":"Trace a mock build dependency plan","zh-CN":"分析模拟制作依赖计划"},
+      "description": {"en":"Paper prototype tasks: design 2 hours; parts 3 after design; drawing review 2 after design; assembly 2 after parts and review; final check 1 after assembly.","zh-CN":"纸面原型任务：设计 2 小时；设计后准备部件 3 小时；设计后审图 2 小时；两项完成后组装 2 小时；完成后终检 1 小时。"},
+      "instructions": {"en":"Draw the dependency network. Compute earliest completion, review slack, and impact of a two-hour review delay from its earliest finish.","zh-CN":"绘制依赖网络，计算最早完成时间、审图浮动时间及审图较最早完成时间晚两小时的影响。"},
+      "expectedDeliverable": {"en":"Network, timing table, and delay impact.","zh-CN":"网络图、时间表及延误影响。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Earliest completion is 8 hours","zh-CN":"最早完成时间为 8 小时"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Review has one hour of slack","zh-CN":"审图有一小时浮动时间"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Two-hour delay pushes completion to 9 hours","zh-CN":"两小时延误使完成时间变为 9 小时"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-ea-compare-slope-sections",
+      "careerField": "Engineering & Architecture",
+      "professionSlugs": ["land-surveyor","landscape-architect"],
+      "skills": ["site-analysis","engineering-calculations"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Compare toy path gradients","zh-CN":"比较模拟路径坡度"},
+      "description": {"en":"Option A rises 2 units over horizontal run 40; B rises 3 over 50; C descends 1 over 15. Fictional design target magnitude at most 6%.","zh-CN":"方案 A 水平距离 40、上升 2；B 水平距离 50、上升 3；C 水平距离 15、下降 1。虚构设计目标为坡度绝对值不超过 6%。"},
+      "instructions": {"en":"Compute signed grades, classify against the toy limit, and sketch the profiles with labeled rise and run. Do not assess real accessibility compliance.","zh-CN":"计算带符号的坡度，依据模拟阈值分类，并绘制标注高差及水平距离的剖面。不要评定实际无障碍合规情况。"},
+      "expectedDeliverable": {"en":"Three-row calculation table and profiles.","zh-CN":"三行计算表及剖面图。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Grades +5%, +6%, and approximately -6.67%","zh-CN":"坡度为 +5%、+6% 及约 -6.67%"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"A and B meet the toy target; C does not","zh-CN":"A 和 B 达到模拟目标，C 未达到"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Profiles label horizontal run and the correct rise or descent","zh-CN":"剖面标明水平距离及正确的上升或下降"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mc-verify-correction",
+      "careerField": "Media & Communication",
+      "professionSlugs": ["fact-checker","journalist"],
+      "skills": ["source-verification","reporting"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Write a precise correction","zh-CN":"撰写准确更正"},
+      "description": {"en":"Mock flyer says Saturday at 12:00. Official organizer notice in this exercise says Sunday at 14:00. A repost repeats the flyer.","zh-CN":"模拟传单写周六 12:00，练习中的主办方公告写周日 14:00；一条转发重复传单说法。"},
+      "instructions": {"en":"Write a two-sentence correction identifying the error and corrected details. Record which exercise source supports each detail.","zh-CN":"写两句更正，指出错误及正确信息，并记录支撑各细节的练习来源。"},
+      "expectedDeliverable": {"en":"Correction and short source trail.","zh-CN":"更正及简短溯源记录。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Corrected day and time are Sunday 14:00","zh-CN":"更正为周日 14:00"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Original error accurately identified","zh-CN":"准确指出原始错误"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Organizer notice is distinguished from repeated claims","zh-CN":"区分主办方公告与重复转述"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mc-edit-audio-clock",
+      "careerField": "Media & Communication",
+      "professionSlugs": ["podcast-producer","radio-presenter"],
+      "skills": ["episode-planning","audio-editing"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Cut a segment to time","zh-CN":"剪辑节目达到目标时长"},
+      "description": {"en":"Mock duration: intro 20 s, clip A 45 s, bridge 15 s, clip B 40 s, close 20 s. Target ≤100 s. Keep both clips, at least 10 s intro and 10 s close. Each clip can lose at most 10 s.","zh-CN":"模拟时长：开场 20 秒、片段 A 45 秒、过渡 15 秒、片段 B 40 秒、结尾 20 秒。目标不超过 100 秒。保留两片段，开场及结尾各至少 10 秒；A 或 B 各最多删 10 秒。"},
+      "instructions": {"en":"Propose a time-coded paper edit with one stated continuity choice. No actual recordings are required.","zh-CN":"提出带时间码的纸面剪辑方案，说明一项保持连贯的处理。不需要录音。"},
+      "expectedDeliverable": {"en":"Before-and-after rundown and continuity note.","zh-CN":"剪辑前后流程表及连贯性说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All required segments and minimum durations are respected","zh-CN":"保留指定片段并满足最小时长"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"New duration is at most 100 seconds and adds up","zh-CN":"新时长不超过 100 秒且合计正确"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Continuity note explains one kept or replaced transition","zh-CN":"说明指出一处保留或替换的过渡"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mc-short-caption",
+      "careerField": "Media & Communication",
+      "professionSlugs": ["captioning-specialist","subtitler"],
+      "skills": ["caption-editing","speaker-identification"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Caption a toy scene","zh-CN":"为模拟场景编写字幕"},
+      "description": {"en":"Audio script: 0–2 seconds Mei says Wait; 2–4 a doorbell rings; 4–6 Jo says I’ll get it.","zh-CN":"音频脚本：0–2 秒小梅说等一下；2–4 秒门铃响；4–6 秒小周说我去开门。"},
+      "instructions": {"en":"Write three timed captions with speakers and the meaningful sound. Keep times nonoverlapping.","zh-CN":"编写三条带时间的字幕，标明说话人与有意义的声音，时间不重叠。"},
+      "expectedDeliverable": {"en":"Three-entry caption file or plain-text timeline.","zh-CN":"三条字幕的文件或纯文字时间轴。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All three events present and correctly ordered","zh-CN":"三个事件齐全且顺序正确"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Dialogue labeled with the correct speakers","zh-CN":"对白标明正确的说话人"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Doorbell appears as a sound cue with accurate timings","zh-CN":"门铃作为声音提示且时间准确"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mc-channel-brief",
+      "careerField": "Media & Communication",
+      "professionSlugs": ["communications-strategist","social-media-manager"],
+      "skills": ["content-planning","message-development"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Adapt one bulletin for two channels","zh-CN":"为两个渠道改写公告"},
+      "description": {"en":"A mock exhibition entrance moves to Gate C on June 2, 09:00–12:00. Entry is still free. No stated reason.","zh-CN":"模拟展览入口在 6 月 2 日 09:00 至 12:00 移至 C 门，仍免费，未说明原因。"},
+      "instructions": {"en":"Write a short sign and a social post. Put the action first on the sign and add one useful orientation detail without inventing a location fact.","zh-CN":"制作简短标牌和社交媒体帖。标牌先写行动要求，补充一项实用导引信息，不编造位置事实。"},
+      "expectedDeliverable": {"en":"Two channel-ready messages.","zh-CN":"两份可在各自渠道发布的消息。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Both preserve Gate C, date, time, and free entry","zh-CN":"两份均保留 C 门、日期、时间及免费入场"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Sign opens with the required visitor action","zh-CN":"标牌以访客需执行的操作开头"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Orientation detail is useful and introduces no unsupported facts","zh-CN":"导引信息实用且没有无依据的事实"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mc-edit-claim-language",
+      "careerField": "Media & Communication",
+      "professionSlugs": ["scientific-communicator","book-editor"],
+      "skills": ["editing","evidence-synthesis"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 50,
+      "title": {"en":"Edit a causal overclaim","zh-CN":"编辑过度因果断言"},
+      "description": {"en":"Fictional survey: 12 of 20 park visitors preferred a new sign. Draft says the sign made all visitors navigate faster. No times recorded.","zh-CN":"虚构调查：20 名公园访客中有 12 人偏好新标牌。草稿称标牌让所有人走得更快，未记录时间。"},
+      "instructions": {"en":"Rewrite the claim with the measured evidence, identify the unsupported part, and propose an observable measure to test travel speed.","zh-CN":"根据实测证据改写结论，找出无依据的部分，并提出一个可观察指标检验通行速度。"},
+      "expectedDeliverable": {"en":"Edited sentence, rationale, and measurement suggestion.","zh-CN":"修改后的句子、理由和指标建议。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Rewrite states 12 of 20 expressed preference","zh-CN":"改写说明 20 人中有 12 人表示偏好"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Neither causality nor travel times are asserted as observed","zh-CN":"没有把因果关系或通行时间写为已观察事实"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Suggestion specifies a time start and endpoint","zh-CN":"建议注明计时起点及终点"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mc-shot-continuity-grid",
+      "careerField": "Media & Communication",
+      "professionSlugs": ["cinematographer","film-and-television-director"],
+      "skills": ["visual-continuity","storyboarding"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Plan three connected shots","zh-CN":"设计三个连贯镜头"},
+      "description": {"en":"In a simple scene a paper envelope is on the left, then crosses to the right, then is opened on the right.","zh-CN":"在简短场景中，信封先在左侧，随后移到右侧，最后在右侧打开。"},
+      "instructions": {"en":"Draw three frames and label orientation and visible envelope state. Indicate one edit point that preserves movement continuity.","zh-CN":"绘制三帧，标明方向及信封的可见状态，并指出一处保持动作连续的剪辑点。"},
+      "expectedDeliverable": {"en":"Three-shot board with edit note.","zh-CN":"三镜头分镜及剪辑说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Left, transfer, and right/open states occur in order","zh-CN":"左侧、移动、右侧打开状态依次出现"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Screen direction is visibly consistent across the transfer","zh-CN":"移动过程中画面方向一致且可见"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Edit note points to a specific shared action or position","zh-CN":"说明指向具体的共同动作或位置"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mc-translation-release-check",
+      "careerField": "Media & Communication",
+      "professionSlugs": ["localization-project-manager","technical-writer"],
+      "skills": ["terminology-management","documentation"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 45,
+      "title": {"en":"Review a localized interface release","zh-CN":"复核界面本地化版本"},
+      "description": {"en":"A mock interface has source strings Save draft, Publish, Delete draft. Approved translation for draft in the target language is 草稿; the localized draft text currently uses both 草稿 and 初稿.","zh-CN":"模拟界面源文本为 Save draft、Publish、Delete draft。规定目标语言中 draft 译为草稿，但现有译文混用草稿和初稿。"},
+      "instructions": {"en":"Create a three-row source-to-target sheet with a stable key per string, enforce the approved term, and flag which action warrants a review for clarity before release.","zh-CN":"制作三行源文到译文表，为各字符串提供稳定键，统一核准术语，标记发布前应复核清晰度的一项操作。"},
+      "expectedDeliverable": {"en":"Mapping sheet and release check.","zh-CN":"映射表及发布检查。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All three source intents represented with distinct keys","zh-CN":"三个源文意图对应不同键"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Both draft strings consistently use 草稿","zh-CN":"两条涉及 draft 的译文统一用草稿"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Review flags delete or publish with an explicit confusion to prevent","zh-CN":"标记删除或发布并说明要预防的具体混淆"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mc-build-quote-context",
+      "careerField": "Media & Communication",
+      "professionSlugs": ["journalist","photojournalist"],
+      "skills": ["caption-verification","source-verification"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Caption a mock documentary image","zh-CN":"为模拟纪实图片配图注"},
+      "description": {"en":"A described image shows two volunteers placing boxes on shelves Friday at Hall D. A separate rumor claims the boxes contain medicine; contents are unknown.","zh-CN":"描述中的图片显示周五两名志愿者在 D 厅把箱子放上架子。另有传言称箱内是药品，但内容不明。"},
+      "instructions": {"en":"Write a single caption with only supported details and a separate line of facts to verify before adding more context.","zh-CN":"写一句只含有依据细节的图注，另列一行增加背景前需核实的事实。"},
+      "expectedDeliverable": {"en":"Caption and verification note.","zh-CN":"图注及核实说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Caption uses the correct action and location","zh-CN":"图注中的动作及地点正确"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Caption does not assert any contents or identity","zh-CN":"图注不声称箱内物品或个人身份"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Verification note explicitly separates the rumor from confirmed details","zh-CN":"核实说明明确区分传言与已知细节"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mc-select-media-mix",
+      "careerField": "Media & Communication",
+      "professionSlugs": ["advertising-media-planner","public-relations-specialist"],
+      "skills": ["budget-allocation","audience-research"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Allocate a toy media budget","zh-CN":"分配模拟媒介预算"},
+      "description": {"en":"Toy channels A costs 40 and yields 80 views; B costs 30 and yields 45; C costs 50 and yields 110. Budget 80, at most one buy per channel, no audience overlap assumed.","zh-CN":"模拟渠道 A 花费 40 获得 80 次浏览，B 花费 30 获得 45 次，C 花费 50 获得 110 次。预算 80，每渠道最多购买一次，假设受众无重叠。"},
+      "instructions": {"en":"Compare feasible pairs, pick the maximum-view mix, and explain how overlap could change the conclusion.","zh-CN":"比较可行的渠道组合，选择浏览量最高的一组，并解释受众重叠可能如何影响结论。"},
+      "expectedDeliverable": {"en":"Feasibility table and one recommendation.","zh-CN":"可行性表及一项推荐。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"A+B and B+C feasible and A+C not feasible","zh-CN":"A+B 及 B+C 可行，A+C 不可行"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"B+C selected with cost 80 and 155 views","zh-CN":"选 B+C，费用 80、浏览量 155"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Note distinguishes summed views from unique reach","zh-CN":"说明区分浏览量相加与独立触达人数"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-mc-build-print-cut",
+      "careerField": "Media & Communication",
+      "professionSlugs": ["copywriter","book-editor"],
+      "skills": ["editing","plain-language"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 25,
+      "title": {"en":"Edit a space-limited sign","zh-CN":"编辑空间有限的提示牌"},
+      "description": {"en":"Mock library sign must list return point downstairs, due time 18:00, and receipts at the desk. Space allows three lines.","zh-CN":"模拟图书馆告示必须列出：楼下归还点、18:00 截止、柜台领取收据。版面仅三行。"},
+      "instructions": {"en":"Write three action-oriented lines. Preserve the facts and record what order makes them quickest to scan.","zh-CN":"写三行以行动开头的内容，保留事实，并说明哪种顺序最便于扫读。"},
+      "expectedDeliverable": {"en":"Three-line sign and ordering rationale.","zh-CN":"三行提示牌及排序理由。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Exactly three lines, with one main instruction per line","zh-CN":"恰好三行，每行一个主要指令"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Downstairs, 18:00, and desk receipt all included","zh-CN":"包含楼下、18:00 和柜台领取收据"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Rationale accounts for the visitor’s next action","zh-CN":"排序理由考虑访客下一步行动"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-en-characterize-waste",
+      "careerField": "Environment & Social Impact",
+      "professionSlugs": ["waste-management-coordinator","environmental-scientist"],
+      "skills": ["waste-auditing","data-analysis"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 30,
+      "title": {"en":"Audit toy waste totals","zh-CN":"审计模拟废弃物总量"},
+      "description": {"en":"Simulated weights: paper 12 kg, mixed waste 18 kg, compost 10 kg. For this exercise, paper and compost are divertible.","zh-CN":"模拟重量：纸张 12 千克、混合垃圾 18 千克、堆肥物 10 千克。题目中纸张和堆肥物可分流。"},
+      "instructions": {"en":"Compute total and diversion share. Draw a labeled graphic and identify the largest category.","zh-CN":"计算总量及分流比例，绘制带标签的图，指出最大类别。"},
+      "expectedDeliverable": {"en":"Calculation and labeled chart.","zh-CN":"计算及带标签图表。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Total 40 kg","zh-CN":"总量 40 千克"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Diversion 22 kg or 55%","zh-CN":"分流 22 千克，即 55%"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Mixed waste labeled as largest category","zh-CN":"标出混合垃圾是最大类别"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-en-curve-precipitation",
+      "careerField": "Environment & Social Impact",
+      "professionSlugs": ["hydrologist","meteorologist"],
+      "skills": ["data-analysis","hydrologic-modeling"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Compare fictional rain gauges","zh-CN":"比较虚构雨量站"},
+      "description": {"en":"Two toy four-day logs: A 0,4,8,0 mm; B 2,2,2,6 mm. Treat a wet day as >0 mm.","zh-CN":"两组模拟四日记录：A 为 0、4、8、0 毫米；B 为 2、2、2、6 毫米。有雨日定义为超过 0 毫米。"},
+      "instructions": {"en":"Plot both series on common axes, compare totals, wet-day counts, and peak timing. Do not make a real forecast.","zh-CN":"在同一坐标轴绘制两序列，比较总量、有雨日数及峰值时点。不发布真实预报。"},
+      "expectedDeliverable": {"en":"Combined plot and comparison table.","zh-CN":"合并图及对照表。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Totals equal 12 mm each","zh-CN":"两站总量均为 12 毫米"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Wet days A 2 and B 4","zh-CN":"A 有雨 2 天，B 有雨 4 天"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Peak days A 3 and B 4 accurately labeled","zh-CN":"准确标注 A 在第 3 天、B 在第 4 天达峰值"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-en-allocate-shelter-kits",
+      "careerField": "Environment & Social Impact",
+      "professionSlugs": ["humanitarian-logistics-coordinator","emergency-management-specialist"],
+      "skills": ["inventory-control","transport-planning"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 55,
+      "title": {"en":"Allocate mock relief kits","zh-CN":"分配模拟救援物资包"},
+      "description": {"en":"Fictional depots N has 7 kits and S 5. Need sites A 5, B 4, C 3. N can reach only A/B. S can reach B/C. Paper exercise only.","zh-CN":"虚构仓库 N 有 7 套、S 有 5 套。需求点 A 需 5 套、B 需 4 套、C 需 3 套。N 仅能到达 A/B，S 仅能到达 B/C。仅为纸面练习。"},
+      "instructions": {"en":"Make a feasible allocation and show an unmet-demand contingency if N loses one kit. Avoid inventing real recipient profiles.","zh-CN":"制定可行分配，并说明 N 少一套时如何记录未满足需求。不编造现实受助者情况。"},
+      "expectedDeliverable": {"en":"Baseline allocation and contingency table.","zh-CN":"基线分配及应变表。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Baseline sends N→A 5, N→B 2, S→B 2, S→C 3","zh-CN":"基线 N→A 5、N→B 2、S→B 2、S→C 3"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Contingency respects route and capacity limits","zh-CN":"应变方案符合路线和容量限制"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Contingency identifies exactly one kit of unmet need without double counting","zh-CN":"应变方案明确缺一套且不重复统计"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-en-energy-scenarios",
+      "careerField": "Environment & Social Impact",
+      "professionSlugs": ["energy-auditor","renewable-energy-technician"],
+      "skills": ["energy-modeling","analytics"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Compare paper energy scenarios","zh-CN":"比较纸面用能情景"},
+      "description": {"en":"Mock room runs 10 lights rated 20 W for 5 h/day. Plan A changes to 12 W, same hours. Plan B keeps 20 W but runs 3 h/day.","zh-CN":"模拟房间使用 10 盏 20 瓦灯，每天五小时。方案 A 用 12 瓦，时长相同；方案 B 仍 20 瓦，每天三小时。"},
+      "instructions": {"en":"Compute baseline and plan daily kWh. Compare savings and identify one input to check in a real audit. Do not touch equipment.","zh-CN":"计算基线及方案的日千瓦时，比较节能量，指出实际审计中需核实的一项输入。不接触设备。"},
+      "expectedDeliverable": {"en":"Three-scenario calculation and one verification question.","zh-CN":"三个场景的计算及一个核实问题。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Baseline 1.0 kWh; both plans 0.6 kWh","zh-CN":"基线 1.0 千瓦时，两方案均为 0.6 千瓦时"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Both plans save 0.4 kWh per day","zh-CN":"两方案每天均节省 0.4 千瓦时"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Question names an uncertain input such as actual hours","zh-CN":"问题指出一项不确定输入，如实际使用时长"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-en-record-toy-transects",
+      "careerField": "Environment & Social Impact",
+      "professionSlugs": ["wildlife-biologist","ecological-restoration-technician"],
+      "skills": ["field-monitoring","field-surveying"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Compare toy observation transects","zh-CN":"比较模拟样带观察"},
+      "description": {"en":"Synthetic survey: transect A length 50, counts 5; B length 100, counts 7; C length 100, counts unknown. Same arbitrary length unit.","zh-CN":"模拟调查：样带 A 长 50、计数 5，B 长 100、计数 7，C 长 100、计数未知。长度单位一致。"},
+      "instructions": {"en":"Compute counts per 100 units for observed transects. Mark missingness and explain why raw totals alone mislead.","zh-CN":"对有观测数据的样带计算每 100 单位计数。标明缺失，并解释为何只看原始总数可能误导。"},
+      "expectedDeliverable": {"en":"Standardized rate table and limitation note.","zh-CN":"标准化比率表及局限说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"A reports 10 and B 7 per 100","zh-CN":"每 100 单位计数为 A 10、B 7"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"C remains unknown, not zero","zh-CN":"C 保持未知而非零"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Note explains the reversal relative to raw counts","zh-CN":"说明解释相对于原始计数的排序反转"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-en-map-community-input",
+      "careerField": "Environment & Social Impact",
+      "professionSlugs": ["community-organizer","urban-planner"],
+      "skills": ["facilitation","public-engagement"],
+      "difficulty": "beginner",
+      "estimatedMinutes": 30,
+      "title": {"en":"Synthesize feedback for a shared space","zh-CN":"汇总共享空间反馈"},
+      "description": {"en":"Invented feedback: two comments want shaded seating; one requests step-free access; one wants evening hours; one says evenings are too noisy.","zh-CN":"虚构反馈：两条希望设置遮阴座椅，一条要求无台阶通行，一条想在晚间开放，一条说夜间太吵。"},
+      "instructions": {"en":"Build an issue matrix with counts, represent the evening conflict, and write a neutral question for the next discussion.","zh-CN":"制作含计数的问题矩阵，呈现晚间使用冲突，写一个供下一轮讨论的中立问题。"},
+      "expectedDeliverable": {"en":"Issue matrix and facilitation prompt.","zh-CN":"问题矩阵及讨论提示。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"All five comments represented without collapsing opposing views","zh-CN":"呈现全部五条反馈，不合并相反观点"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Shade count is two and access is visible despite lower count","zh-CN":"遮阴计数为二，无台阶通行虽票数少仍清楚列出"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Question allows input from both evening viewpoints","zh-CN":"提问允许持不同晚间观点的人表达意见"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-en-rank-climate-exposure",
+      "careerField": "Environment & Social Impact",
+      "professionSlugs": ["climate-risk-analyst","sustainability-specialist"],
+      "skills": ["scenario-analysis","policy-analysis"],
+      "difficulty": "advanced",
+      "estimatedMinutes": 55,
+      "title": {"en":"Compare fictional exposure rankings","zh-CN":"比较虚构暴露风险排序"},
+      "description": {"en":"Toy score is hazard × exposure. Site A present 2×6 and future 4×6; B present 3×5 and future 3×5; C present and future 1×8.","zh-CN":"模拟分值为危险程度 × 暴露度。A 当前 2×6、未来 4×6，B 当前及未来均为 3×5，C 当前及未来均为 1×8。"},
+      "instructions": {"en":"Compute and rank each scenario, test future A if exposure drops to 3, and name a limitation of the toy score.","zh-CN":"计算各情景并排序，测试 A 未来暴露度降至 3 的结果，并说明模拟分值的一项局限。"},
+      "expectedDeliverable": {"en":"Ranked scenario table plus sensitivity note.","zh-CN":"排序情景表及敏感性说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Present ranks B 15, A 12, C 8","zh-CN":"当前排序为 B 15、A 12、C 8"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Future ranks A 24, B 15, C 8","zh-CN":"未来排序为 A 24、B 15、C 8"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Adjusted A becomes 12 and note names an unmodeled factor","zh-CN":"调整后 A 为 12，说明列出未建模因素"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-en-follow-grant-indicators",
+      "careerField": "Environment & Social Impact",
+      "professionSlugs": ["nonprofit-program-manager","community-organizer"],
+      "skills": ["program-evaluation","outcome-measurement"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Write usable program indicators","zh-CN":"编写可操作的项目指标"},
+      "description": {"en":"A fictional tool library wants more residents to return equipment on time and fewer borrowing instructions left unanswered.","zh-CN":"虚构工具图书馆希望更多居民按期归还设备，并减少借用说明未得到解答的情况。"},
+      "instructions": {"en":"Convert both aims to indicators with numerator, denominator, and collection window. Define which direction is desirable.","zh-CN":"将两个目标转化为具有分子、分母及收集时段的指标，并定义理想变化方向。"},
+      "expectedDeliverable": {"en":"Two-row measurement plan.","zh-CN":"两行测量方案。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"First indicator measures on-time returns against eligible returns","zh-CN":"第一项衡量在应归还件数中的按期归还情况"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Second indicator measures unresolved questions against questions received","zh-CN":"第二项衡量在收到问题中的未解决比例"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Both windows and desired directions explicitly stated","zh-CN":"两项均明确时段和理想变化方向"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-en-schedule-field-kit",
+      "careerField": "Environment & Social Impact",
+      "professionSlugs": ["forester","ecological-restoration-technician"],
+      "skills": ["planning","field-monitoring"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 40,
+      "title": {"en":"Schedule a paper-only monitoring route","zh-CN":"安排纸面监测路线"},
+      "description": {"en":"Simulated graph: depot→A 10 min, A→B 5, B→depot 10, A→C 12, C→depot 10; edges reversible. Budget 35 minutes including 5 minutes per site.","zh-CN":"模拟网络：库房到 A 10 分钟，A 到 B 5，B 到库房 10，A 到 C 12，C 到库房 10；边可双向。预算 35 分钟，每个点观察五分钟计入。"},
+      "instructions": {"en":"Compare depot–A–B–depot and depot–A–C–depot. Choose a feasible route and include a two-item sampling-log template. Do not visit any site.","zh-CN":"比较库房–A–B–库房和库房–A–C–库房，选可行路线并给出两项采样日志模板。不走访场地。"},
+      "expectedDeliverable": {"en":"Route calculation and log template.","zh-CN":"路线计算及日志模板。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"A/B route totals 35 minutes","zh-CN":"A/B 路线合计 35 分钟"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"A/C route totals 42 minutes and exceeds the budget","zh-CN":"A/C 路线合计 42 分钟，超预算"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Log provides site ID and a checkable observation field","zh-CN":"日志提供点位编号及可核查的观察字段"}}
+        ]
+      }
+    },
+    {
+      "id": "sc-en-mock-water-balance",
+      "careerField": "Environment & Social Impact",
+      "professionSlugs": ["water-treatment-operator","environmental-engineer"],
+      "skills": ["process-monitoring","water-quality"],
+      "difficulty": "intermediate",
+      "estimatedMinutes": 35,
+      "title": {"en":"Reconcile virtual water-meter readings","zh-CN":"核对虚拟水表读数"},
+      "description": {"en":"Toy storage starts at 60 L, receives 30 L, and dispenses 25 L. End meter reads 62 L. No equipment or samples are involved.","zh-CN":"模拟容器初始 60 升，进水 30 升，出水 25 升，末表读数 62 升。不涉及设备或样本。"},
+      "instructions": {"en":"Compute expected end and meter minus expected. Propose a document check and state why discrepancy alone cannot prove a leak.","zh-CN":"计算预期末量及读数减预期的差异，提出一项文档核对，并说明仅凭差异为何不能证明泄漏。"},
+      "expectedDeliverable": {"en":"Balance worksheet and verification note.","zh-CN":"平衡工作表及复核说明。"},
+      "rubric": {
+        "maxPoints": 3,
+        "criteria": [
+          {"id":"criterion-1","points":1,"fullCreditWhen":{"en":"Expected end is 65 L","zh-CN":"预期末量 65 升"}},
+          {"id":"criterion-2","points":1,"fullCreditWhen":{"en":"Meter minus expected is -3 L","zh-CN":"读数减预期为 -3 升"}},
+          {"id":"criterion-3","points":1,"fullCreditWhen":{"en":"Verification note names an alternative such as an entry or timing error","zh-CN":"复核说明提出记录或时间误差等其他可能原因"}}
+        ]
+      }
+    }
+  ]
+}
