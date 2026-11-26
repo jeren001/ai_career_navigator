@@ -19,6 +19,7 @@ import SignUp from './pages/SignUp'
 import MyProfile from './pages/MyProfile'
 import Settings from './pages/Settings'
 
+import AIAssistant from './pages/AIAssistant'
 
 // Main application component
 
@@ -54,7 +55,10 @@ function App() {
 
           {/* Settings Page */}
           <Route path="/settings" element={<Settings />} />
-          
+
+          {/* AI Assistant Page */}
+          <Route path="/ai-assistant" element={<AIAssistant />} />
+
         </Routes>
 
       </BrowserRouter>
