@@ -78,6 +78,23 @@ Assessment completion saves the recommendation response, including the AI guidan
 
 The response includes both self-reported and practically assessed skill records when available. Practical challenge activity reports submissions and evaluations as practice history. Challenge points never change proficiency or rankings. GET shows current skill and challenge data alongside the last saved guidance. Call refresh to regenerate that guidance after profile or evidence changes. A refresh that encounters an AI outage saves the deterministic result and a fallback reason.
 
+## My Roadmap API
+
+Run the backend migrations and authorize in Swagger UI with a registered account token.
+
+| Method and path | Purpose |
+| --- | --- |
+| `POST /api/roadmaps` | Generate and save a plan for a profession in your latest Career Match. |
+| `GET /api/roadmaps` | List your saved plans, newest first. Use `next_offset` to fetch another page. |
+| `GET /api/roadmaps/{id}` | Read a saved plan and its milestone progress. |
+| `PATCH /api/roadmaps/{id}/milestones/{milestoneId}` | Edit a milestone, add or clear notes, or set `completed` to true or false. |
+
+An empty create request uses the top match, your profile language, and 180 minutes of study per week. Supply `profession_slug`, `language` (`en` or `zh-CN`), or `weekly_study_minutes` (30 to 2400) to override those defaults. Each request saves a separate plan with three milestones for study, practice, and review.
+
+Roadmaps use current skill gaps and practice history to select relevant catalog materials. Resource links include the actual learning language, which can differ from the roadmap language. Milestone estimates cover the suggested activity. Provider estimates, when available, refer to the listed resource. Progress reflects milestones you mark complete.
+
+Gemini personalizes the actions and outcomes within the shared account quota and cache. A roadmap using rule-based guidance exposes the reason in `personalization`. Reading a plan and updating a milestone require zero AI calls.
+
 ## My Skills API
 
 Run `npm run migrate` from `backend`, then authorize in Swagger UI with a registered account token. The `My Skills` section documents these endpoints.
@@ -133,6 +150,27 @@ Run `npm run migrate` from `backend` to create the interview history table. Sign
 Choose a slug returned by `GET /api/careers`. The simulator selects three questions at the chosen difficulty, prioritizing profession tags and filling from the same career field. After each main answer, the AI provider selects a follow-up from the bank and can personalize it with a quote from the answer. A bank follow-up is available when the provider is unavailable. Answer the `current_question` in each response until the session is `completed`.
 
 Request evaluation after all six answers. The evaluator applies the bank's 0–2 rubric to the main answers and follow-ups, returning criterion feedback, strengths, mistakes or omissions, and improvement suggestions. The score describes the practice transcript. Follow-ups and evaluation share the existing daily account allowance. While a request is processing, use `GET /api/interviews/{id}` to check progress. An unavailable evaluation saves the transcript and a failure reason. The scores and feedback become available after a successful evaluation.
+
+## My Resume API
+
+Run the backend migrations and use a registered account bearer token. File extraction requires Python 3 and Poppler's `pdftotext` on the backend's PATH. Structured resume creation and editing work independently of the extractors.
+
+| Method and path | Purpose |
+| --- | --- |
+| `POST /api/resumes` | Create a resume with a title and optional structured sections. |
+| `POST /api/resumes/upload` | Send a raw PDF or DOCX body with its document `Content-Type`. Optional query parameters are `title` and `language`. |
+| `GET /api/resumes` | List your resume metadata. Use `next_offset` for the next page. |
+| `GET /api/resumes/{id}` | Read your resume, including sections and extracted text. |
+| `PATCH /api/resumes/{id}` | Edit the title, language, or selected sections. An empty section array clears that section. |
+| `GET /api/resumes/{id}/file` | Download the private original document. |
+| `POST /api/resumes/{id}/analyze` | Get improvement suggestions with `{"consent":true}` and an optional `target_role`. |
+| `DELETE /api/resumes/{id}` | Remove the resume, original bytes, and extracted text from the active database. |
+
+The file limit is 5 MiB. Extraction reads the first 30 PDF pages or the DOCX main document and accepts up to 40,000 characters of extracted text. Image-only documents need a text layer. Uploaded text is available for review before entering structured skills, education, work experience, projects, and certifications. The resume language defaults to the account preference and supports `en` and `zh-CN`.
+
+To opt in for a single request, send `"resume_context": {"resume_id":"<owned resume UUID>","consent":true}` to Career Match refresh, My Skills compare, My Roadmap create, or Interview Simulator evaluate. The response includes temporary `resume_guidance`. Resume excerpts are labeled as user claims. The AI provider chooses from grounded improvement actions using the shared account quota and uses localized rule-based suggestions when unavailable.
+
+Original files and text are private PostgreSQL data. Resume excerpts and guidance are kept out of saved personalization and the AI result cache. Explicit consent permits the configured provider to receive selected excerpts. Database backups and provider retention follow their own retention policies.
 
 ## Adaptive assessment API
 

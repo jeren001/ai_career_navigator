@@ -3,6 +3,8 @@ import { evaluateAnswers, loadActiveCareers } from './assessment.js';
 import { catalogLanguage, challengePracticeDetails } from './challenge-catalog.js';
 import { addEnrichment, enrichRecommendations } from './gemini.js';
 import { challengeProgress } from './practical-challenges.js';
+import { resumeAdvice } from './resume-ai.js';
+import { consentedResume } from './resumes.js';
 import { compareSkillsToCareers } from './skill-comparison.js';
 import { buildUserContext, latestCompletedAssessment } from './user-context.js';
 import { listUserSkills, skillsBody, skillsError } from './user-skills.js';
@@ -74,8 +76,9 @@ function enrichmentEvidence({ skills, skill_gaps: skillGaps, challenge_practice:
 }
 
 export async function refreshCareerMatch(database, userId, raw) {
-  const { language } = skillsBody(raw, ['language']);
+  const { language, resume_context: resumeContext } = skillsBody(raw, ['language', 'resume_context']);
   if (language !== undefined) catalogLanguage(language);
+  const resume = await consentedResume(database, userId, resumeContext);
   const context = await buildUserContext(database, userId);
   const assessment = requireAssessment(context.latest_assessment);
   const skills = await listUserSkills(database, userId);
@@ -104,5 +107,11 @@ export async function refreshCareerMatch(database, userId, raw) {
     [userId, assessment.id, assessment.career_match && JSON.stringify(assessment.career_match), JSON.stringify(snapshot)],
   );
   if (!saved) throw skillsError(409, 'The saved assessment or career recommendations changed. Reload and retry');
-  return { assessment_session_id: assessment.id, completed_at: assessment.completed_at, ...saved.career_match, ...details };
+  const result = { assessment_session_id: assessment.id, completed_at: assessment.completed_at, ...saved.career_match, ...details };
+  if (resume) {
+    result.resume_guidance = await resumeAdvice(database, userId, resume, 'career_match', {
+      professions: result.professions.map(({ title }) => title),
+    }, selectedLanguage);
+  }
+  return result;
 }

@@ -17,7 +17,9 @@ export default function createCareerMatchRouter(database) {
   router.post('/refresh', requireAuthentication, async (request, response, next) => {
     try {
       const body = request.body === undefined ? {} : request.body;
-      return response.json(await refreshCareerMatch(database, request.auth.userId, body));
+      const match = await refreshCareerMatch(database, request.auth.userId, body);
+      if (match.resume_guidance) response.set('Cache-Control', 'private, no-store');
+      return response.json(match);
     } catch (error) {
       return next(error);
     }

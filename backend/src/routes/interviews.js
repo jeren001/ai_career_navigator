@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { optionalAuthentication, requireAuthentication } from '../services/auth.js';
+import { resumeAdvice } from '../services/resume-ai.js';
+import { consentedResume } from '../services/resumes.js';
 import {
   answerInterview, createInterview, interviewHistory, readInterview, requestInterviewEvaluation,
 } from '../services/interviews.js';
@@ -57,7 +59,16 @@ export default function createInterviewsRouter(database) {
 
   router.post('/:id/evaluate', async (request, response, next) => {
     try {
-      const session = await requestInterviewEvaluation(database, request.auth.userId, request.params.id);
+      const { userId } = request.auth;
+      const resume = await consentedResume(database, userId, request.body?.resume_context);
+      const session = await requestInterviewEvaluation(database, userId, request.params.id);
+      if (resume && !session.processing) {
+        session.resume_guidance = await resumeAdvice(database, userId, resume, 'interview_simulator', {
+          profession: session.profession.title,
+          difficulty: session.difficulty,
+        }, session.language);
+        response.set('Cache-Control', 'private, no-store');
+      }
       return response.status(session.processing ? 202 : 200).json({ session });
     } catch (error) {
       return next(error);

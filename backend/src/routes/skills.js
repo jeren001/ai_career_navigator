@@ -35,7 +35,9 @@ export default function createSkillsRouter(database) {
 
   router.post('/compare', async (request, response, next) => {
     try {
-      return response.json(await compareUserSkills(database, request.auth.userId, request.body));
+      const comparison = await compareUserSkills(database, request.auth.userId, request.body);
+      if (comparison.resume_guidance) response.set('Cache-Control', 'private, no-store');
+      return response.json(comparison);
     } catch (error) {
       return next(error);
     }

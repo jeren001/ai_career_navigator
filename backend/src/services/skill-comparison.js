@@ -1,6 +1,8 @@
 import { reserveDailyAiRequest } from './ai-limits.js';
 import { generateAssessmentJson } from './assessment-ai.js';
 import { assessmentPrompt } from './assessment-prompts.js';
+import { resumeAdvice } from './resume-ai.js';
+import { consentedResume } from './resumes.js';
 import { listUserSkills, skillKey, skillsBody, skillsError } from './user-skills.js';
 
 const TARGET_LEVEL = 3;
@@ -95,8 +97,8 @@ function validateGuidance(value, gaps, language) {
 }
 
 export async function compareUserSkills(database, userId, raw) {
-  const { career_ids: careerIds, language, include_ai: includeAi = true } =
-    skillsBody(raw, ['career_ids', 'language', 'include_ai']);
+  const { career_ids: careerIds, language, include_ai: includeAi = true, resume_context: resumeContext } =
+    skillsBody(raw, ['career_ids', 'language', 'include_ai', 'resume_context']);
   if (!Array.isArray(careerIds) || !careerIds.length || careerIds.length > MAX_CAREERS ||
       careerIds.some((id) => !Number.isInteger(id) || id < 1 || id > 2_147_483_647) ||
       new Set(careerIds).size !== careerIds.length) {
@@ -104,6 +106,8 @@ export async function compareUserSkills(database, userId, raw) {
   }
   if (language !== undefined && !['en', 'zh-CN'].includes(language)) throw skillsError(400, 'language must be en or zh-CN');
   if (typeof includeAi !== 'boolean') throw skillsError(400, 'include_ai must be a boolean');
+  if (resumeContext !== undefined && !includeAi) throw skillsError(400, 'Resume personalization requires include_ai');
+  const resume = await consentedResume(database, userId, resumeContext);
 
   const { rows } = await database.query(
     'SELECT id, slug, title, market_pulse FROM career_roles WHERE is_active AND id = ANY($1::int[])',
@@ -116,6 +120,12 @@ export async function compareUserSkills(database, userId, raw) {
   const selectedLanguage = language || profiles[0]?.preferred_language || 'en';
   const gaps = comparison.prioritized_gaps.slice(0, MAX_GUIDANCE_GAPS);
   const base = { ...comparison, language: selectedLanguage };
+  if (resume) {
+    base.resume_guidance = await resumeAdvice(database, userId, resume, 'my_skills', {
+      careers: comparison.careers.map(({ title }) => title),
+      skill_gaps: gaps.map(({ name }) => name),
+    }, selectedLanguage);
+  }
   if (!gaps.length) {
     return { ...base, guidance: { status: 'not_needed', recommendations: [] } };
   }

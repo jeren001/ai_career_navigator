@@ -31,6 +31,24 @@ const catalogSkill = catalogQuery('skill', 'Skill name or dataset skill slug.');
 const pathId = (schema, example) => ({ name: 'id', in: 'path', required: true, schema, example });
 const challengeId = pathId(string, 'sc-ta-query-library');
 const submissionId = pathId({ ...string, format: 'uuid' }, demoId);
+const roadmapId = pathId({ ...string, format: 'uuid' }, demoId);
+const resumeId = pathId({ ...string, format: 'uuid' }, demoId);
+const resumeConsentExample = { resume_id: demoId, consent: true };
+const resumeErrors = {
+  400: 'Invalid request options, fields, ID, or missing consent where required.',
+  401: 'A registered account bearer token is required.',
+  404: 'Owned resume or file not found.',
+  503: 'The resume schema, authentication, or document extractor is unavailable.',
+};
+const resumeFormats = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+const resumeBinary = Object.fromEntries(resumeFormats.map((type) => [
+  type, { schema: { type: 'string', format: 'binary' } },
+]));
+const milestoneId = { ...roadmapId, name: 'milestoneId', example: '88b04fb4-e25f-4a51-978d-2065df0d1e34' };
+const roadmapErrors = {
+  401: 'A registered account bearer token is required.',
+  503: 'Authentication configuration or the roadmap database migration is unavailable.',
+};
 const interviewErrors = {
   400: 'Invalid interview fields, offset, or session ID.',
   401: 'A registered account bearer token is required.',
@@ -192,8 +210,8 @@ export const openapi = {
   servers: [{ url: '/', description: 'Current backend' }],
   tags: [
     { name: 'Health' }, { name: 'Authentication' }, { name: 'Profile' },
-    { name: 'Careers' }, { name: 'Career Match' }, { name: 'My Skills' }, { name: 'Practical Challenges' }, { name: 'Learning Hub' },
-    { name: 'Interview Simulator' }, { name: 'Assessment' }, { name: 'Quiz aliases' },
+    { name: 'Careers' }, { name: 'Career Match' }, { name: 'My Roadmap' }, { name: 'My Skills' }, { name: 'Practical Challenges' }, { name: 'Learning Hub' },
+    { name: 'Interview Simulator' }, { name: 'My Resume' }, { name: 'Assessment' }, { name: 'Quiz aliases' },
   ],
   paths: {
     '/api/health': { get: {
@@ -306,14 +324,134 @@ export const openapi = {
       requestBody: body('CareerMatchRefresh', {
         defaults: example('Use the profile language', {}),
         simplifiedChinese: example('Refresh in Simplified Chinese', { language: 'zh-CN' }),
+        resume: example('Add resume guidance for this request', { resume_context: resumeConsentExample }),
       }, false),
       responses: {
         200: response('Refreshed recommendations with AI guidance or a fallback reason.', ref('CareerMatch')),
         ...errors({
           400: 'Invalid language or request fields.', 401: 'A registered account bearer token is required.',
-          404: 'No completed assessment for this account.', 409: 'The saved assessment or match changed during refresh.',
+          404: 'No completed assessment or owned resume for this account.', 409: 'The saved assessment or match changed during refresh.',
           503: 'Authentication, the Career Match database migration, or the active catalog is unavailable.',
         }),
+      },
+    } },
+    '/api/resumes': {
+      get: {
+        tags: ['My Resume'], operationId: 'listResumes', summary: 'List your private resumes',
+        security: requireBearer,
+        parameters: [catalogQuery('offset', 'Number of resumes to skip.', {
+          type: 'integer', minimum: 0, maximum: 2147483647, default: 0,
+        })],
+        responses: { 200: response('Resume metadata, newest first.', ref('ResumeList')), ...errors(resumeErrors) },
+      },
+      post: {
+        tags: ['My Resume'], operationId: 'createResume', summary: 'Create a structured resume',
+        security: requireBearer,
+        requestBody: body('ResumeCreate', {
+          analyst: example('Create a resume for an analyst role', {
+            title: 'Analyst resume', language: 'en',
+            sections: { skills: [{ name: 'SQL' }], projects: [{ name: 'Transit dashboard', details: 'Summarized on-time arrivals by route.' }] },
+          }),
+        }),
+        responses: { 201: response('Saved resume.', ref('ResumeResponse')), ...errors(resumeErrors) },
+      },
+    },
+    '/api/resumes/upload': { post: {
+      tags: ['My Resume'], operationId: 'uploadResume', summary: 'Upload and extract a PDF or DOCX',
+      description: 'Send the file as the raw binary request body with its document Content-Type. Maximum size is 5 MiB. Extraction reads up to 30 PDF pages or the DOCX main document. Save or replace structured section entries with PATCH.',
+      security: requireBearer,
+      parameters: [
+        catalogQuery('title', 'Optional title.', { ...string, maxLength: 120 }),
+        catalogQuery('language', 'Resume language. Defaults to the account preference.', { ...string, enum: ['en', 'zh-CN'] }),
+      ],
+      requestBody: { required: true, content: resumeBinary },
+      responses: {
+        201: response('Saved resume with text extracted locally.', ref('ResumeResponse')),
+        ...errors({ ...resumeErrors, 413: 'File exceeds 5 MiB.', 415: 'Unsupported media type or content encoding.',
+          422: 'Invalid, protected, or textless document, or an extraction limit was reached.' }),
+      },
+    } },
+    '/api/resumes/{id}': {
+      get: {
+        tags: ['My Resume'], operationId: 'readResume', summary: 'Read an owned resume',
+        security: requireBearer, parameters: [resumeId],
+        responses: { 200: response('Resume sections and extracted text.', ref('ResumeResponse')), ...errors(resumeErrors) },
+      },
+      patch: {
+        tags: ['My Resume'], operationId: 'updateResume', summary: 'Edit an owned resume',
+        description: 'Each supplied section replaces that section. Supply an empty array to clear it.',
+        security: requireBearer, parameters: [resumeId],
+        requestBody: body('ResumeUpdate', { edit: example('Replace selected sections', {
+          sections: { skills: [{ name: 'SQL' }, { name: 'Data visualization' }], certifications: [] },
+        }) }),
+        responses: { 200: response('Updated resume.', ref('ResumeResponse')), ...errors(resumeErrors) },
+      },
+      delete: {
+        tags: ['My Resume'], operationId: 'deleteResume', summary: 'Delete an owned resume',
+        security: requireBearer, parameters: [resumeId],
+        responses: { 204: { description: 'Resume, uploaded bytes, and extracted text deleted.' }, ...errors(resumeErrors) },
+      },
+    },
+    '/api/resumes/{id}/file': { get: {
+      tags: ['My Resume'], operationId: 'downloadResume', summary: 'Download the original file as an attachment',
+      security: requireBearer, parameters: [resumeId],
+      responses: { 200: { description: 'Private original document.', content: resumeBinary }, ...errors(resumeErrors) },
+    } },
+    '/api/resumes/{id}/analyze': { post: {
+      tags: ['My Resume'], operationId: 'analyzeResume', summary: 'Analyze a resume with consent',
+      description: 'Explicit consent allows the configured AI provider to process selected resume excerpts for this request. Suggestions link to source excerpts as resume claims and use rule-based advice if the provider is unavailable.',
+      security: requireBearer, parameters: [resumeId],
+      requestBody: body('ResumeAnalyze', { analyst: example('Analyze for a target role', { consent: true, target_role: 'Data analyst' }) }),
+      responses: { 200: response('Request-scoped resume guidance.', ref('ResumeAnalysisResponse')), ...errors(resumeErrors) },
+    } },
+    '/api/roadmaps': {
+      post: {
+        tags: ['My Roadmap'], operationId: 'createRoadmap', summary: 'Generate and save a learning roadmap',
+        security: requireBearer,
+        description: 'Defaults to the top profession in your latest Career Match and your profile language. Uses current skills and practice history. A new roadmap preserves earlier plans and progress. The saved response shows whether guidance used AI or fallback.',
+        requestBody: body('RoadmapCreate', {
+          defaults: example('Use the top career and default study time', {}),
+          chinese: example('Plan for three hours a week in Simplified Chinese', { language: 'zh-CN', weekly_study_minutes: 180 }),
+          resume: example('Add resume guidance for this request', { resume_context: resumeConsentExample }),
+        }, false),
+        responses: {
+          201: response('Saved roadmap with three milestones.', ref('RoadmapResponse')),
+          ...errors({ ...roadmapErrors, 400: 'Invalid roadmap options.', 404: 'No completed assessment, matched profession, or owned resume.' }),
+        },
+      },
+      get: {
+        tags: ['My Roadmap'], operationId: 'listRoadmaps', summary: 'List your saved roadmaps',
+        security: requireBearer,
+        parameters: [catalogQuery('offset', 'Number of roadmaps to skip. Use next_offset to fetch another page.', {
+          type: 'integer', minimum: 0, maximum: 2147483647, default: 0,
+        })],
+        responses: {
+          200: response('Up to 20 roadmaps, newest first.', ref('RoadmapList')),
+          ...errors({ ...roadmapErrors, 400: 'Invalid offset.' }),
+        },
+      },
+    },
+    '/api/roadmaps/{id}': { get: {
+      tags: ['My Roadmap'], operationId: 'readRoadmap', summary: 'Read your saved roadmap and progress',
+      security: requireBearer,
+      parameters: [roadmapId],
+      responses: {
+        200: response('Saved roadmap.', ref('RoadmapResponse')),
+        ...errors({ ...roadmapErrors, 400: 'Invalid roadmap ID.', 404: 'Owned roadmap not found.' }),
+      },
+    } },
+    '/api/roadmaps/{id}/milestones/{milestoneId}': { patch: {
+      tags: ['My Roadmap'], operationId: 'updateRoadmapMilestone', summary: 'Edit, complete, or reopen a milestone',
+      security: requireBearer,
+      parameters: [roadmapId, milestoneId],
+      requestBody: body('RoadmapMilestonePatch', {
+        edit: example('Update the study estimate and notes', { estimated_minutes: 45, notes: 'Use the public transit sample.' }),
+        complete: example('Mark complete', { completed: true }),
+        reopen: example('Reopen and clear notes', { completed: false, notes: null }),
+      }),
+      responses: {
+        200: response('Saved roadmap with updated milestone and progress.', ref('RoadmapResponse')),
+        ...errors({ ...roadmapErrors, 400: 'Invalid IDs or milestone fields.', 404: 'Owned roadmap milestone not found.' }),
       },
     } },
     '/api/skills': {
@@ -355,15 +493,16 @@ export const openapi = {
     },
     '/api/skills/compare': { post: {
       tags: ['My Skills'], operationId: 'compareUserSkills', summary: 'Compare your skills with selected careers',
-      description: 'Choose 1–5 active career IDs from /api/careers. The response prioritizes catalog skill gaps using a default planning level of 3 and prefers practical ratings when both evidence types exist. Guidance covers up to five gaps and uses the profile language by default. Use include_ai: false for deterministic suggestions without provider calls.',
+      description: 'Choose 1–5 active career IDs from /api/careers. The response prioritizes catalog skill gaps using a default planning level of 3 and prefers practical ratings when both evidence types exist. Guidance covers up to five gaps and uses the profile language by default. Use include_ai: false for deterministic suggestions without provider calls. To get additional resume guidance, supply resume_context with consent and leave include_ai enabled.',
       security: requireBearer,
       requestBody: body('SkillCompare', {
         comparison: example('Compare a career with AI guidance', { career_ids: [1], language: 'en' }),
         chinese: example('Compare with rule-based guidance in Simplified Chinese', { career_ids: [1], language: 'zh-CN', include_ai: false }),
+        resume: example('Add resume guidance to the comparison', { career_ids: [1], resume_context: resumeConsentExample }),
       }),
       responses: {
         200: response('Prioritized comparisons and guidance. Inspect guidance.status, provider, and reason.', ref('SkillComparison')),
-        ...errors({ ...skillErrors, 400: 'Invalid comparison options.', 404: 'At least one selected active career was not found.' }),
+        ...errors({ ...skillErrors, 400: 'Invalid comparison options.', 404: 'At least one selected active career or the owned resume was not found.' }),
       },
     } },
     '/api/challenges': { get: {
@@ -484,6 +623,9 @@ export const openapi = {
       description: 'After all six answers, request an evaluation with rubric points, strengths, mistakes, and improvement suggestions. If evaluation_status is unavailable, the transcript is saved and evaluation can be retried later.',
       parameters: [submissionId],
       security: requireBearer,
+      requestBody: body('InterviewEvaluate', {
+        resume: example('Add resume-based interview preparation tips', { resume_context: resumeConsentExample }),
+      }, false),
       responses: {
         200: response('Saved evaluation or an unavailable status with a reason.', ref('InterviewSessionResponse')),
         202: response('An evaluation is running. Read the session to check progress.', ref('InterviewSessionResponse')),

@@ -157,7 +157,9 @@ export async function generateAssessmentJson(options) {
   inFlight.set(key, operation);
   try {
     const result = await operation;
-    if (result.status === 'ai') cache.set(key, { value: result, createdAt: Date.now() });
+    if (options.cacheResult !== false && result.status === 'ai') {
+      cache.set(key, { value: result, createdAt: Date.now() });
+    }
     return result;
   } finally {
     inFlight.delete(key);

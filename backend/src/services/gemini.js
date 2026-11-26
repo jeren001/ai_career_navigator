@@ -130,7 +130,7 @@ function validText(value, maxLength = 500) {
 const abilityAssertion = /\byou (?:excel at|are (?:an? )?(?:skilled|proficient|qualified|certified|experienced|expert)|have (?:proven|demonstrated|advanced|expert)|(?:have|possess|show|demonstrate) (?:the ability|strong skills))\b|(?:\b(?:as an?|you['’]re an?) (?:certified|licensed|proficient|expert))\b|(?:你的|您的|你|您)(?:具备|展现出|已证明|精通|擅长|已取得|具有丰富)|(?:^|[，。；、]\s*)(?:擅长|精通|已取得|熟练掌握)/iu;
 const verificationDemand = /\b(?:prove|verify|demonstrate) (?:your|that you have) (?:existing |reported )?(?:skill|ability|proficiency|competence)|证明你(?:的|具备)|验证你(?:的|具备)|证实你(?:的|具备)/iu;
 
-function unsafeClaim(text) {
+export function unsafeClaim(text) {
   return abilityAssertion.test(text) || verificationDemand.test(text) ||
     /(?:你的|您的|展现的|展现出|表现出的|体现出的)[^，。；、]{1,14}(?:能力|专长)/u.test(text) ||
     /\byour (?:proven|demonstrated)\s+[^.!?]{0,40}\b(?:skill|skills|ability|expertise)\b/iu.test(text);

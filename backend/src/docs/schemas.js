@@ -137,6 +137,14 @@ const skillGapFields = {
   prioritized_gaps: array(object({ ...skillRequirement, career_ids: skillCareerIds })),
 };
 const challengeDifficulty = choices('beginner', 'intermediate', 'advanced');
+const weeklyStudyMinutes = { ...integer, minimum: 30, maximum: 2400 };
+const milestoneFields = {
+  title: { ...untrimmed, maxLength: 120 },
+  action: { ...untrimmed, maxLength: 400 },
+  outcome: { ...untrimmed, maxLength: 240 },
+  estimated_minutes: { ...integer, minimum: 5, maximum: 2400 },
+  notes: { ...untrimmed, maxLength: 1000, nullable: true },
+};
 const interviewEvaluationStatus = choices('pending', 'ai', 'unavailable');
 const interviewScore = { points: integer, max_points: integer };
 const interviewSessionSummary = {
@@ -184,7 +192,54 @@ const challengeEvaluation = {
   nullable: true,
 };
 
+const resumeEntry = object({
+  name: { ...untrimmed, maxLength: 120 },
+  organization: { ...untrimmed, maxLength: 120 },
+  dates: { ...untrimmed, maxLength: 80 },
+  details: { ...untrimmed, maxLength: 500 },
+}, ['name']);
+const resumeSectionNames = ['skills', 'education', 'work_experience', 'projects', 'certifications'];
+const resumeSections = Object.fromEntries(resumeSectionNames.map((section) => [section, array(ref('ResumeEntry'), { maxItems: 25 })]));
+const resumeTitle = { ...untrimmed, maxLength: 120 };
+const resumeSummary = {
+  id: uuid, title: resumeTitle, language,
+  file_media_type: { ...choices('application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', null), nullable: true },
+  created_at: dateTime, updated_at: dateTime,
+};
+const resumeUpdate = { title: resumeTitle, language, sections: ref('ResumeSectionUpdate') };
+const resumeContext = { resume_context: ref('ResumeContext') };
+const resumeGuidance = { resume_guidance: ref('ResumeGuidance') };
+const resumeConsent = { ...bool, enum: [true] };
+
 export const schemas = {
+  ResumeEntry: { ...resumeEntry, additionalProperties: false },
+  ResumeSectionUpdate: { ...object(resumeSections, []), additionalProperties: false },
+  ResumeCreate: { ...object(resumeUpdate, ['title']), additionalProperties: false },
+  ResumeUpdate: { ...object(resumeUpdate, []), minProperties: 1, additionalProperties: false },
+  Resume: object({ ...resumeSummary, sections: object(resumeSections), extracted_text: { ...nullableText, maxLength: 40000 } }),
+  ResumeResponse: object({ resume: ref('Resume') }),
+  ResumeList: object({ resumes: array(object(resumeSummary), { maxItems: 20 }), next_offset: { ...integer, nullable: true } }),
+  ResumeAnalyze: {
+    ...object({ consent: resumeConsent, target_role: { ...untrimmed, maxLength: 120 } }, ['consent']),
+    additionalProperties: false,
+  },
+  ResumeContext: { ...object({ resume_id: uuid, consent: resumeConsent }), additionalProperties: false },
+  ResumeGuidance: object({
+    status: choices('ai', 'fallback'),
+    provider,
+    reason: choices(...fallbackReason.enum, 'no_resume_content'),
+    suggestions: array(object({
+      code: choices('clarify_result', 'clarify_contribution', 'add_example', 'clarify_credential',
+        'tailor_to_role', 'practice_skill', 'prepare_example', 'check_dates'),
+      action: string,
+      evidence: {
+        ...object({ section: choices(...resumeSectionNames, 'document'), quote: string, source: choices('resume_claim') }),
+        nullable: true,
+      },
+    }), { minItems: 1, maxItems: 4 }),
+  }, ['status', 'suggestions']),
+  ResumeAnalysisResponse: object({ guidance: ref('ResumeGuidance') }),
+  InterviewEvaluate: object(resumeContext, []),
   InterviewCreate: {
     ...object({
       profession_slug: { ...string, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$', maxLength: 100 },
@@ -224,7 +279,8 @@ export const schemas = {
         nullable: true,
       },
       guidance: object({ examples: string, interpretation: string }),
-    }),
+      ...resumeGuidance,
+    }, [...Object.keys(interviewSessionSummary), 'current_question', 'transcript', 'evaluation', 'guidance']),
   }),
   Error: object({ error: string }),
   Health: object({ status: choices('ok') }),
@@ -341,7 +397,7 @@ export const schemas = {
     allOf: [ref('UserSkill'), object({ challenge_practice: { ...object(practiceCounts), nullable: true } })],
   }) }),
   SkillCompare: {
-    ...object({ career_ids: skillCareerIds, language, include_ai: { ...bool, default: true } }, ['career_ids']),
+    ...object({ career_ids: skillCareerIds, language, include_ai: { ...bool, default: true }, ...resumeContext }, ['career_ids']),
     additionalProperties: false,
   },
   SkillRequirement: object(skillRequirement),
@@ -356,8 +412,9 @@ export const schemas = {
       reason: fallbackReason,
       recommendations: array(object({ skill_key: string, action: { ...string, maxLength: 280 } }), { maxItems: 5 }),
     }, ['status', 'recommendations']),
-  }),
-  CareerMatchRefresh: { ...object({ language }, []), additionalProperties: false },
+    ...resumeGuidance,
+  }, ['language', ...Object.keys(skillGapFields), 'guidance']),
+  CareerMatchRefresh: { ...object({ language, ...resumeContext }, []), additionalProperties: false },
   CareerMatch: object({
     assessment_session_id: id,
     completed_at: dateTime,
@@ -374,6 +431,63 @@ export const schemas = {
       scope: choices('practice_activity'),
       history: array(object({ ...challengeProgressFields, title: nullableText, skill_keys: strings })),
     }),
+    ...resumeGuidance,
+  }, ['assessment_session_id', 'completed_at', 'refreshed_at', 'language', 'trait_scores', 'directions',
+    'specializations', 'professions', 'personalization', 'skill_gaps', 'skills', 'challenge_practice']),
+  RoadmapCreate: {
+    ...object({
+      profession_slug: { ...string, maxLength: 100, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' },
+      language,
+      weekly_study_minutes: { ...weeklyStudyMinutes, default: 180 },
+      ...resumeContext,
+    }, []),
+    additionalProperties: false,
+  },
+  RoadmapMilestonePatch: {
+    ...object({ ...milestoneFields, completed: bool }, []),
+    minProperties: 1, additionalProperties: false,
+  },
+  RoadmapMilestone: object({
+    id: uuid,
+    position: { ...integer, enum: [1, 2, 3] },
+    ...milestoneFields,
+    skill_keys: strings,
+    resources: array(object({
+      id: string, title: string, provider: string, url: { ...string, format: 'uri' },
+      learning_language: string, access_type: string,
+      provider_estimated_minutes: { ...integer, nullable: true },
+    })),
+    challenges: array(object({
+      id: string, title: string, difficulty: challengeDifficulty, estimated_minutes: integer,
+      expected_deliverable: string, prior_submissions: integer, prior_evaluations: integer,
+    })),
+    completed_at: { ...dateTime, nullable: true },
+    updated_at: dateTime,
+  }),
+  Roadmap: object({
+    id: uuid,
+    assessment_session_id: { ...id, nullable: true },
+    language,
+    profession: object({ id, slug: string, title: string }),
+    weekly_study_minutes: weeklyStudyMinutes,
+    prioritized_skills: array(object({
+      key: string, name: string, priority: skillRequirement.priority, status: skillRequirement.status,
+      evidence: skillRequirement.evidence, current_level: skillRequirement.current_level,
+    }), { maxItems: 6 }),
+    personalization: { oneOf: [
+      object({ status: choices('ai'), provider, cached: bool }),
+      object({ status: choices('fallback'), reason: fallbackReason }),
+    ] },
+    milestones: array(ref('RoadmapMilestone'), { minItems: 3, maxItems: 3 }),
+    study_plan: object({ estimated_minutes: integer, estimated_weeks: integer }),
+    progress: object({ completed_milestones: integer, total_milestones: integer, completed_estimated_minutes: integer }),
+    created_at: dateTime,
+    ...resumeGuidance,
+  }, ['id', 'assessment_session_id', 'language', 'profession', 'weekly_study_minutes', 'prioritized_skills',
+    'personalization', 'milestones', 'study_plan', 'progress', 'created_at']),
+  RoadmapResponse: object({ roadmap: ref('Roadmap') }),
+  RoadmapList: object({
+    roadmaps: array(ref('Roadmap'), { maxItems: 20 }), next_offset: { ...integer, nullable: true },
   }),
   Challenge: object({
     id: string, career_field: string, profession_slugs: strings, skills: strings, difficulty: challengeDifficulty,
