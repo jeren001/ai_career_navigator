@@ -48,7 +48,7 @@ const responseJsonSchema = {
   required: ['overview', 'strengths', 'skills_to_develop', 'roadmap', 'profession_explanations'],
 };
 
-function compactInput({ answers, traitScores, recommendations, userContext, language }) {
+function compactInput({ answers, traitScores, recommendations, userContext, language, matchEvidence }) {
   return {
     traits: traitScores,
     profile: userContext?.profile ? {
@@ -78,6 +78,7 @@ function compactInput({ answers, traitScores, recommendations, userContext, lang
       education_requirements: market_pulse?.education_requirements,
       match_percent,
     })),
+    ...(matchEvidence && { match_evidence: matchEvidence }),
   };
 }
 
@@ -114,6 +115,10 @@ function promptFor(input, language) {
     'Give two skills to develop and three brief roadmap steps. Each step should fit the stated time and budget and produce an observable result the user controls.',
     'Ground the roadmap in the stated goals and time or budget. Keep each field to one short sentence and avoid promises of employment or claims of demonstrated aptitude.',
     'Recommend a tool category or free option without making unverified claims about price, licensing, or access.',
+    ...(input.match_evidence ? [
+      'Use relevant skill gaps to choose practice priorities. Describe self-reported levels and recorded practical assessments with their stated sources.',
+      'Use challenge activity only as practice context. A submission or evaluation count provides no evidence of verified proficiency or professional qualification.',
+    ] : []),
     CUSTOM_EVIDENCE_INSTRUCTION,
   ], input);
 }

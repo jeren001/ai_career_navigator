@@ -71,6 +71,7 @@ const fallbackReason = choices(
   'rate_limited', 'quota_exceeded', 'timeout', 'service_unavailable', 'network_error',
   'invalid_response', 'unavailable',
 );
+const savedMatchFallbackReason = choices(...fallbackReason.enum, 'not_saved');
 const guidance = {
   strengths: strings,
   skills_to_develop: strings,
@@ -127,6 +128,14 @@ const skillRequirement = {
   evidence: { ...choices('practical', 'self_reported', null), nullable: true },
 };
 const skillCareerIds = array(id, { minItems: 1, maxItems: 5, uniqueItems: true });
+const skillGapFields = {
+  target_basis: choices('default_level_3'),
+  careers: array(object({
+    id, slug: string, title: string, requirements_status: choices('available', 'unavailable'),
+    requirements: array(ref('SkillRequirement')),
+  }), { maxItems: 5 }),
+  prioritized_gaps: array(object({ ...skillRequirement, career_ids: skillCareerIds })),
+};
 const challengeDifficulty = choices('beginner', 'intermediate', 'advanced');
 const interviewEvaluationStatus = choices('pending', 'ai', 'unavailable');
 const interviewScore = { points: integer, max_points: integer };
@@ -155,6 +164,9 @@ const interviewQuestion = object({
 const submissionStatus = choices('submitted', 'evaluating', 'evaluated', 'unavailable');
 const practiceCounts = {
   submitted_count: integer, evaluated_count: integer, latest_submission_id: uuid,
+};
+const challengeProgressFields = {
+  challenge_id: string, ...practiceCounts, latest_status: submissionStatus, last_submitted_at: dateTime,
 };
 const criterion = { id: string, points: integer };
 const practiceScope = choices('practice_artifact');
@@ -302,7 +314,7 @@ export const schemas = {
   }, ['status', 'cached', 'overview', ...Object.keys(guidance)]),
   FallbackPersonalization: object({
     status: choices('fallback'),
-    reason: fallbackReason,
+    reason: savedMatchFallbackReason,
     message: string,
     strengths: { ...guidance.strengths, maxItems: 0 },
     skills_to_develop: { ...guidance.skills_to_develop, maxItems: 0 },
@@ -335,12 +347,8 @@ export const schemas = {
   SkillRequirement: object(skillRequirement),
   SkillComparison: object({
     language,
-    target_basis: choices('default_level_3'),
-    careers: array(object({
-      id, slug: string, title: string, requirements_status: choices('available', 'unavailable'),
-      requirements: array(ref('SkillRequirement')),
-    }), { minItems: 1, maxItems: 5 }),
-    prioritized_gaps: array(object({ ...skillRequirement, career_ids: skillCareerIds })),
+    ...skillGapFields,
+    careers: { ...skillGapFields.careers, minItems: 1 },
     guidance: object({
       status: choices('ai', 'fallback', 'skipped', 'not_needed'),
       provider,
@@ -348,6 +356,24 @@ export const schemas = {
       reason: fallbackReason,
       recommendations: array(object({ skill_key: string, action: { ...string, maxLength: 280 } }), { maxItems: 5 }),
     }, ['status', 'recommendations']),
+  }),
+  CareerMatchRefresh: { ...object({ language }, []), additionalProperties: false },
+  CareerMatch: object({
+    assessment_session_id: id,
+    completed_at: dateTime,
+    refreshed_at: { ...dateTime, nullable: true },
+    language,
+    trait_scores: result.trait_scores,
+    directions: result.directions,
+    specializations: result.specializations,
+    professions: { ...result.professions, minItems: 0 },
+    personalization: result.personalization,
+    skill_gaps: object(skillGapFields),
+    skills: array(ref('UserSkill')),
+    challenge_practice: object({
+      scope: choices('practice_activity'),
+      history: array(object({ ...challengeProgressFields, title: nullableText, skill_keys: strings })),
+    }),
   }),
   Challenge: object({
     id: string, career_field: string, profession_slugs: strings, skills: strings, difficulty: challengeDifficulty,
@@ -362,9 +388,7 @@ export const schemas = {
     ...object({ artifact: { ...untrimmed, maxLength: 6000 }, language: { ...language, default: 'en' } }, ['artifact']),
     additionalProperties: false,
   },
-  ChallengeProgress: object({ progress: array(object({
-    challenge_id: string, ...practiceCounts, latest_status: submissionStatus, last_submitted_at: dateTime,
-  })) }),
+  ChallengeProgress: object({ progress: array(object(challengeProgressFields)) }),
   ChallengeEvaluation: challengeEvaluation,
   ChallengeSubmissionResponse: object({
     submission: object({

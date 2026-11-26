@@ -192,7 +192,7 @@ export const openapi = {
   servers: [{ url: '/', description: 'Current backend' }],
   tags: [
     { name: 'Health' }, { name: 'Authentication' }, { name: 'Profile' },
-    { name: 'Careers' }, { name: 'My Skills' }, { name: 'Practical Challenges' }, { name: 'Learning Hub' },
+    { name: 'Careers' }, { name: 'Career Match' }, { name: 'My Skills' }, { name: 'Practical Challenges' }, { name: 'Learning Hub' },
     { name: 'Interview Simulator' }, { name: 'Assessment' }, { name: 'Quiz aliases' },
   ],
   paths: {
@@ -288,6 +288,32 @@ export const openapi = {
       responses: {
         200: response('Active career.', ref('Career')),
         ...errors({ 400: 'ID must be a positive integer.', 404: 'Active career not found.' }),
+      },
+    } },
+    '/api/career-match': { get: {
+      tags: ['Career Match'], operationId: 'getCareerMatch', summary: 'Read your latest saved career recommendations',
+      description: 'Use the owner account or guest token. This reads the latest completed assessment and combines its saved recommendations with current skill gaps and practical challenge activity. It requires no AI request.',
+      security: requireBearer,
+      responses: {
+        200: response('Saved recommendations with current skills and challenge activity.', ref('CareerMatch')),
+        ...errors({ 401: 'A valid account or guest bearer token is required.', 404: 'No completed assessment for this identity.', 503: 'Authentication or the Career Match database migration is unavailable.' }),
+      },
+    } },
+    '/api/career-match/refresh': { post: {
+      tags: ['Career Match'], operationId: 'refreshCareerMatch', summary: 'Refresh and save career recommendations',
+      description: 'Uses the existing assessment ranker with the latest completed answers and active catalog. Gemini guidance uses the current profile, structured skills, skill gaps, and challenge activity. Language defaults to the profile preference. If AI is unavailable, the response saves the deterministic recommendations and identifies the fallback reason.',
+      security: requireBearer,
+      requestBody: body('CareerMatchRefresh', {
+        defaults: example('Use the profile language', {}),
+        simplifiedChinese: example('Refresh in Simplified Chinese', { language: 'zh-CN' }),
+      }, false),
+      responses: {
+        200: response('Refreshed recommendations with AI guidance or a fallback reason.', ref('CareerMatch')),
+        ...errors({
+          400: 'Invalid language or request fields.', 401: 'A registered account bearer token is required.',
+          404: 'No completed assessment for this account.', 409: 'The saved assessment or match changed during refresh.',
+          503: 'Authentication, the Career Match database migration, or the active catalog is unavailable.',
+        }),
       },
     } },
     '/api/skills': {

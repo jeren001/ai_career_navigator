@@ -3,6 +3,7 @@ import {
   CLARIFICATION_START,
   GENERAL_QUESTION_IDS,
   getQuestion,
+  loadActiveCareers,
   MAX_QUESTIONS,
   createAssessmentState,
   evaluateAnswers,
@@ -86,23 +87,17 @@ async function createGuest(database) {
   return result.rows[0].id;
 }
 
-async function loadRoles(database) {
+async function persistResult(database, state, evaluation, recommendations) {
   const result = await database.query(
-    'SELECT * FROM career_roles WHERE is_active = TRUE ORDER BY id',
-  );
-  return result.rows;
-}
-
-async function persistResult(database, state, answers, evaluation) {
-  const result = await database.query(
-    `INSERT INTO quiz_sessions (user_id, answers, trait_scores, recommended_roles)
-     VALUES ($1, $2::jsonb, $3::jsonb, $4::jsonb)
+    `INSERT INTO quiz_sessions (user_id, answers, trait_scores, recommended_roles, career_match)
+     VALUES ($1, $2::jsonb, $3::jsonb, $4::jsonb, $5::jsonb)
      RETURNING id, completed_at`,
     [
       state.userId,
-      JSON.stringify(answers),
+      JSON.stringify(state.answers),
       JSON.stringify(evaluation.trait_scores),
       JSON.stringify(evaluation.recommendations.professions),
+      JSON.stringify({ language: state.language, trait_scores: evaluation.trait_scores, ...recommendations }),
     ],
   );
   return result.rows[0] || {};
@@ -112,7 +107,7 @@ async function enrichForUser(database, state, evaluation, isGuest, waitForSlot =
   const { userId, answers, language } = state;
   let userContext;
   try {
-    userContext = await buildUserContext(database, userId);
+    userContext = await buildUserContext(database, userId, { loadAssessment: false });
   } catch {
     userContext = undefined;
   }
@@ -129,15 +124,11 @@ async function enrichForUser(database, state, evaluation, isGuest, waitForSlot =
 }
 
 async function finish(database, state, isGuest) {
-  const roles = await loadRoles(database);
-  if (roles.length === 0) {
-    const error = new Error('No active career roles are available');
-    error.status = 503;
-    throw error;
-  }
+  const roles = await loadActiveCareers(database);
   const evaluation = evaluateAnswers(state.answers, roles, state.language);
-  const saved = await persistResult(database, state, state.answers, evaluation);
   const enrichment = await enrichForUser(database, state, evaluation, isGuest, true);
+  const recommendations = addEnrichment(evaluation.recommendations, enrichment, state.language);
+  const saved = await persistResult(database, state, evaluation, recommendations);
   return {
     assessment_id: state.id,
     session_id: saved.id || null,
@@ -147,7 +138,7 @@ async function finish(database, state, isGuest) {
     language: state.language,
     clarifications: clarificationSummary(state.clarificationPlan),
     custom_analysis: customAnalysis(state.answers, state.clarificationPlan.custom_evidence, enrichment),
-    ...addEnrichment(evaluation.recommendations, enrichment, state.language),
+    ...recommendations,
   };
 }
 
@@ -248,12 +239,7 @@ export default function createAssessmentRouter(database) {
       const body = bodyObject(request.body);
       const answers = validateAnswers(body.answers, { minimum: 15, maximum: MAX_QUESTIONS });
       const language = await assessmentLanguage(database, request.auth, body.language);
-      const roles = await loadRoles(database);
-      if (roles.length === 0) {
-        const error = new Error('No active career roles are available');
-        error.status = 503;
-        throw error;
-      }
+      const roles = await loadActiveCareers(database);
       if ('user_id' in body) throw validationError('user_id is assigned by the authentication token');
       if (!request.auth) assertAuthConfigured();
       const userId = request.auth?.userId || await createGuest(database);
@@ -261,8 +247,9 @@ export default function createAssessmentRouter(database) {
       const state = createAssessmentState(userId);
       state.answers = answers;
       state.language = language;
-      const saved = await persistResult(database, state, answers, evaluation);
       const enrichment = await enrichForUser(database, state, evaluation, request.auth?.isGuest ?? true);
+      const recommendations = addEnrichment(evaluation.recommendations, enrichment, language);
+      const saved = await persistResult(database, state, evaluation, recommendations);
 
       return response.status(201).json({
         assessment_id: state.id,
@@ -273,7 +260,7 @@ export default function createAssessmentRouter(database) {
         trait_scores: evaluation.trait_scores,
         language,
         custom_analysis: customAnalysis(answers, [], enrichment),
-        ...addEnrichment(evaluation.recommendations, enrichment, language),
+        ...recommendations,
       });
     } catch (error) {
       return next(error);

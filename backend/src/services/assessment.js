@@ -535,6 +535,14 @@ export function evaluateAnswers(answers, roles, language = 'en') {
   };
 }
 
+export async function loadActiveCareers(database) {
+  const { rows } = await database.query('SELECT * FROM career_roles WHERE is_active = TRUE ORDER BY id');
+  if (!rows.length) {
+    throw Object.assign(new Error('No active career roles are available'), { status: 503 });
+  }
+  return rows;
+}
+
 function validateAnswersInternal(rawAnswers, { minimum = 1, maximum = MAX_QUESTIONS, questionFor = getQuestion } = {}) {
   if (!Array.isArray(rawAnswers) || rawAnswers.length < minimum || rawAnswers.length > maximum) {
     throw new Error(`answers must contain between ${minimum} and ${maximum} items`);

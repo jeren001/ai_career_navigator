@@ -65,6 +65,19 @@ With the backend running on port 3000, open [Swagger UI](http://localhost:3000/a
 
 To complete an assessment, execute **POST /api/assessment/start** in Swagger UI. For a guest assessment, copy the returned `access_token` into **Authorize**. In **POST /api/assessment/answer**, submit the same assessment ID and the current question ID with an option ID or custom text. Repeat until `complete` is true. The response shows the clarification source and final personalization status, including the fallback reason when applicable.
 
+## Career Match API
+
+After running `npm run migrate`, use the **Career Match** section of Swagger UI.
+
+| Method and path | Purpose |
+| --- | --- |
+| `GET /api/career-match` | Read the latest owned assessment match and current skill gaps and challenge activity. Accepts an account or guest bearer token and makes zero AI requests. |
+| `POST /api/career-match/refresh` | Refresh and save the match for the latest completed assessment. Requires an account bearer token and accepts an optional `language` of `en` or `zh-CN`. |
+
+Assessment completion saves the recommendation response, including the AI guidance or fallback status. Older assessments return their original saved professions until refreshed. Refresh uses the existing ranker with the saved answers and active catalog. It defaults to the current profile language. The profile, recorded skills, current gaps, and challenge activity inform Gemini guidance while assessment answers determine the scores.
+
+The response includes both self-reported and practically assessed skill records when available. Practical challenge activity reports submissions and evaluations as practice history. Challenge points never change proficiency or rankings. GET shows current skill and challenge data alongside the last saved guidance. Call refresh to regenerate that guidance after profile or evidence changes. A refresh that encounters an AI outage saves the deterministic result and a fallback reason.
+
 ## My Skills API
 
 Run `npm run migrate` from `backend`, then authorize in Swagger UI with a registered account token. The `My Skills` section documents these endpoints.

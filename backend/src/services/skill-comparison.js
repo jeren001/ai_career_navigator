@@ -8,9 +8,8 @@ const MAX_CAREERS = 5;
 const MAX_GUIDANCE_GAPS = 5;
 const priorityOrder = { high: 0, medium: 1, review: 2, none: 3 };
 
-function checkRequirement(name, inventory) {
-  const key = skillKey(name);
-  const skill = inventory.get(key);
+function checkRequirement({ key, name, translatedName }, inventory, language) {
+  const skill = inventory.get(key) ?? (translatedName ? inventory.get(skillKey(translatedName)) : undefined);
   const measured = skill?.practical_assessment || skill?.self_assessment;
   const currentLevel = measured?.level ?? null;
   const shortfall = currentLevel === null ? null : Math.max(0, TARGET_LEVEL - currentLevel);
@@ -18,7 +17,8 @@ function checkRequirement(name, inventory) {
   const priority = status === 'missing' || shortfall >= 2 ? 'high'
     : shortfall === 1 ? 'medium' : status === 'unrated' ? 'review' : 'none';
   return {
-    name, key, target_level: TARGET_LEVEL, status, priority,
+    name: language === 'zh-CN' ? translatedName ?? name : name,
+    key, target_level: TARGET_LEVEL, status, priority,
     skill_id: skill?.id ?? null,
     current_level: currentLevel,
     evidence: skill?.practical_assessment ? 'practical' : skill?.self_assessment ? 'self_reported' : null,
@@ -26,18 +26,23 @@ function checkRequirement(name, inventory) {
 }
 
 // The catalog lists skill names. Level 3 is a planning default, not a hiring requirement.
-export function compareSkillsToCareers(skills, careers) {
+export function compareSkillsToCareers(skills, careers, language = 'en') {
   const inventory = new Map(skills.map((skill) => [skill.key, skill]));
   const gaps = new Map();
   const comparisons = careers.map(({ id, slug, title, market_pulse }) => {
     const names = new Map();
-    const keySkills = market_pulse?.key_skills;
-    for (const name of Array.isArray(keySkills) ? keySkills : []) {
-      if (typeof name !== 'string' || !name.trim()) continue;
+    const keySkills = Array.isArray(market_pulse?.key_skills) ? market_pulse.key_skills : [];
+    const translations = market_pulse?.translations?.['zh-CN']?.key_skills;
+    const translatedSkills = Array.isArray(translations) && translations.length === keySkills.length ? translations : [];
+    keySkills.forEach((name, index) => {
+      if (typeof name !== 'string' || !name.trim()) return;
       const key = skillKey(name);
-      if (!names.has(key)) names.set(key, name.trim());
-    }
-    const requirements = [...names.values()].map((name) => checkRequirement(name, inventory));
+      if (!names.has(key)) {
+        const translatedName = typeof translatedSkills[index] === 'string' ? translatedSkills[index].trim() : '';
+        names.set(key, { key, name: name.trim(), translatedName: translatedName || undefined });
+      }
+    });
+    const requirements = [...names.values()].map((requirement) => checkRequirement(requirement, inventory, language));
     requirements.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
     for (const requirement of requirements) {
       if (requirement.priority === 'none') continue;

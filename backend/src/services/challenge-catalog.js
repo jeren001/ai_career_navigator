@@ -37,6 +37,14 @@ export function challengeById(id, language) {
   return localizedChallenge(challenge, language);
 }
 
+export function challengePracticeDetails(id, language) {
+  const challenge = challenges.get(id);
+  return {
+    title: challenge?.title[language] ?? null,
+    skill_keys: challenge ? [...new Set(challenge.skills.map(challengeSkillKey))] : [],
+  };
+}
+
 function filterText(value, field) {
   if (value !== undefined && (typeof value !== 'string' || !value.trim() || value.length > 120)) {
     throw skillsError(400, `${field} must be a nonempty string of at most 120 characters`);
