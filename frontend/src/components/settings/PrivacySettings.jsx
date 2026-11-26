@@ -1,204 +1,48 @@
-// ==========================================
-// PROJECT: AI CAREER
-// COMPONENT: Privacy Settings
-// PURPOSE: Multilingual personal information visibility
-// ==========================================
-
-// Import translation tools
-
-// Import icons
-import { ShieldCheck, Lock } from 'lucide-react'
-
-// Import global user context
-import { useUser } from '../../context/user.js'
-
-// Import reusable dropdown
+import { LockKeyhole, Shield } from 'lucide-react'
 import CustomDropdown from '../common/CustomDropdown'
+import { useUser } from '../../context/user.js'
+import { useLocale } from '../../lib/locale.js'
 
-
-// ==========================================
-// 01. PRIVACY FIELDS
-// ==========================================
-
-const privacyFields = [
-
-  { id: 'profilePhoto', label: "Profile Photo" },
-  { id: 'firstName', label: "First Name" },
-  { id: 'lastName', label: "Last Name" },
-  { id: 'username', label: "Username" },
-  { id: 'country', label: "Country" },
-  { id: 'city', label: "City" },
-  { id: 'currentStatus', label: "Current Status" },
-  { id: 'careerGoal', label: "Career Goal" },
-  { id: 'aboutMe', label: "About Me" }
-
+const fields = [
+  ['profile_photo', 'Profile Photo', '头像'], ['first_name', 'First Name', '名'],
+  ['last_name', 'Last Name', '姓'], ['username', 'Username', '用户名'],
+  ['country', 'Country', '国家'], ['city', 'City', '城市'],
+  ['current_status', 'Current Status', '当前状态'], ['career_goals', 'Career Goal', '职业目标'],
+  ['about_me', 'About Me', '关于我']
 ]
 
-
-// ==========================================
-// 02. PRIVACY SETTINGS COMPONENT
-// ==========================================
-
-function PrivacySettings() {
-
-  // Global user data
-
-  const { profile, updateProfileEdits } = useUser()
-
-
-  // Translation tools
-
-
-
-
-  // Current privacy preferences
-
-  const visibility = profile.privacySettings || {}
-
-
-  // 03. TRANSLATED VISIBILITY OPTIONS
-
-  const visibilityOptions = [
-
-    {
-      value: 'private',
-      label: "Only Me"
-    },
-
-    {
-      value: 'public',
-      label: "Public"
-    }
-
+export default function PrivacySettings() {
+  const { settings, settingsSaving, updateSettings } = useUser()
+  const { t } = useLocale()
+  const options = [
+    { value: 'private', label: t('Only Me', '仅自己可见') }, { value: 'public', label: t('Public', '公开') }
   ]
-
-
-  // 04. UPDATE FIELD VISIBILITY
-
-  function handleVisibilityChange(field, value) {
-
-    updateProfileEdits(previous => ({
-
-      ...previous,
-
-      privacySettings: {
-
-        ...previous.privacySettings,
-
-        [field]: value
-
-      }
-
-    }))
-
-  }
-
-
-  // 05. PRIVACY SETTINGS INTERFACE
-
   return (
-
     <section className="settings-card">
-
-      {/* Section heading */}
-
       <div className="settings-card-header">
-
-        <div className="settings-card-icon">
-          <ShieldCheck size={24} />
-        </div>
-
+        <div className="settings-card-icon"><Shield size={24} /></div>
         <div>
-
-          <h2>{"Privacy & Visibility"}</h2>
-
-          <p>
-            {"Control who can see your personal information."}
-          </p>
-
+          <h2>{t('Privacy & Visibility', '隐私与可见性')}</h2>
+          <p>{t('Choose which information to share on your public profile.', '选择要在公开资料中分享的信息。')}</p>
         </div>
-
       </div>
-
-
       <div className="settings-divider" />
-
-
-      {/* Privacy information */}
-
-      <div className="settings-privacy-notice">
-
-        <ShieldCheck size={20} />
-
-        <p>
-          {"Your personal information is private by default. Choose what you want to share with others."}
-        </p>
-
-      </div>
-
-
-      {/* Individual privacy settings */}
-
       <div className="settings-privacy-list">
-
-        {privacyFields.map(field => (
-
-          <div
-            key={field.id}
-            className="settings-privacy-row"
-          >
-
-            <CustomDropdown
-              label={field.label}
-              options={visibilityOptions}
-              value={visibility[field.id] || 'private'}
-              onChange={value =>
-                handleVisibilityChange(field.id, value)
-              }
-              searchable={false}
-            />
-
+        {fields.map(([key, en, zh]) => (
+          <div key={key} className="settings-privacy-row">
+            <CustomDropdown label={t(en, zh)} options={options} value={settings.privacy_settings[key]}
+              disabled={settingsSaving} searchable={false} onChange={(value) => updateSettings({ privacy_settings: { [key]: value } })} />
           </div>
-
         ))}
-
       </div>
-
-
       <div className="settings-divider" />
-
-
-      {/* Permanently private information */}
-
       <div className="settings-private-information">
-
-        <Lock size={20} />
-
+        <LockKeyhole size={20} />
         <div>
-
-          <h3>{"Always Private"}</h3>
-
-          <p>
-            {"Your email address and date of birth are always private."}
-          </p>
-
+          <h3>{t('Always Private', '始终保密')}</h3>
+          <p>{t('Your email and date of birth are always private.', '你的邮箱和出生日期始终保密。')}</p>
         </div>
-
       </div>
-
-
-      {/* Frontend implementation notice */}
-
-      <p className="settings-privacy-disclaimer">
-
-        {"Visibility preferences are currently in preview mode. Privacy protection will be enabled after backend integration."}
-
-      </p>
-
     </section>
-
   )
-
 }
-
-export default PrivacySettings

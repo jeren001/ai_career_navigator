@@ -4,6 +4,7 @@ import { ApiError, createApiClient } from '../src/lib/api.js'
 import { careerText, searchCareers } from '../src/lib/careers.js'
 import { readSessionToken, storeSessionToken } from '../src/lib/storage.js'
 import { apiErrorText } from '../src/lib/locale.js'
+import { profileFromAccount, profilePatch } from '../src/lib/profile.js'
 
 test('client sends JSON and bearer credentials only when requested', async () => {
   const request = createApiClient({
@@ -102,4 +103,49 @@ test('problem messages distinguish invalid credentials from session expiry', () 
   const chinese = (_, zh) => zh
   assert.equal(apiErrorText(new ApiError(401, 'Unauthorized'), chinese, 'login'), '邮箱或密码不正确。')
   assert.equal(apiErrorText(new ApiError(401, 'Unauthorized'), chinese), '会话已过期，请重新登录。')
+})
+
+test('all editable profile fields use the API names and reload from the account response', () => {
+  const edits = {
+    firstName: 'Ada', lastName: 'Cheng', username: 'ada.cheng', dateOfBirth: '1999-05-02',
+    country: 'CN', city: '北京', currentStatus: 'University Student',
+    careerGoal: '学习产品设计', aboutMe: '喜欢无障碍设计。'
+  }
+  const wire = {
+    first_name: 'Ada', last_name: 'Cheng', username: 'ada.cheng', date_of_birth: '1999-05-02',
+    country: 'CN', city: '北京', current_status: 'University Student',
+    career_goals: '学习产品设计', about_me: '喜欢无障碍设计。'
+  }
+  assert.deepEqual(profilePatch(edits, {}), wire)
+  assert.deepEqual(profileFromAccount({ ...wire, email: 'user@example.test', email_verified_at: '2026-11-25' }), {
+    ...edits, email: 'user@example.test', emailVerified: true
+  })
+  assert.deepEqual(profilePatch({ city: '', aboutMe: ' ' }, edits), { city: null, about_me: null })
+})
+
+test('structured names retain the other name when upgrading a legacy display name', () => {
+  const legacy = profileFromAccount({ display_name: 'Ada Cheng Wu' })
+  assert.deepEqual(profilePatch({ firstName: 'June' }, legacy), { first_name: 'June', last_name: 'Cheng Wu' })
+  const mononym = profileFromAccount({ display_name: 'Old Name', first_name: 'Ari', last_name: null })
+  assert.equal(mononym.lastName, '')
+})
+
+test('private profile photos send raw bytes and decode authenticated binary responses', async () => {
+  const photo = new Blob(['test bytes'], { type: 'image/png' })
+  const request = createApiClient({
+    fetchImpl: async (url, options) => {
+      assert.match(url, /\/api\/profile\/photo$/)
+      assert.equal(options.headers.Authorization, 'Bearer photo-user')
+      if (options.method === 'PUT') {
+        assert.equal(options.headers['Content-Type'], 'image/png')
+        assert.equal(options.body, photo)
+        return Response.json({ profile_photo_url: '/api/profile/photo' })
+      }
+      assert.equal(options.headers.Accept, 'image/jpeg')
+      return new Response(new Blob(['encoded'], { type: 'image/jpeg' }))
+    }
+  })
+  await request('/api/profile/photo', { method: 'PUT', rawBody: photo, token: 'photo-user' })
+  const restored = await request('/api/profile/photo', { responseType: 'blob', token: 'photo-user' })
+  assert.equal(await restored.text(), 'encoded')
 })

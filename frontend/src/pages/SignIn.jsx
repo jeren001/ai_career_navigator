@@ -38,8 +38,13 @@ function SignIn() {
   const [showPassword, setShowPassword] = useState(false)
 
   const { language, setLanguage, t } = useLocale()
-  const { authenticate, status } = useSession()
+  const { accountUpdated, authenticate, status } = useSession()
   const navigate = useNavigate()
+  const accountNotice = {
+    password: t('Password updated. Sign in with your new password.', '密码已更新。请使用新密码登录。'),
+    'email-change': t('Email updated. Sign in with your new email.', '邮箱已更新。请使用新邮箱登录。'),
+    deleted: t('Your account was deleted.', '你的账户已删除。')
+  }[accountUpdated]
   const [pending, setPending] = useState(false)
 
   // Temporary form feedback
@@ -187,15 +192,9 @@ function SignIn() {
                 {t("Remember me", "记住我")}
               </label>
 
-              <button
-                type="button"
-                className="forgot-password"
-                onClick={() =>
-                  setMessage(t("Password recovery coming soon.", "暂不支持密码找回。"))
-                }
-              >
-                {t("Forgot your password?", "忘记密码？")}
-              </button>
+              <Link className="forgot-password" to="/password-recovery">
+                {t('Forgot your password?', '忘记密码？')}
+              </Link>
 
             </div>
 
@@ -239,6 +238,7 @@ function SignIn() {
           </div>
 
           {/* Temporary feedback */}
+          {accountNotice && !message && <p role="status">{accountNotice}</p>}
           {message && (
             <p className="signin-message" role="alert">
               {message}

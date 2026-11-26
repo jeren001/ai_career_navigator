@@ -26,11 +26,3 @@ export function storeSessionToken(token, remember = false) {
   writeStorage(TOKEN_KEY, remember ? null : token, false)
   writeStorage(TOKEN_KEY, remember ? token : null, true)
 }
-
-export function readProfileUsername(userId) {
-  return readStorage(`career-navigator-username-${userId}`, true) || ''
-}
-
-export function storeProfileUsername(userId, username) {
-  writeStorage(`career-navigator-username-${userId}`, username || null, true)
-}

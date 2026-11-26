@@ -2,13 +2,15 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Bell, ChevronDown, LogOut, Menu, Settings, UserRound } from 'lucide-react'
 import { useUser } from '../../context/user.js'
-import { useLocale } from '../../lib/locale.js'
+import { profileStatusLabel } from '../../lib/profile.js'
+import { apiErrorText, useLocale } from '../../lib/locale.js'
 import { accountName, useSession } from '../../session/session.js'
+import NotificationsMenu from './NotificationsMenu'
 import CommandBar from '../CommandBar'
 import '../../styles/dashboard-header.css'
 
 function DashboardHeader({ onMenuClick }) {
-  const { profile } = useUser()
+  const { profile, settings, settingsSaving, settingsSaveError, updateSettings } = useUser()
   const { user, signOut } = useSession()
   const { language, setLanguage, t } = useLocale()
   const navigate = useNavigate()
@@ -69,11 +71,14 @@ function DashboardHeader({ onMenuClick }) {
               type="button"
               className={language === option ? 'active' : ''}
               aria-pressed={language === option}
-              onClick={() => setLanguage(option)}
+              disabled={!user.is_guest && (!settings || settingsSaving)}
+              onClick={() => user.is_guest ? setLanguage(option)
+                : updateSettings({ preferred_language: option === 'CH' ? 'zh-CN' : 'en' })}
             >
               {option}
             </button>
           ))}
+          {settingsSaveError && <span className="dashboard-language-error" role="alert">{apiErrorText(settingsSaveError, t)}</span>}
         </div>
 
         <div className="dashboard-notifications" ref={notificationsRef}>
@@ -86,12 +91,7 @@ function DashboardHeader({ onMenuClick }) {
           >
             <Bell size={23} />
           </button>
-          {openMenu === 'notifications' && (
-            <div className="notification-dropdown">
-              <h3>{t('Notifications', '通知')}</h3>
-              <p>{t('Notifications are unavailable.', '暂不支持通知。')}</p>
-            </div>
-          )}
+          {openMenu === 'notifications' && <NotificationsMenu key={language} />}
         </div>
 
         <div className="dashboard-profile" ref={profileRef}>
@@ -110,7 +110,7 @@ function DashboardHeader({ onMenuClick }) {
                 {user.is_guest ? accountName(user, t) : profile.firstName || accountName(user, t)}
               </span>
               <span className="profile-role">
-                {user.is_guest ? t('Guest session', '访客会话') : profile.currentStatus || t('Account', '账户')}
+                {user.is_guest ? t('Guest session', '访客会话') : profileStatusLabel(profile.currentStatus, t) || t('Account', '账户')}
               </span>
             </div>
             <ChevronDown size={16} />

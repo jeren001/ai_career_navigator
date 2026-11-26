@@ -7,7 +7,8 @@
 // Import navigation tools
 import { useSearchParams } from 'react-router-dom'
 
-import { useLocale } from '../lib/locale.js'
+import { useUser } from '../context/user.js'
+import { apiErrorText, useLocale } from '../lib/locale.js'
 
 // Import shared dashboard layout
 import DashboardLayout from '../components/dashboard/DashboardLayout'
@@ -40,6 +41,7 @@ const availableSections = [
 function Settings() {
 
   const { t } = useLocale()
+  const { settings, settingsLoading, settingsError, settingsSaveError, retrySettings } = useUser()
 
   // 03. URL SEARCH PARAMETERS
 
@@ -80,6 +82,15 @@ function Settings() {
 
   function renderSection() {
 
+    if (['privacy', 'notifications', 'language'].includes(activeSection)) {
+      if (settingsLoading) return <p role="status">{t('Loading settings…', '正在加载设置…')}</p>
+      if (!settings && settingsError) return (
+        <div>
+          <p role="alert">{apiErrorText(settingsError, t)}</p>
+          <button type="button" className="settings-action-button" onClick={retrySettings}>{t('Retry', '重试')}</button>
+        </div>
+      )
+    }
     switch (activeSection) {
 
       case 'account':
@@ -144,6 +155,7 @@ function Settings() {
 
           <div className="settings-content">
 
+            {settingsSaveError && <p role="alert">{apiErrorText(settingsSaveError, t)}</p>}
             {renderSection()}
 
           </div>

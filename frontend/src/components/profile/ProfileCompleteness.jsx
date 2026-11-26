@@ -4,7 +4,11 @@
 // PURPOSE: Display profile completion progress
 // ==========================================
 
+import { useLocale } from '../../lib/locale.js'
+
 function ProfileCompleteness({ percentage = 0 }) {
+
+  const { t } = useLocale()
 
   // 01. VALIDATE PERCENTAGE
 
@@ -18,7 +22,7 @@ function ProfileCompleteness({ percentage = 0 }) {
 
       <div className="profile-completeness-header">
 
-        <span>Profile Completeness</span>
+        <span>{t('Profile Completeness', '资料完善度')}</span>
 
         <strong>{progress}%</strong>
 
@@ -27,7 +31,7 @@ function ProfileCompleteness({ percentage = 0 }) {
       <div
         className="profile-progress-track"
         role="progressbar"
-        aria-label="Profile completeness"
+        aria-label={t('Profile completeness', '资料完善度')}
         aria-valuenow={progress}
         aria-valuemin={0}
         aria-valuemax={100}

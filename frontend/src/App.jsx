@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import About from './pages/About'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
+import PasswordRecovery from './pages/PasswordRecovery'
 import LocaleProvider from './lib/LocaleProvider'
 import SessionProvider from './session/SessionProvider'
 import RequireSession from './session/RequireSession'
@@ -23,6 +24,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/signin" element={<SignIn />} />
+            <Route path="/password-recovery" element={<PasswordRecovery />} />
             <Route path="/signup" element={<SignUp />} />
             <Route element={
               <RequireSession>

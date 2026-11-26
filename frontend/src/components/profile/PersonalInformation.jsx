@@ -19,6 +19,7 @@ import {
 } from '../../utils/usernameUtils'
 
 // Import navigation
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 // Import profile components
@@ -26,32 +27,26 @@ import CountryCitySelector from './CountryCitySelector'
 
 
 // Import reusable dropdown
+import { useLocale } from '../../lib/locale.js'
+import { currentStatusOptions } from '../../lib/profile.js'
 import CustomDropdown from '../common/CustomDropdown'
 
 // 01. CURRENT STATUS OPTIONS
 
-const currentStatusOptions = [
-  'High School Student',
-  'University Student',
-  'Recent Graduate',
-  'Employed',
-  'Self-employed',
-  'Unemployed',
-  'Other'
-]
+
 
 
 // 02. CAREER GOAL OPTIONS
 
 const careerGoalOptions = [
-  'Exploring Career Options',
-  'Looking for an Internship',
-  'Preparing for My First Job',
-  'Looking for a Job',
-  'Developing New Skills',
-  'Advancing My Career',
-  'Changing Careers',
-  'Starting a Business'
+  ['Exploring Career Options', '探索职业选项'],
+  ['Looking for an Internship', '寻找实习'],
+  ['Preparing for My First Job', '准备第一份工作'],
+  ['Looking for a Job', '寻找工作'],
+  ['Developing New Skills', '培养新技能'],
+  ['Advancing My Career', '推进职业发展'],
+  ['Changing Careers', '转行'],
+  ['Starting a Business', '创业']
 ]
 
 
@@ -63,6 +58,13 @@ function PersonalInformation({
   onChange,
   onSave
 }) {
+  const { t } = useLocale()
+  const [today] = useState(() => new Date().toISOString().slice(0, 10))
+  function localizedOptions(options, current) {
+    const labels = options.map(([value, zh]) => ({ value, label: t(value, zh) }))
+    if (current && !labels.some(({ value }) => value === current)) labels.push({ value: current, label: current })
+    return labels
+  }
 
     // Validate current username
 const isUsernameValid = !profile.username || validateUsername(profile.username)
@@ -98,8 +100,8 @@ function handleSubmit(event) {
         </div>
 
         <div>
-          <h2>Personal Information</h2>
-          <p>Manage your personal details.</p>
+          <h2>{t('Personal Information', '个人信息')}</h2>
+          <p>{t('Manage your personal details.', '管理你的个人资料。')}</p>
         </div>
 
       </div>
@@ -117,7 +119,7 @@ function handleSubmit(event) {
           <div className="profile-form-field">
 
             <label htmlFor="firstName">
-              First Name
+              {t('First Name', '名')}
             </label>
 
             <input
@@ -128,8 +130,8 @@ function handleSubmit(event) {
                 onChange('firstName', e.target.value)
               }
               disabled={!isEditing}
-              placeholder="Enter first name"
-              required
+              placeholder={t('Enter first name', '输入名')}
+              maxLength={120}
             />
 
           </div>
@@ -140,7 +142,7 @@ function handleSubmit(event) {
           <div className="profile-form-field">
 
             <label htmlFor="lastName">
-              Last Name
+              {t('Last Name', '姓')}
             </label>
 
             <input
@@ -151,8 +153,8 @@ function handleSubmit(event) {
                 onChange('lastName', e.target.value)
               }
               disabled={!isEditing}
-              placeholder="Enter last name"
-              required
+              placeholder={t('Enter last name', '输入姓')}
+              maxLength={120}
             />
 
           </div>
@@ -163,7 +165,7 @@ function handleSubmit(event) {
 <div className="profile-form-field">
 
   <label htmlFor="username">
-    Username
+    {t('Username', '用户名')}
   </label>
 
   <input
@@ -174,7 +176,7 @@ function handleSubmit(event) {
       onChange('username', e.target.value)
     }
     disabled={!isEditing}
-    placeholder="Choose a username"
+    placeholder={t('Choose a username', '选择用户名')}
     autoComplete="username"
     autoCapitalize="none"
     spellCheck={false}
@@ -205,8 +207,8 @@ function handleSubmit(event) {
 
       <span>
         {isUsernameValid
-          ? 'Valid username format'
-          : 'Use 3–20 letters, numbers, underscores or dots.'
+          ? t('Valid username format', '用户名格式有效')
+          : t('Use 3–20 letters, numbers, underscores or dots.', '使用 3–20 个英文字母、数字、下划线或点。')
         }
       </span>
 
@@ -221,7 +223,7 @@ function handleSubmit(event) {
   <div className="username-suggestions">
 
     <p className="username-suggestions-title">
-      Suggested usernames
+      {t('Suggested usernames', '建议的用户名')}
     </p>
 
     <div className="username-suggestions-list">
@@ -254,7 +256,7 @@ function handleSubmit(event) {
           <div className="profile-form-field">
 
             <label htmlFor="email">
-              Email Address
+              {t('Email Address', '邮箱地址')}
             </label>
 
             <input
@@ -272,12 +274,14 @@ function handleSubmit(event) {
           <div className="profile-form-field">
 
             <label htmlFor="dateOfBirth">
-              Date of Birth
+              {t('Date of Birth', '出生日期')}
             </label>
 
             <input
               id="dateOfBirth"
               type="date"
+              min="1900-01-01"
+              max={today}
               value={profile.dateOfBirth}
               onChange={e =>
                 onChange('dateOfBirth', e.target.value)
@@ -306,16 +310,13 @@ function handleSubmit(event) {
           {/* Current Status */}
 
             <CustomDropdown
-            label="Current Status"
-            options={currentStatusOptions.map(option => ({
-                value: option,
-                label: option
-            }))}
+            label={t('Current Status', '当前状态')}
+            options={localizedOptions(currentStatusOptions, profile.currentStatus)}
             value={profile.currentStatus}
             onChange={value =>
                 onChange('currentStatus', value)
             }
-            placeholder="Select your current status"
+            placeholder={t('Select your current status', '选择当前状态')}
             searchable={false}
             disabled={!isEditing}
             />
@@ -326,16 +327,13 @@ function handleSubmit(event) {
         <div className="profile-form-field full-width">
 
         <CustomDropdown
-            label="Career Goal"
-            options={[...new Set([...careerGoalOptions, ...(profile.careerGoal ? [profile.careerGoal] : [])])].map(option => ({
-            value: option,
-            label: option
-            }))}
+            label={t('Career Goal', '职业目标')}
+            options={localizedOptions(careerGoalOptions, profile.careerGoal)}
             value={profile.careerGoal}
             onChange={value =>
             onChange('careerGoal', value)
             }
-            placeholder="Select your career goal"
+            placeholder={t('Select your career goal', '选择职业目标')}
             searchable={false}
             disabled={!isEditing}
         />
@@ -348,7 +346,7 @@ function handleSubmit(event) {
           <div className="profile-form-field full-width">
 
             <label htmlFor="aboutMe">
-              About Me
+              {t('About Me', '关于我')}
             </label>
 
             <textarea
@@ -358,7 +356,7 @@ function handleSubmit(event) {
                 onChange('aboutMe', e.target.value)
               }
               disabled={!isEditing}
-              placeholder="Tell us a little about yourself..."
+              placeholder={t('Tell us a little about yourself...', '简单介绍一下自己…')}
               rows={5}
               maxLength={500}
             />
@@ -379,9 +377,9 @@ function handleSubmit(event) {
           <Lock size={15} />
 
           <span>
-            Manage your information visibility in{' '}
+            {t('Manage visibility in', '在此管理资料可见性')}{' '}
             <Link to="/settings">
-              Settings
+              {t('Settings', '设置')}
             </Link>.
           </span>
 
@@ -395,7 +393,7 @@ function handleSubmit(event) {
   className="profile-save-button"
   disabled={!isEditing || !isUsernameValid}
 >
-  Save Changes
+  {t('Save Changes', '保存更改')}
 </button>
 
       </form>

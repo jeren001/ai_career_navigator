@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { UserContext } from './user.js'
-import { readProfileUsername, storeProfileUsername } from '../lib/storage.js'
 import { useSession } from '../session/session.js'
+import { useLocale } from '../lib/locale.js'
+import { profileFromAccount, profilePatch } from '../lib/profile.js'
 
 export function UserProvider({ children }) {
   const { user } = useSession()
@@ -10,68 +11,112 @@ export function UserProvider({ children }) {
 
 function AccountProfileProvider({ children, user }) {
   const { request } = useSession()
-  const [accountProfile, setAccountProfile] = useState(null)
-  const [profileEdits, setProfileEdits] = useState(() => ({
-    username: user.is_guest ? '' : readProfileUsername(user.id),
-    dateOfBirth: '',
-    city: '',
-    currentStatus: '',
-    aboutMe: '',
-    profilePhoto: null
-  }))
+  const { setLanguage } = useLocale()
+  const [account, setAccount] = useState(user)
+  const [photo, setPhoto] = useState(null)
+  const [photoVersion, setPhotoVersion] = useState(0)
+  const [photoError, setPhotoError] = useState(null)
+  const [settings, setSettings] = useState(null)
+  const [settingsError, setSettingsError] = useState(null)
+  const [settingsLoading, setSettingsLoading] = useState(!user.is_guest)
+  const [settingsVersion, setSettingsVersion] = useState(0)
+  const [settingsSaving, setSettingsSaving] = useState(false)
+  const [settingsSaveError, setSettingsSaveError] = useState(null)
+  const hasPhoto = Boolean(account.profile_photo_url)
+
+  useEffect(() => {
+    if (!hasPhoto) return
+    const controller = new AbortController()
+    let url
+    request('/api/profile/photo', { responseType: 'blob', signal: controller.signal })
+      .then((blob) => {
+        if (controller.signal.aborted) return
+        url = URL.createObjectURL(blob)
+        setPhoto(url)
+        setPhotoError(null)
+      })
+      .catch((error) => {
+        if (!controller.signal.aborted) setPhotoError(error)
+      })
+    return () => {
+      controller.abort()
+      if (url) URL.revokeObjectURL(url)
+    }
+  }, [hasPhoto, photoVersion, request])
 
   useEffect(() => {
     if (user.is_guest) return
-
     const controller = new AbortController()
-    request('/api/profile', { signal: controller.signal })
-      .then(({ profile }) => {
-        if (!controller.signal.aborted) setAccountProfile((current) => current ?? profile)
+    request('/api/settings', { signal: controller.signal })
+      .then(({ settings: saved }) => {
+        if (controller.signal.aborted) return
+        setSettings(saved)
+        setLanguage(saved.preferred_language === 'zh-CN' ? 'CH' : 'EN')
       })
-      .catch(() => {
-        // Use the account fields returned by authentication while profile data is unavailable.
+      .catch((error) => {
+        if (!controller.signal.aborted) setSettingsError(error)
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setSettingsLoading(false)
       })
     return () => controller.abort()
-  }, [request, user.id, user.is_guest])
+  }, [request, setLanguage, settingsVersion, user.is_guest])
 
-  const account = accountProfile ?? user
-  const [firstName = '', ...lastName] = (account.display_name ?? '').trim().split(/\s+/)
   const profile = {
-    firstName,
-    lastName: lastName.join(' '),
-    email: account.email ?? '',
-    country: account.country ?? '',
-    careerGoal: account.career_goals ?? '',
-    ...profileEdits
+    ...profileFromAccount(account), profilePhoto: hasPhoto ? photo : null, hasPhoto
   }
 
   async function updateProfile(changes) {
-    const edits = { ...changes }
-    const body = {}
-    if ('firstName' in edits || 'lastName' in edits) {
-      edits.firstName = (edits.firstName ?? profile.firstName).trim()
-      edits.lastName = (edits.lastName ?? profile.lastName).trim()
-      body.display_name = [edits.firstName, edits.lastName].filter(Boolean).join(' ')
-    }
-    if ('country' in edits) body.country = edits.country
-    if ('careerGoal' in edits) body.career_goals = edits.careerGoal
-
-    if (Object.keys(body).length) {
-      const { profile: savedProfile } = await request('/api/profile', { method: 'PATCH', body })
-      setAccountProfile(savedProfile)
-    }
-    delete edits.country
-    delete edits.careerGoal
-    if ('username' in edits) storeProfileUsername(user.id, edits.username)
-    setProfileEdits((previous) => ({ ...previous, ...edits }))
+    const body = profilePatch(changes, profile)
+    if (!Object.keys(body).length) return
+    const { profile: saved } = await request('/api/profile', { method: 'PATCH', body })
+    setAccount((current) => ({ ...saved, profile_photo_url: current.profile_photo_url }))
   }
 
-  function updateProfilePhoto(photo) {
-    setProfileEdits((previous) => ({ ...previous, profilePhoto: photo }))
+  async function refreshProfile() {
+    const { profile: saved } = await request('/api/profile')
+    setAccount((current) => ({ ...saved, profile_photo_url: current.profile_photo_url }))
+  }
+
+  async function updateProfilePhoto(file) {
+    if (file) {
+      const saved = await request('/api/profile/photo', { method: 'PUT', rawBody: file })
+      setAccount((current) => ({ ...current, profile_photo_url: saved.profile_photo_url }))
+    } else {
+      await request('/api/profile/photo', { method: 'DELETE' })
+      setAccount((current) => ({ ...current, profile_photo_url: null }))
+    }
+    setPhoto(null)
+    setPhotoError(null)
+    setPhotoVersion((version) => version + 1)
+  }
+
+  async function updateSettings(body) {
+    if (!settings || settingsLoading || settingsSaving) return
+    setSettingsSaving(true)
+    setSettingsSaveError(null)
+    try {
+      const { settings: saved } = await request('/api/settings', { method: 'PATCH', body })
+      setSettings(saved)
+      setLanguage(saved.preferred_language === 'zh-CN' ? 'CH' : 'EN')
+    } catch (error) {
+      setSettingsSaveError(error)
+    } finally {
+      setSettingsSaving(false)
+    }
+  }
+
+  function retrySettings() {
+    setSettingsError(null)
+    setSettingsLoading(true)
+    setSettingsVersion((version) => version + 1)
   }
 
   return (
-    <UserContext.Provider value={{ profile, updateProfile, updateProfilePhoto, updateProfileEdits: setProfileEdits }}>
+    <UserContext.Provider value={{
+      profile, updateProfile, refreshProfile, updateProfilePhoto, photoError,
+      settings, settingsError, settingsLoading, settingsSaving, settingsSaveError, updateSettings, retrySettings
+    }}>
       {children}
     </UserContext.Provider>
   )

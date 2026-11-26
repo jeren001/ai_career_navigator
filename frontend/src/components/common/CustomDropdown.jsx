@@ -8,6 +8,7 @@
 import { useState, useEffect, useRef, useId } from 'react'
 
 // Import icons
+import { useLocale } from '../../lib/locale.js'
 import { ChevronDown, Check, Search, Plus } from 'lucide-react'
 
 // Import component styles
@@ -19,7 +20,7 @@ function CustomDropdown({
   options = [],
   value = '',
   onChange,
-  placeholder = 'Select an option',
+  placeholder,
   searchable = true,
   allowCustom = false,
   disabled = false
@@ -28,6 +29,8 @@ function CustomDropdown({
   // 01. COMPONENT STATE
 
   const [isOpen, setIsOpen] = useState(false)
+  const { t } = useLocale()
+  const searchLabel = t(`Search ${label.toLowerCase()}`, `搜索${label}`)
   const [search, setSearch] = useState('')
 
   const dropdownRef = useRef(null)
@@ -55,10 +58,9 @@ function CustomDropdown({
 
   }
 
-  const filteredOptions = options.filter(option =>
-    normalizeText(option.label).includes(
-      normalizeText(search.trim())
-    )
+  const searchTerm = normalizeText(search.trim())
+  const filteredOptions = options.filter(({ label, sourceLabel }) =>
+    normalizeText(label).includes(searchTerm) || (sourceLabel && normalizeText(sourceLabel).includes(searchTerm))
   )
 
 
@@ -219,7 +221,7 @@ function CustomDropdown({
             </span>
           )}
 
-          {selectedOption?.label || value || placeholder}
+          {selectedOption?.label || value || placeholder || t('Select an option', '请选择')}
 
         </span>
 
@@ -254,8 +256,8 @@ function CustomDropdown({
                 ref={searchRef}
                 type="text"
                 value={search}
-                placeholder={`Search ${label.toLowerCase()}...`}
-                aria-label={`Search ${label}`}
+                placeholder={searchLabel + '…'}
+                aria-label={searchLabel}
                 onChange={event =>
                   setSearch(event.target.value)
                 }
@@ -310,7 +312,7 @@ function CustomDropdown({
               !showCustomOption && (
 
                 <div className="custom-dropdown-empty">
-                  No results found
+                  {t('No results found', '未找到结果')}
                 </div>
 
             )}
@@ -329,7 +331,7 @@ function CustomDropdown({
                 <Plus size={16} />
 
                 <span>
-                  Use "{customValue}"
+                  {t(`Use “${customValue}”`, `使用“${customValue}”`)}
                 </span>
 
               </button>

@@ -1,8 +1,11 @@
 import { Check, Globe } from 'lucide-react'
+import { useUser } from '../../context/user.js'
 import { useLocale } from '../../lib/locale.js'
 
 function LanguageSettings() {
-  const { language, setLanguage, t } = useLocale()
+  const { t } = useLocale()
+  const { settings, settingsSaving, updateSettings } = useUser()
+  const language = settings.preferred_language === 'zh-CN' ? 'CH' : 'EN'
   const languages = [
     { code: 'EN', name: t('English', '英语'), nativeName: 'English' },
     { code: 'CH', name: t('Chinese', '中文'), nativeName: '简体中文' }
@@ -27,7 +30,8 @@ function LanguageSettings() {
             type="button"
             aria-pressed={code === language}
             className={`settings-language-option ${code === language ? 'active' : ''}`}
-            onClick={() => setLanguage(code)}
+            disabled={settingsSaving}
+            onClick={() => updateSettings({ preferred_language: code === 'CH' ? 'zh-CN' : 'en' })}
           >
             <span className="settings-language-code">{code}</span>
             <div className="settings-option-content">

@@ -12,8 +12,9 @@ export function createApiClient({
 } = {}) {
   const base = baseUrl.replace(/\/+$/, '')
 
-  return async function request(path, { method = 'GET', body, token, signal } = {}) {
-    const headers = { Accept: 'application/json' }
+  return async function request(path, { method = 'GET', body, token, signal, rawBody, responseType = 'json' } = {}) {
+    const headers = { Accept: responseType === 'blob' ? 'image/jpeg' : 'application/json' }
+    if (rawBody) headers['Content-Type'] = rawBody.type
     if (body !== undefined) headers['Content-Type'] = 'application/json'
     if (token) headers.Authorization = `Bearer ${token}`
 
@@ -22,7 +23,7 @@ export function createApiClient({
       response = await fetchImpl(`${base}${path}`, {
         method,
         headers,
-        ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+        ...(rawBody ? { body: rawBody } : body !== undefined ? { body: JSON.stringify(body) } : {}),
         signal
       })
     } catch (error) {
@@ -30,6 +31,8 @@ export function createApiClient({
       throw new ApiError(0, 'API network request failed')
     }
     if (response.status === 204) return null
+
+    if (response.ok && responseType === 'blob') return response.blob()
 
     let data
     try {

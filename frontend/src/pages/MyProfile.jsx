@@ -14,6 +14,7 @@ import { useState } from 'react'
 // Import global user context
 import { useUser } from '../context/user.js'
 
+import { profileStatusLabel } from '../lib/profile.js'
 import { apiErrorText, useLocale } from '../lib/locale.js'
 
 // Import shared dashboard layout
@@ -44,7 +45,8 @@ function MyProfile() {
   const {
     profile,
     updateProfile,
-    updateProfilePhoto
+    updateProfilePhoto,
+    photoError
   } = useUser()
 
 
@@ -146,10 +148,11 @@ function MyProfile() {
             lastName={profile.lastName}
             username={profile.username}
             headline={
-              profile.currentStatus ||
+              profileStatusLabel(profile.currentStatus, t) ||
               t('Career Explorer', '职业探索者')
             }
             profilePhoto={profile.profilePhoto}
+            hasPhoto={profile.hasPhoto}
             percentage={percentage}
             onEdit={isEditing ? undefined : handleEdit}
             onPhotoChange={updateProfilePhoto}
@@ -174,6 +177,7 @@ function MyProfile() {
         )}
 
 
+        {photoError && <p role="alert">{apiErrorText(photoError, t)}</p>}
         {saveError && <p role="alert">{apiErrorText(saveError, t)}</p>}
 
         {/* Personal information */}

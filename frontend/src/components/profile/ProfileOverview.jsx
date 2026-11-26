@@ -5,6 +5,7 @@
 // ==========================================
 
 // Import icons
+import { useLocale } from '../../lib/locale.js'
 import { Pencil } from 'lucide-react'
 
 // Import reusable profile components
@@ -18,11 +19,13 @@ import ProfileAvatar from './ProfileAvatar'
     username = '',
     headline = 'Career Explorer',
     profilePhoto = null,
+    hasPhoto,
     percentage = 0,
     onEdit,
     onPhotoChange
     }) {
 
+  const { t } = useLocale()
   return (
     <div className="profile-overview-card">
 
@@ -34,6 +37,7 @@ import ProfileAvatar from './ProfileAvatar'
 
         <ProfileAvatar
           photo={profilePhoto}
+          hasPhoto={hasPhoto}
           onPhotoChange={onPhotoChange}
         />
 
@@ -43,7 +47,7 @@ import ProfileAvatar from './ProfileAvatar'
         <div className="profile-overview-details">
 
           <h2>
-                {[firstName, lastName].filter(Boolean).join(' ') || 'Your Name'}
+                {[firstName, lastName].filter(Boolean).join(' ') || t('Your Name', '你的姓名')}
                 </h2>
 
           {username && (
@@ -62,7 +66,7 @@ import ProfileAvatar from './ProfileAvatar'
         <button
           type="button"
           className="profile-overview-edit"
-          aria-label="Edit profile"
+          aria-label={t('Edit profile', '编辑资料')}
           onClick={onEdit}
           disabled={!onEdit}
         >

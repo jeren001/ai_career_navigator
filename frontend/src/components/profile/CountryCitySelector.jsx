@@ -11,6 +11,7 @@ import { useMemo } from 'react'
 import { Country, City } from 'country-state-city'
 
 // Import reusable dropdown
+import { useLocale } from '../../lib/locale.js'
 import CustomDropdown from '../common/CustomDropdown'
 
 
@@ -22,21 +23,25 @@ function CountryCitySelector({
   disabled = false
 }) {
 
+  const { t, locale } = useLocale()
+
   // 01. LOAD COUNTRY OPTIONS
 
   const countries = useMemo(() => {
 
+    const names = new Intl.DisplayNames([locale], { type: 'region' })
     return Country.getAllCountries()
       .map(item => ({
         value: item.isoCode,
-        label: item.name,
+        label: names.of(item.isoCode) ?? item.name,
+        sourceLabel: item.name,
         flag: item.flag
       }))
       .sort((a, b) =>
         a.label.localeCompare(b.label)
       )
 
-  }, [])
+  }, [locale])
 
 
   // 02. LOAD CITY OPTIONS
@@ -45,8 +50,8 @@ function CountryCitySelector({
 
     if (!country) return []
 
-    const countryCode = countries.find(({ value, label }) =>
-      value === country || label.toLowerCase() === country.toLowerCase()
+    const countryCode = countries.find(({ value, label, sourceLabel }) =>
+      [value, label, sourceLabel].some((name) => name.toLowerCase() === country.toLowerCase())
     )?.value
     const countryCities = countryCode ? City.getCitiesOfCountry(countryCode) : []
 
@@ -90,11 +95,11 @@ function CountryCitySelector({
       {/* Country dropdown */}
 
       <CustomDropdown
-        label="Country"
+        label={t('Country', '国家')}
         options={countries}
         value={country}
         onChange={handleCountryChange}
-        placeholder="Select your country"
+        placeholder={t('Select your country', '选择国家')}
         searchable={true}
         disabled={disabled}
       />
@@ -103,14 +108,14 @@ function CountryCitySelector({
       {/* City dropdown */}
 
       <CustomDropdown
-        label="City"
+        label={t('City', '城市')}
         options={cities}
         value={city}
         onChange={onCityChange}
         placeholder={
           country
-            ? 'Select or search your city'
-            : 'Select a country first'
+            ? t('Select or search your city', '选择或搜索城市')
+            : t('Select a country first', '请先选择国家')
         }
         searchable={true}
         allowCustom={true}

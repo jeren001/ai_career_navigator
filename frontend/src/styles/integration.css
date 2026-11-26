@@ -36,3 +36,44 @@
   opacity: 0.55;
   cursor: default;
 }
+
+.account-recovery {
+  display: grid;
+  align-content: center;
+  padding: 24px;
+}
+
+.account-recovery label,
+.settings-delete-confirmation label {
+  display: grid;
+  gap: 6px;
+}
+
+.account-recovery input {
+  min-height: 45px;
+  padding: 0 14px;
+  border: 1px solid #d5deef;
+  border-radius: 20px;
+}
+
+.account-notification-list {
+  max-height: 300px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+}
+
+.account-notification-list li + li {
+  margin-top: 12px;
+}
+
+.dashboard-language-error {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 160px;
+  padding: 6px;
+  background: white;
+  color: #96311d;
+  z-index: 2;
+}

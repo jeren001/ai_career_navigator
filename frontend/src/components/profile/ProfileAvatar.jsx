@@ -8,18 +8,22 @@
 import { useRef, useState } from 'react'
 
 // Import icons
+import { apiErrorText, useLocale } from '../../lib/locale.js'
 import { UserRound, Camera, Upload, Trash2 } from 'lucide-react'
 
 
 function ProfileAvatar({
   photo = null,
-  onPhotoChange
+  onPhotoChange,
+  hasPhoto = Boolean(photo)
 }) {
 
   // 01. COMPONENT STATE
 
   const [menuOpen, setMenuOpen] = useState(false)
   const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
+  const { t } = useLocale()
 
   const fileInputRef = useRef(null)
 
@@ -34,67 +38,33 @@ function ProfileAvatar({
   }
 
 
-  // 03. VALIDATE AND PREVIEW PHOTO
-
   function handleFileChange(event) {
-
     const file = event.target.files?.[0]
-
     event.target.value = ''
-
-    if (!file) return
-
-    setError('')
-
-    const allowedTypes = [
-      'image/jpeg',
-      'image/png',
-      'image/webp'
-    ]
-
-    if (!allowedTypes.includes(file.type)) {
-
-      setError('Please select a JPG, PNG or WEBP image.')
+    if (!file || busy) return
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      setError(t('Please select a JPEG, PNG, or WebP image.', '请选择 JPEG、PNG 或 WebP 图片。'))
       return
-
     }
-
-    if (file.size > 5 * 1024 * 1024) {
-
-      setError('The image must be smaller than 5 MB.')
+    if (!file.size || file.size > 5 * 1024 * 1024) {
+      setError(t('Select a nonempty image up to 5 MiB.', '请选择不超过 5 MiB 的非空图片。'))
       return
-
     }
-
-    const reader = new FileReader()
-
-    reader.onload = () => {
-
-      onPhotoChange(reader.result)
-
-    }
-
-    reader.onerror = () => {
-
-      setError('Unable to read the selected image.')
-
-    }
-
-    reader.readAsDataURL(file)
-
+    void savePhoto(file)
   }
 
-
-  // 04. REMOVE PHOTO
-
-  function handleRemovePhoto() {
-
-    onPhotoChange(null)
+  async function savePhoto(file) {
+    setBusy(true)
     setMenuOpen(false)
     setError('')
-
+    try {
+      await onPhotoChange(file)
+    } catch (error) {
+      setError(apiErrorText(error, t))
+    } finally {
+      setBusy(false)
+    }
   }
-
 
   // 05. AVATAR INTERFACE
 
@@ -122,7 +92,7 @@ function ProfileAvatar({
 
           <img
             src={photo}
-            alt="Profile"
+            alt={t('Profile photo', '头像')}
           />
 
         ) : (
@@ -140,7 +110,8 @@ function ProfileAvatar({
         type="button"
         className="profile-avatar-camera"
         onClick={() => setMenuOpen(previous => !previous)}
-        aria-label="Manage profile photo"
+        disabled={busy}
+        aria-label={t('Manage profile photo', '管理头像')}
         aria-expanded={menuOpen}
       >
 
@@ -173,22 +144,22 @@ function ProfileAvatar({
 
             <Upload size={16} />
 
-            {photo ? 'Change Photo' : 'Upload Photo'}
+            {hasPhoto ? t('Change Photo', '更换头像') : t('Upload Photo', '上传头像')}
 
           </button>
 
 
-          {photo && (
+          {hasPhoto && (
 
             <button
               type="button"
               className="remove-photo-button"
-              onClick={handleRemovePhoto}
+              onClick={() => savePhoto(null)}
             >
 
               <Trash2 size={16} />
 
-              Remove Photo
+              {t('Remove Photo', '移除头像')}
 
             </button>
 

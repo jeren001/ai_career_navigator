@@ -30,7 +30,6 @@ import mascotImage from '../assets/mascot.png'
 import '../styles/signin.css'
 import '../styles/signup.css'
 import { apiErrorText, useLocale } from '../lib/locale.js'
-import { storeProfileUsername } from '../lib/storage.js'
 import { useSession } from '../session/session.js'
 // Import reusable username utilities
 import {
@@ -43,7 +42,7 @@ import {
 
 
 function SignUp() {
-  const { language, setLanguage, t } = useLocale()
+  const { language, locale, setLanguage, t } = useLocale()
   const { authenticate, status, user } = useSession()
   const navigate = useNavigate()
   const [pending, setPending] = useState(false)
@@ -84,11 +83,10 @@ function SignUp() {
     setMessage('')
     try {
       const registeredUser = await authenticate('/api/auth/register', {
-        body: { display_name: fullName.trim(), email: email.trim(), password },
+        body: { display_name: fullName.trim(), email: email.trim(), password, username, preferred_language: locale },
         upgradeGuest: user?.is_guest === true
       })
       if (registeredUser) {
-        storeProfileUsername(registeredUser.id, username)
         navigate('/dashboard', { replace: true })
       }
     } catch (error) {
