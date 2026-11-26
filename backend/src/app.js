@@ -8,6 +8,7 @@ import authRouter from './routes/auth.js';
 import careersRouter from './routes/careers.js';
 import challengesRouter from './routes/challenges.js';
 import healthRouter from './routes/health.js';
+import interviewsRouter from './routes/interviews.js';
 import profileRouter from './routes/profile.js';
 import skillsRouter from './routes/skills.js';
 import { discoverResources } from './services/challenge-catalog.js';
@@ -27,6 +28,7 @@ export function createApp(database = pool) {
   app.use('/api/profile', profileRouter(database));
   app.use('/api/skills', skillsRouter(database));
   app.use('/api/challenges', challengesRouter(database));
+  app.use('/api/interviews', interviewsRouter(database));
   app.use('/api/careers', careersRouter(database));
   app.get('/api/learning/resources', (request, response) => response.json(discoverResources(request.query)));
   app.use('/api/assessment', assessmentRouter(database));

@@ -105,6 +105,22 @@ Evaluation sends plain text to the configured AI provider. The API sums rubric p
 
 While another request is evaluating the same submission, the evaluation endpoint returns HTTP 202. If the provider is unavailable, the submission retains its artifact and exposes the failure reason. It can be evaluated again later. Swagger UI includes example requests under **Practical Challenges** and **Learning Hub**.
 
+## Interview Simulator API
+
+Run `npm run migrate` from `backend` to create the interview history table. Sign in with a registered account and use its bearer token in **Interview Simulator** in Swagger UI.
+
+| Method and path | Purpose |
+| --- | --- |
+| `POST /api/interviews` | Start an interview with an active `profession_slug`, `difficulty` of `beginner`, `intermediate`, or `advanced`, and optional `language` of `en` or `zh-CN` |
+| `GET /api/interviews` | List your sessions with answer progress and available scores, 20 per page. Pass `next_offset` as `offset` to continue |
+| `GET /api/interviews/{id}` | Resume an interview or read its transcript and feedback |
+| `POST /api/interviews/{id}/answers` | Submit the current `question_id` and up to 1500 characters of `answer` |
+| `POST /api/interviews/{id}/evaluate` | Evaluate a completed interview or retry an unavailable evaluation |
+
+Choose a slug returned by `GET /api/careers`. The simulator selects three questions at the chosen difficulty, prioritizing profession tags and filling from the same career field. After each main answer, the AI provider selects a follow-up from the bank and can personalize it with a quote from the answer. A bank follow-up is available when the provider is unavailable. Answer the `current_question` in each response until the session is `completed`.
+
+Request evaluation after all six answers. The evaluator applies the bank's 0–2 rubric to the main answers and follow-ups, returning criterion feedback, strengths, mistakes or omissions, and improvement suggestions. The score describes the practice transcript. Follow-ups and evaluation share the existing daily account allowance. While a request is processing, use `GET /api/interviews/{id}` to check progress. An unavailable evaluation saves the transcript and a failure reason. The scores and feedback become available after a successful evaluation.
+
 ## Adaptive assessment API
 
 The hybrid assessment asks 6 general questions, 8 adaptive questions selected from the 105-question bilingual bank, and 4 personalized clarification questions. The adaptive stage covers all seven bank categories and at least two interdisciplinary questions. New bank options carry deterministic weights. Custom answers and notes on new items provide context for AI analysis. Gemini prepares the clarification batch after answer 14. Each clarification uses one distinct topic and a validated reference to a previous answer. The API supplies predefined clarification questions when AI cannot provide a valid question.

@@ -31,6 +31,13 @@ const catalogSkill = catalogQuery('skill', 'Skill name or dataset skill slug.');
 const pathId = (schema, example) => ({ name: 'id', in: 'path', required: true, schema, example });
 const challengeId = pathId(string, 'sc-ta-query-library');
 const submissionId = pathId({ ...string, format: 'uuid' }, demoId);
+const interviewErrors = {
+  400: 'Invalid interview fields, offset, or session ID.',
+  401: 'A registered account bearer token is required.',
+  404: 'Active profession or owned interview session not found.',
+  409: 'The interview is processing another request, the question has changed, or feedback is premature.',
+  503: 'Authentication configuration or interview schema unavailable.',
+};
 const challengeErrors = {
   400: 'Invalid submission ID or request body.',
   401: 'A registered account bearer token is required.',
@@ -186,7 +193,7 @@ export const openapi = {
   tags: [
     { name: 'Health' }, { name: 'Authentication' }, { name: 'Profile' },
     { name: 'Careers' }, { name: 'My Skills' }, { name: 'Practical Challenges' }, { name: 'Learning Hub' },
-    { name: 'Assessment' }, { name: 'Quiz aliases' },
+    { name: 'Interview Simulator' }, { name: 'Assessment' }, { name: 'Quiz aliases' },
   ],
   paths: {
     '/api/health': { get: {
@@ -398,6 +405,63 @@ export const openapi = {
       responses: {
         200: response('Matching resources with localized descriptions and provider metadata.', ref('LearningResourceList')),
         ...errors({ 400: 'Invalid catalog filters.' }),
+      },
+    } },
+    '/api/interviews': {
+      post: {
+        tags: ['Interview Simulator'], operationId: 'createInterview', summary: 'Start a practice interview',
+        description: 'Choose an active profession slug from GET /api/careers. Each session has three bank questions and three follow-ups. The selected difficulty applies to all bank questions.',
+        security: requireBearer,
+        requestBody: body('InterviewCreate', {
+          english: example('Start a beginner interview', { profession_slug: 'backend-engineer', difficulty: 'beginner', language: 'en' }),
+          chinese: example('Start in Simplified Chinese', { profession_slug: 'data-analyst', difficulty: 'intermediate', language: 'zh-CN' }),
+        }),
+        responses: {
+          201: response('Session created with the first question.', ref('InterviewSessionResponse')),
+          ...errors({ ...interviewErrors, 409: 'No question set for the selected profession and difficulty.' }),
+        },
+      },
+      get: {
+        tags: ['Interview Simulator'], operationId: 'listInterviews', summary: 'List your interview history and progress',
+        security: requireBearer,
+        parameters: [catalogQuery('offset', 'Use next_offset to fetch the next page.', { type: 'integer', minimum: 0, maximum: 2147483647, default: 0 })],
+        responses: {
+          200: response('Up to twenty sessions, newest first.', ref('InterviewHistory')),
+          ...errors({ 400: interviewErrors[400], 401: interviewErrors[401], 503: interviewErrors[503] }),
+        },
+      },
+    },
+    '/api/interviews/{id}': { get: {
+      tags: ['Interview Simulator'], operationId: 'getInterview', summary: 'Read or resume your practice interview',
+      parameters: [submissionId],
+      security: requireBearer,
+      responses: {
+        200: response('Owned session with transcript and saved feedback.', ref('InterviewSessionResponse')),
+        ...errors({ 400: interviewErrors[400], 401: interviewErrors[401], 404: interviewErrors[404], 503: interviewErrors[503] }),
+      },
+    } },
+    '/api/interviews/{id}/answers': { post: {
+      tags: ['Interview Simulator'], operationId: 'answerInterview', summary: 'Answer the current interview question',
+      description: 'Copy current_question.id from the previous response and repeat until status is completed. A main answer prompts a relevant follow-up. If AI is unavailable, the bank supplies that follow-up.',
+      parameters: [submissionId],
+      security: requireBearer,
+      requestBody: body('InterviewAnswer', {
+        english: example('Answer a first question', { question_id: 'iq-ta-review-feedback', answer: 'A reviewer pointed out that our retry could create duplicates. I added an idempotency key and verified that two requests produced one record.' }),
+      }),
+      responses: {
+        200: response('Saved transcript and the next question, if any.', ref('InterviewSessionResponse')),
+        ...errors(interviewErrors),
+      },
+    } },
+    '/api/interviews/{id}/evaluate': { post: {
+      tags: ['Interview Simulator'], operationId: 'evaluateInterview', summary: 'Request rubric feedback for a completed interview',
+      description: 'After all six answers, request an evaluation with rubric points, strengths, mistakes, and improvement suggestions. If evaluation_status is unavailable, the transcript is saved and evaluation can be retried later.',
+      parameters: [submissionId],
+      security: requireBearer,
+      responses: {
+        200: response('Saved evaluation or an unavailable status with a reason.', ref('InterviewSessionResponse')),
+        202: response('An evaluation is running. Read the session to check progress.', ref('InterviewSessionResponse')),
+        ...errors(interviewErrors),
       },
     } },
     ...Object.fromEntries(Object.entries(assessmentPaths).flatMap(([action, operation]) => [

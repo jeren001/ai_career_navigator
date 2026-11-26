@@ -128,6 +128,30 @@ const skillRequirement = {
 };
 const skillCareerIds = array(id, { minItems: 1, maxItems: 5, uniqueItems: true });
 const challengeDifficulty = choices('beginner', 'intermediate', 'advanced');
+const interviewEvaluationStatus = choices('pending', 'ai', 'unavailable');
+const interviewScore = { points: integer, max_points: integer };
+const interviewSessionSummary = {
+  id: uuid,
+  profession: object({ id, slug: string, title: string, career_field: string }),
+  difficulty: challengeDifficulty,
+  language,
+  status: choices('in_progress', 'completed'),
+  processing: bool,
+  progress: object({ answered: { ...integer, minimum: 0, maximum: 6 }, total: { ...integer, enum: [6] } }),
+  evaluation_status: interviewEvaluationStatus,
+  score: { ...object(interviewScore), nullable: true },
+  created_at: dateTime,
+  updated_at: dateTime,
+};
+const interviewQuestion = object({
+  id: string,
+  type: choices('behavioral', 'situational', 'technical', 'problem-solving', 'follow_up'),
+  text: string,
+  source: choices('bank', 'ai', 'fallback'),
+  relevance: choices('profession', 'career_field'),
+  provider,
+  reason: fallbackReason,
+}, ['id', 'type', 'text', 'source', 'relevance']);
 const submissionStatus = choices('submitted', 'evaluating', 'evaluated', 'unavailable');
 const practiceCounts = {
   submitted_count: integer, evaluated_count: integer, latest_submission_id: uuid,
@@ -149,6 +173,47 @@ const challengeEvaluation = {
 };
 
 export const schemas = {
+  InterviewCreate: {
+    ...object({
+      profession_slug: { ...string, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$', maxLength: 100 },
+      difficulty: challengeDifficulty,
+      language: { ...language, default: 'en' },
+    }, ['profession_slug', 'difficulty']),
+    additionalProperties: false,
+  },
+  InterviewAnswer: {
+    ...object({ question_id: untrimmed, answer: { ...untrimmed, maxLength: 1500 } }),
+    additionalProperties: false,
+  },
+  InterviewHistory: object({
+    sessions: array(object(interviewSessionSummary), { maxItems: 20 }),
+    next_offset: { ...integer, nullable: true },
+  }),
+  InterviewSessionResponse: object({
+    session: object({
+      ...interviewSessionSummary,
+      current_question: { ...interviewQuestion, nullable: true },
+      transcript: array(object({ question: interviewQuestion, answer: string }), { maxItems: 6 }),
+      evaluation: {
+        ...object({
+          status: choices('ai', 'unavailable'),
+          scope: choices('practice_interview'),
+          provider, cached: bool, reason: fallbackReason,
+          ...interviewScore,
+          strengths: strings, mistakes: strings, suggestions: strings,
+          criteria: array(object({
+            question_id: string, criterion_id: string,
+            ...interviewScore,
+            evidence: { ...nullableText, maxLength: 180 },
+            feedback: { ...string, maxLength: 240 },
+            suggestion: { ...nullableText, maxLength: 240 },
+          })),
+        }, ['status', 'scope']),
+        nullable: true,
+      },
+      guidance: object({ examples: string, interpretation: string }),
+    }),
+  }),
   Error: object({ error: string }),
   Health: object({ status: choices('ok') }),
   Credentials: object(credentials),
