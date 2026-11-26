@@ -37,6 +37,7 @@ export function createAccessToken(user) {
   const payload = encode({
     sub: user.id,
     guest: user.is_guest,
+    ver: user.session_version ?? 0,
     iat: now,
     exp: now + TOKEN_LIFETIME_SECONDS,
   });
@@ -46,10 +47,10 @@ export function createAccessToken(user) {
 
 export function verifyAccessToken(token) {
   if (typeof token !== 'string' || token.length > 2048) throw authError('Invalid bearer token');
-  const [version, payload, suppliedSignature, extra] = token.split('.');
-  if (version !== 'v1' || !payload || !suppliedSignature || extra) throw authError('Invalid bearer token');
+  const [format, payload, suppliedSignature, extra] = token.split('.');
+  if (format !== 'v1' || !payload || !suppliedSignature || extra) throw authError('Invalid bearer token');
 
-  const input = `${version}.${payload}`;
+  const input = `${format}.${payload}`;
   const expected = Buffer.from(signature(input));
   const supplied = Buffer.from(suppliedSignature);
   if (expected.length !== supplied.length || !timingSafeEqual(expected, supplied)) {
@@ -68,7 +69,13 @@ export function verifyAccessToken(token) {
     throw authError('Expired or invalid bearer token');
   }
   if (typeof claims.guest !== 'boolean') throw authError('Invalid bearer token');
-  return { userId: claims.sub, isGuest: claims.guest };
+  const version = claims.ver ?? 0;
+  if (!Number.isInteger(version) || version < 0) throw authError('Invalid bearer token');
+  return { userId: claims.sub, isGuest: claims.guest, version };
+}
+
+export function accountDigest(scope, ...values) {
+  return createHmac('sha256', tokenSecret()).update(JSON.stringify([scope, ...values])).digest();
 }
 
 export async function hashPassword(password) {
@@ -101,10 +108,12 @@ export function optionalAuthentication(database) {
 
     try {
       const claims = verifyAccessToken(match[1]);
-      const result = await database.query('SELECT id, is_guest FROM users WHERE id = $1', [claims.userId]);
+      const result = await database.query('SELECT id, is_guest, session_version FROM users WHERE id = $1', [claims.userId]);
       const user = result.rows[0];
-      if (!user || user.is_guest !== claims.isGuest) throw authError('Invalid bearer token');
-      request.auth = { userId: user.id, isGuest: user.is_guest };
+      if (!user || user.is_guest !== claims.isGuest || (user.session_version ?? 0) !== claims.version) {
+        throw authError('Invalid bearer token');
+      }
+      request.auth = { userId: user.id, isGuest: user.is_guest, version: claims.version };
       return next();
     } catch (error) {
       return next(error);

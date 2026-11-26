@@ -1,3 +1,5 @@
+import { notificationFields, privacyFields } from '../services/settings.js';
+
 export const ref = (name) => ({ $ref: `#/components/schemas/${name}` });
 export const object = (properties, required = Object.keys(properties)) => ({
   type: 'object', properties, ...(required.length && { required }),
@@ -24,7 +26,15 @@ const credentials = {
   email,
   password: { ...string, format: 'password', minLength: 10, maxLength: 128, writeOnly: true },
 };
+const username = { ...string, pattern: '^[a-zA-Z0-9_.]{3,20}$', maxLength: 20 };
+const date = { ...string, format: 'date' };
+const profileExtras = {
+  first_name: optionalPatchText(120), last_name: optionalPatchText(120),
+  username: { ...username, nullable: true }, city: optionalPatchText(100),
+  date_of_birth: { ...date, nullable: true }, current_status: optionalPatchText(120), about_me: optionalPatchText(500),
+};
 const patchProperties = {
+  ...profileExtras,
   display_name: optionalPatchText(120),
   country: optionalPatchText(100),
   preferred_language: { ...choices('en', 'zh-CN', '', null), nullable: true, description: 'An empty string or null resets the preference to English.' },
@@ -36,6 +46,7 @@ const patchProperties = {
   career_goals: optionalPatchText(2000),
 };
 const profileProperties = {
+  ...profileExtras,
   id,
   email: { ...email, nullable: true },
   display_name: nullableText,
@@ -48,8 +59,15 @@ const profileProperties = {
   skills: strings,
   career_goals: nullableText,
   is_guest: bool,
+  email_verified_at: { ...dateTime, nullable: true },
+  profile_photo_url: nullableText,
   created_at: dateTime,
 };
+const privacyProperties = Object.fromEntries(privacyFields.map((field) => [field, choices('private', 'public')]));
+const notificationProperties = Object.fromEntries(notificationFields.map((field) => [field, bool]));
+const code = { ...string, pattern: '^[0-9]{8}$', writeOnly: true };
+const currentPassword = { current_password: credentials.password };
+const newPassword = { new_password: credentials.password };
 const career = {
   id,
   slug: string,
@@ -212,6 +230,37 @@ const resumeGuidance = { resume_guidance: ref('ResumeGuidance') };
 const resumeConsent = { ...bool, enum: [true] };
 
 export const schemas = {
+  SettingsResponse: object({ settings: object({
+    preferred_language: language, privacy_settings: object(privacyProperties),
+    notification_settings: object(notificationProperties),
+  }) }),
+  SettingsPatch: {
+    ...object({
+      preferred_language: language,
+      privacy_settings: { ...object(privacyProperties, []), additionalProperties: false },
+      notification_settings: { ...object(notificationProperties, []), additionalProperties: false },
+    }, []),
+    minProperties: 1, additionalProperties: false,
+  },
+  NotificationList: object({
+    notifications: array(object({
+      id, kind: choices('career_recommendations', 'roadmap_created', 'roadmap_completed'),
+      message: string, related_id: string, created_at: dateTime, read_at: { ...dateTime, nullable: true },
+    }), { maxItems: 20 }),
+    next_before: { ...id, nullable: true },
+  }),
+  PublicProfile: object({ profile: object({
+    ...Object.fromEntries(privacyFields.filter((key) => key !== 'profile_photo').map((key) => [key, string])),
+    profile_photo_url: string,
+  }, []) }),
+  ProfilePhoto: object({ profile_photo_url: string }),
+  EmailCodeAccepted: object({ accepted: { ...bool, enum: [true] } }),
+  EmailCode: object({ code }),
+  EmailChangeRequest: object({ email, ...currentPassword }),
+  PasswordResetRequest: object({ email, language }, ['email']),
+  PasswordResetConfirm: object({ email, code, ...newPassword }),
+  PasswordChange: object({ ...currentPassword, ...newPassword }),
+  AccountDelete: object({ ...currentPassword, confirmation: choices('DELETE') }),
   ResumeEntry: { ...resumeEntry, additionalProperties: false },
   ResumeSectionUpdate: { ...object(resumeSections, []), additionalProperties: false },
   ResumeCreate: { ...object(resumeUpdate, ['title']), additionalProperties: false },
@@ -285,7 +334,9 @@ export const schemas = {
   Error: object({ error: string }),
   Health: object({ status: choices('ok') }),
   Credentials: object(credentials),
-  Registration: object({ ...credentials, display_name: optionalPatchText(120) }, ['email', 'password']),
+  Registration: object({
+    ...credentials, display_name: optionalPatchText(120), username, preferred_language: language,
+  }, ['email', 'password']),
   UserProfile: object(profileProperties),
   AuthUser: object(profileProperties, Object.keys(profileProperties).filter((field) => field !== 'created_at')),
   AuthResponse: object({ ...token, user: ref('AuthUser') }),

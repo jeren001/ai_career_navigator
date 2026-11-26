@@ -172,6 +172,33 @@ To opt in for a single request, send `"resume_context": {"resume_id":"<owned res
 
 Original files and text are private PostgreSQL data. Resume excerpts and guidance are kept out of saved personalization and the AI result cache. Explicit consent permits the configured provider to receive selected excerpts. Database backups and provider retention follow their own retention policies.
 
+## Profile, account security, and settings
+
+The frontend integration at `ed72a66` saves display name, country, and career goals through the existing profile API. The username, remaining personal details, photo, and settings currently live in browser state. Its password and email change and account deletion controls are placeholders. The backend contract below supports wiring those controls to PostgreSQL.
+
+| Client area | Backend contract |
+| --- | --- |
+| Sign Up | `POST /api/auth/register` accepts optional `username` and `preferred_language` (`en` or `zh-CN`). A guest token still promotes the guest and keeps their assessment history. New email addresses start unverified. |
+| My Profile | `GET/PATCH /api/profile` supports `username`, `first_name`, `last_name`, `date_of_birth`, `city`, `current_status`, and `about_me` alongside existing fields. Use `career_goals` for the career goal. Usernames use 3–20 ASCII letters, digits, underscores, or dots and are stored in lowercase. |
+| Profile photo | `GET/PUT/DELETE /api/profile/photo` uses an account token. Upload a raw JPEG, PNG, or WebP body up to 5 MiB. ImageMagick 7 (`magick` on PATH) decodes and resizes the image and strips metadata before PostgreSQL stores it. |
+| Settings | `GET/PATCH /api/settings` reads or updates `preferred_language`, `privacy_settings`, and `notification_settings`. Send only the fields to change. |
+| Public profile | `GET /api/profile/public/{username}` and its `/photo` subresource serve explicitly published fields. The default is private. Email and date of birth stay private. |
+| Notifications | `GET /api/notifications` lists the account’s English or Simplified Chinese inbox. Use `next_before` as the next request’s `before` parameter. `PATCH /api/notifications/{id}/read` marks an item as read. |
+
+In-app notifications cover completed assessments, new roadmaps, and completed milestones when their category is enabled. Preferences for job alerts, learning reminders, platform announcements, and optional email notifications are saved for future delivery integrations. Security email is sent separately from optional notification preferences.
+
+| Account operation | Request |
+| --- | --- |
+| Verify email | Call `POST /api/auth/email-verification/request` with the account token, then `POST /api/auth/email-verification/confirm` with `code`. |
+| Change email | Call `POST /api/auth/email-change/request` with the new `email` and `current_password`, then `POST /api/auth/email-change/confirm` with the code sent to the new address. Both calls require the account token. |
+| Recover a password | Call `POST /api/auth/password-reset/request` with `email` and optional `language`, then `POST /api/auth/password-reset/confirm` with `email`, `code`, and `new_password`. These calls are public. Passwordless legacy accounts use this flow to prove mailbox ownership and retain their assessment data. |
+| Change a password | Call `POST /api/auth/password/change` with the account token, `current_password`, and `new_password`. |
+| Delete an account | Call `DELETE /api/auth/account` with the account token, `current_password`, and `confirmation: "DELETE"`. PostgreSQL deletes the account and its linked data from the active database. |
+
+Email codes are eight-digit strings, expire after 10 minutes, and allow five incorrect attempts. Rate limits are stored in PostgreSQL. After an email change, password change, or recovery, discard the old bearer token and sign in again. Verification status is available as `email_verified_at` on the profile and account endpoints.
+
+For transactional email, configure `ACCOUNT_EMAIL_PROVIDER=resend`, `ACCOUNT_EMAIL_FROM` with a verified sender, and `RESEND_API_KEY`. The server chooses the message language from the account preference or recovery request. The integration suite uses an injected test mailer to verify the account flow without sending email.
+
 ## Adaptive assessment API
 
 The hybrid assessment asks 6 general questions, 8 adaptive questions selected from the 105-question bilingual bank, and 4 personalized clarification questions. The adaptive stage covers all seven bank categories and at least two interdisciplinary questions. New bank options carry deterministic weights. Custom answers and notes on new items provide context for AI analysis. Gemini prepares the clarification batch after answer 14. Each clarification uses one distinct topic and a validated reference to a previous answer. The API supplies predefined clarification questions when AI cannot provide a valid question.

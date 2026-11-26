@@ -277,6 +277,12 @@ export default function createAssessmentRouter(database) {
   return router;
 }
 
-export function clearAssessmentSessions() {
-  sessions.clear();
+export function clearAssessmentSessions(userId) {
+  if (userId === undefined) {
+    sessions.clear();
+    return;
+  }
+  for (const [id, session] of sessions) {
+    if (session.userId === userId) sessions.delete(id);
+  }
 }
