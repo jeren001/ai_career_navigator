@@ -1,0 +1,858 @@
+/* ==========================================
+   PROJECT: AI CAREER
+   PAGE: Settings
+   PURPOSE: Settings layout and responsive design
+   ========================================== */
+
+
+/* ==========================================
+   01. PAGE VARIABLES AND CONTAINER
+   ========================================== */
+
+.settings-page {
+  --settings-primary: #385781;
+  --settings-purple: #9A78F5;
+  --settings-blue: #EAF5FF;
+  --settings-muted: #8393AC;
+  --settings-border: #DCE7F5;
+  --settings-danger: #D65C65;
+
+  width: 100%;
+  min-height: 100%;
+  padding: 32px;
+  box-sizing: border-box;
+}
+
+.settings-page * {
+  box-sizing: border-box;
+}
+
+
+/* ==========================================
+   02. PAGE HEADING
+   ========================================== */
+
+.settings-page-heading {
+  margin-bottom: 30px;
+}
+
+.settings-page-heading h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--settings-primary);
+}
+
+.settings-page-heading p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--settings-muted);
+}
+
+
+/* ==========================================
+   03. SETTINGS LAYOUT
+   ========================================== */
+
+.settings-layout {
+  display: grid;
+  grid-template-columns: 245px minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+}
+
+.settings-sidebar {
+  min-width: 0;
+}
+
+.settings-content {
+  width: 100%;
+  min-width: 0;
+}
+
+
+/* ==========================================
+   04. SETTINGS NAVIGATION
+   ========================================== */
+
+.settings-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+
+  background: #FFFFFF;
+  border: 1px solid var(--settings-border);
+  border-radius: 20px;
+}
+
+.settings-nav-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  width: 100%;
+  padding: 14px 12px;
+
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+
+  color: var(--settings-primary);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.settings-nav-button svg {
+  flex-shrink: 0;
+}
+
+.settings-nav-button:hover {
+  background: #F5F8FC;
+}
+
+.settings-nav-button.active {
+  background: var(--settings-blue);
+  color: #2987F5;
+  font-weight: 600;
+}
+
+.settings-nav-button.danger {
+  color: var(--settings-danger);
+}
+
+.settings-nav-button.danger:hover,
+.settings-nav-button.danger.active {
+  background: #FFF1F2;
+}
+
+
+/* ==========================================
+   05. SETTINGS CARD
+   ========================================== */
+
+.settings-card {
+  width: 100%;
+  padding: 28px;
+
+  background: #FFFFFF;
+  border: 1px solid var(--settings-border);
+  border-radius: 20px;
+}
+
+.settings-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.settings-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+
+  background: #F0E9FF;
+  color: var(--settings-purple);
+  border-radius: 15px;
+}
+
+.settings-card-icon.danger {
+  background: #FFF1F2;
+  color: var(--settings-danger);
+}
+
+.settings-card-header h2 {
+  margin: 0 0 6px;
+  font-size: 21px;
+  font-weight: 600;
+  color: var(--settings-primary);
+}
+
+.settings-card-header p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--settings-muted);
+}
+
+.settings-divider {
+  width: 100%;
+  height: 1px;
+  margin: 24px 0;
+  background: var(--settings-border);
+}
+
+
+/* ==========================================
+   06. ACCOUNT SETTINGS
+   ========================================== */
+
+.settings-option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.settings-option-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+
+  background: var(--settings-blue);
+  color: var(--settings-primary);
+  border-radius: 12px;
+}
+
+.settings-option-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-option-content h3 {
+  margin: 0 0 5px;
+  color: var(--settings-primary);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.settings-option-content p {
+  margin: 0;
+  color: var(--settings-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.settings-action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 10px 14px;
+
+  background: var(--settings-blue);
+  border: none;
+  border-radius: 10px;
+
+  color: var(--settings-primary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+.settings-action-button:hover:not(:disabled) {
+  background: #D8EBFF;
+}
+
+.settings-action-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+
+/* ==========================================
+   07. PRIVACY SETTINGS
+   ========================================== */
+
+.settings-privacy-notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 16px;
+  margin-bottom: 24px;
+
+  background: var(--settings-blue);
+  color: var(--settings-primary);
+  border-radius: 12px;
+}
+
+.settings-privacy-notice svg {
+  flex-shrink: 0;
+}
+
+.settings-privacy-notice p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.settings-privacy-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.settings-privacy-row {
+  min-width: 0;
+}
+
+.settings-private-information {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 16px;
+
+  background: #F5F8FC;
+  border-radius: 12px;
+}
+
+.settings-private-information svg {
+  color: var(--settings-purple);
+  flex-shrink: 0;
+}
+
+.settings-private-information h3 {
+  margin: 0 0 6px;
+  color: var(--settings-primary);
+  font-size: 14px;
+}
+
+.settings-private-information p {
+  margin: 0;
+  color: var(--settings-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.settings-privacy-disclaimer {
+  margin: 22px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--settings-muted);
+}
+
+
+/* ==========================================
+   08. NOTIFICATION SETTINGS
+   ========================================== */
+
+.settings-notification-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-notification-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 20px 0;
+  border-bottom: 1px solid #EDF1F7;
+}
+
+.settings-notification-row:first-child {
+  padding-top: 0;
+}
+
+.settings-notification-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+
+/* Notification toggle switch */
+
+.settings-toggle {
+  position: relative;
+
+  width: 48px;
+  height: 27px;
+  flex-shrink: 0;
+
+  padding: 0;
+  border: none;
+  border-radius: 30px;
+
+  background: #DCE7F5;
+  cursor: pointer;
+
+  transition: background 0.25s ease;
+}
+
+.settings-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+
+  width: 21px;
+  height: 21px;
+
+  background: #FFFFFF;
+  border-radius: 50%;
+
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+
+  transition: transform 0.25s ease;
+}
+
+.settings-toggle.active {
+  background: var(--settings-purple);
+}
+
+.settings-toggle.active .settings-toggle-thumb {
+  transform: translateX(21px);
+}
+
+
+/* ==========================================
+   09. LANGUAGE SETTINGS
+   ========================================== */
+
+.settings-language-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.settings-language-option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  width: 100%;
+  padding: 16px;
+
+  background: #FFFFFF;
+  border: 1px solid var(--settings-border);
+  border-radius: 14px;
+
+  font-family: inherit;
+  text-align: left;
+
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.settings-language-option:hover {
+  background: #F8F5FF;
+}
+
+.settings-language-option.active {
+  background: #F3EEFF;
+  border-color: var(--settings-purple);
+}
+/* Language name and translation spacing */
+
+.settings-language-option .settings-option-content {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.settings-language-code {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+
+  background: var(--settings-blue);
+  color: var(--settings-primary);
+
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.settings-language-option.active
+.settings-language-code {
+  background: var(--settings-purple);
+  color: #FFFFFF;
+}
+
+.settings-language-check {
+  color: var(--settings-purple);
+  flex-shrink: 0;
+}
+
+
+/* ==========================================
+   10. DELETE ACCOUNT
+   ========================================== */
+
+.settings-danger-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+
+  padding: 18px;
+
+  background: #FFF1F2;
+  border: 1px solid #F3CDD1;
+  border-radius: 14px;
+
+  color: var(--settings-danger);
+}
+
+.settings-danger-notice svg {
+  flex-shrink: 0;
+}
+
+.settings-danger-notice h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.settings-danger-notice p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.settings-delete-information {
+  margin: 26px 0;
+}
+
+.settings-delete-information h3 {
+  color: var(--settings-primary);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.settings-delete-information ul {
+  padding-left: 22px;
+  color: var(--settings-primary);
+  font-size: 14px;
+  line-height: 2.1;
+}
+
+.settings-delete-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  padding: 12px 20px;
+
+  background: var(--settings-danger);
+  color: #FFFFFF;
+
+  border: none;
+  border-radius: 12px;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.settings-delete-button:hover:not(:disabled) {
+  background: #C94C59;
+}
+
+.settings-delete-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+
+/* ==========================================
+   11. DELETE CONFIRMATION
+   ========================================== */
+
+.settings-delete-confirmation {
+  padding: 22px;
+
+  border: 1px solid #F3CDD1;
+  border-radius: 14px;
+}
+
+.settings-confirmation-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--settings-danger);
+}
+
+.settings-confirmation-heading h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.settings-delete-confirmation p {
+  color: var(--settings-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.settings-delete-confirmation label {
+  display: block;
+  margin-bottom: 8px;
+
+  color: var(--settings-primary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.settings-delete-confirmation input {
+  width: 100%;
+  padding: 13px 15px;
+
+  background: #FFFFFF;
+  border: 1px solid var(--settings-border);
+  border-radius: 10px;
+
+  color: var(--settings-primary);
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.settings-delete-confirmation input:focus {
+  outline: none;
+  border-color: var(--settings-purple);
+}
+
+.settings-confirmation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+
+  margin-top: 20px;
+}
+
+.settings-cancel-button {
+  padding: 12px 20px;
+
+  background: #F5F8FC;
+  border: 1px solid var(--settings-border);
+  border-radius: 12px;
+
+  color: var(--settings-primary);
+  font-family: inherit;
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+.settings-cancel-button:hover {
+  background: var(--settings-blue);
+}
+
+
+/* ==========================================
+   12. KEYBOARD ACCESSIBILITY
+   ========================================== */
+
+.settings-page button:focus-visible,
+.settings-page input:focus-visible {
+  outline: 2px solid var(--settings-purple);
+  outline-offset: 3px;
+}
+
+
+/* ==========================================
+   13. TABLET RESPONSIVE DESIGN
+   ========================================== */
+
+@media (max-width: 1100px) {
+
+  .settings-page {
+    padding: 24px;
+  }
+
+  .settings-layout {
+    grid-template-columns: 210px minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .settings-card {
+    padding: 22px;
+  }
+
+  .settings-privacy-list {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+/* ==========================================
+   14. MOBILE RESPONSIVE DESIGN
+   ========================================== */
+
+@media (max-width: 768px) {
+
+  .settings-page {
+    padding: 18px;
+  }
+
+  .settings-page-heading {
+    margin-bottom: 22px;
+  }
+
+  .settings-page-heading h1 {
+    font-size: 27px;
+  }
+
+  .settings-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .settings-navigation {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 6px;
+    padding: 8px;
+    border-radius: 14px;
+  }
+
+  .settings-nav-button {
+    flex-shrink: 0;
+    width: auto;
+    padding: 12px;
+    white-space: nowrap;
+    font-size: 13px;
+  }
+
+  .settings-card {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .settings-card-header h2 {
+    font-size: 19px;
+  }
+
+  .settings-card-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .settings-option {
+    flex-wrap: wrap;
+  }
+
+  .settings-action-button {
+    width: 100%;
+  }
+
+  .settings-privacy-list {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-confirmation-actions {
+    flex-direction: column;
+  }
+
+  .settings-confirmation-actions button {
+    width: 100%;
+  }
+
+}
+
+
+/* ==========================================
+   15. SMALL MOBILE DEVICES
+   ========================================== */
+
+@media (max-width: 400px) {
+
+  .settings-page {
+    padding: 12px;
+  }
+
+  .settings-card {
+    padding: 16px;
+  }
+
+  .settings-card-header {
+    gap: 10px;
+  }
+
+  .settings-card-header h2 {
+    font-size: 17px;
+  }
+
+  .settings-card-header p {
+    font-size: 12px;
+  }
+
+  .settings-delete-button {
+    width: 100%;
+  }
+
+}
+
+
+/* ==========================================
+   16. REDUCED MOTION ACCESSIBILITY
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .settings-page *,
+  .settings-page *::before,
+  .settings-page *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+
+}
+
+
+
+/* ==========================================
+   LANGUAGE SETTINGS REFINEMENTS
+========================================== */
+
+.settings-language-list {
+  margin-top: 24px;
+  gap: 14px;
+}
+
+.settings-language-option .settings-option-content {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settings-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 24px;
+  padding: 14px 16px;
+  background: #EAF5FF;
+  border-radius: 12px;
+  color: #385781;
+  font-size: 13px;
+}
+
+.settings-info svg {
+  flex-shrink: 0;
+  color: #2987F5;
+}
+
+.settings-info p {
+  margin: 0;
+  line-height: 1.5;
+}

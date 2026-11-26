@@ -8,6 +8,10 @@
 // Import navigation tools
 import { Link } from 'react-router-dom'
 
+// Import global user context
+import { useUser } from '../../context/UserContext'
+
+
 // Import icons
 import { CircleCheck, ArrowRight } from 'lucide-react'
 
@@ -15,7 +19,13 @@ import { CircleCheck, ArrowRight } from 'lucide-react'
 import dashboardMascot from '../../assets/dashboard-mascot.gif'
 
 
-function WelcomeSection({ userName = 'Alex' }) {
+function WelcomeSection() {
+
+  // Access global user data
+  const { profile } = useUser()
+
+  // Get the user's first name
+  const userName = profile.firstName || 'Explorer'
 
   return (
     <section className="dashboard-welcome">

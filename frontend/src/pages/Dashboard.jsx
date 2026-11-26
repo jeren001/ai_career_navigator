@@ -1,4 +1,3 @@
-
 // ==========================================
 // PROJECT: AI CAREER
 // PAGE: Dashboard
@@ -17,20 +16,26 @@ import '../styles/dashboard-content.css'
 function Dashboard() {
 
   return (
+
     <DashboardLayout>
 
       <div className="dashboard-hero">
 
         {/* 01. Decorative background */}
+
         <DashboardBackground />
 
+
         {/* 02. Personalized welcome section */}
-        <WelcomeSection userName="Alex" />
+
+        <WelcomeSection />
 
       </div>
 
     </DashboardLayout>
+
   )
+
 }
 
 export default Dashboard

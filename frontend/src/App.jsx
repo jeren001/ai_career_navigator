@@ -1,4 +1,3 @@
-
 // ==========================================
 // PROJECT: AI CAREER
 // FILE: App.jsx
@@ -8,40 +7,62 @@
 // Import React Router
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
+// Import global user context
+import { UserProvider } from './context/UserContext'
+
 // Import application pages
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import About from './pages/About'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
+import MyProfile from './pages/MyProfile'
+import Settings from './pages/Settings'
+
 
 // Main application component
+
 function App() {
+
   return (
-    <BrowserRouter>
 
-      {/* Define application routes */}
-      <Routes>
+    <UserProvider>
 
-        {/* Home Page */}
-        <Route path="/" element={<Home />} />
+      <BrowserRouter>
 
-        {/* Dashboard Page */}
-        <Route path="/dashboard" element={<Dashboard />} />
+        {/* Define application routes */}
 
-        {/* About Page */}
-        <Route path="/about" element={<About />} />
+        <Routes>
 
-        {/* Sign In Page */}
-        <Route path="/signin" element={<SignIn />} />
+          {/* Home Page */}
+          <Route path="/" element={<Home />} />
 
-        {/* Create an Account Page */}
-        <Route path="/signup" element={<SignUp />} />
+          {/* Dashboard Page */}
+          <Route path="/dashboard" element={<Dashboard />} />
 
-      </Routes>
+          {/* My Profile Page */}
+          <Route path="/profile" element={<MyProfile />} />
 
-    </BrowserRouter>
+          {/* About Page */}
+          <Route path="/about" element={<About />} />
+
+          {/* Sign In Page */}
+          <Route path="/signin" element={<SignIn />} />
+
+          {/* Create an Account Page */}
+          <Route path="/signup" element={<SignUp />} />
+
+          {/* Settings Page */}
+          <Route path="/settings" element={<Settings />} />
+          
+        </Routes>
+
+      </BrowserRouter>
+
+    </UserProvider>
+
   )
+
 }
 
 // Export the application

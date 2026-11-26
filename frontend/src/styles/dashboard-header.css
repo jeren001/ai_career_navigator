@@ -393,3 +393,38 @@
     gap: 4px;
   }
 }
+
+
+
+/* ==========================================
+   DYNAMIC USER PROFILE PHOTO
+   ========================================== */
+
+.dashboard-header .profile-avatar {
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.dashboard-header .profile-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+
+/* Prevent long user information from
+   affecting the header layout */
+
+.dashboard-header .profile-information {
+  min-width: 0;
+  max-width: 150px;
+}
+
+.dashboard-header .profile-name,
+.dashboard-header .profile-role {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
