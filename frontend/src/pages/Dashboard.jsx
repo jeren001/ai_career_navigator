@@ -1,4 +1,3 @@
-
 // ==========================================
 // PROJECT: AI CAREER
 // PAGE: Dashboard
@@ -7,8 +6,7 @@
 
 // Import dashboard components
 import { useState } from 'react'
-import { accountName, useSession } from '../session/session.js'
-import { useLocale } from '../lib/locale.js'
+import { useSession } from '../session/session.js'
 import ChallengeProgress from '../components/dashboard/ChallengeProgress'
 import DashboardLayout from '../components/dashboard/DashboardLayout'
 import DashboardBackground from '../components/dashboard/DashboardBackground'
@@ -20,7 +18,6 @@ import '../styles/dashboard-content.css'
 
 function Dashboard() {
   const { user } = useSession()
-  const { t } = useLocale()
   const [showProgress, setShowProgress] = useState(false)
 
   return (
@@ -33,7 +30,6 @@ function Dashboard() {
 
         {/* 02. Personalized welcome section */}
         <WelcomeSection
-          userName={accountName(user, t)}
           isGuest={user.is_guest}
           onProgress={() => setShowProgress((visible) => !visible)}
           showProgress={showProgress}

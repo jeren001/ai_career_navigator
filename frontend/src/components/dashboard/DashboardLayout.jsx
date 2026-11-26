@@ -1,4 +1,3 @@
-
 // ==========================================
 // PROJECT: AI CAREER
 // COMPONENT: Dashboard Layout
@@ -23,9 +22,7 @@ function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
 
-  // 02. SHARED LANGUAGE STATE
-
-  const { language, setLanguage, t } = useLocale()
+  const { t } = useLocale()
 
 
   // 03. SIDEBAR CONTROLS
@@ -58,19 +55,13 @@ function DashboardLayout({ children }) {
       <Sidebar
         isOpen={sidebarOpen}
         onClose={closeSidebar}
-        language={language}
-        setLanguage={setLanguage}
       />
 
       {/* Dashboard workspace */}
       <div className="dashboard-workspace">
 
         {/* Shared dashboard header */}
-        <DashboardHeader
-          onMenuClick={openSidebar}
-          language={language}
-          setLanguage={setLanguage}
-        />
+        <DashboardHeader onMenuClick={openSidebar} />
 
         {/* Main page content */}
         <main className="dashboard-main">

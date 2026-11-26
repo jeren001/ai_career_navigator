@@ -1,9 +1,9 @@
-import { Navigate } from 'react-router-dom'
+import { Navigate, Outlet } from 'react-router-dom'
 import { apiErrorText, useLocale } from '../lib/locale.js'
 import { useSession } from './session.js'
 
-export default function RequireSession({ children }) {
-  const { status, error, restoreSession, signOut } = useSession()
+export default function RequireSession({ children, registeredOnly = false }) {
+  const { user, status, error, restoreSession, signOut } = useSession()
   const { t } = useLocale()
 
   if (status === 'loading') {
@@ -18,7 +18,7 @@ export default function RequireSession({ children }) {
       </main>
     )
   }
-  return status === 'authenticated'
-    ? children
-    : <Navigate to="/signin" replace />
+  if (status !== 'authenticated') return <Navigate to="/signin" replace />
+  if (registeredOnly && user.is_guest) return <Navigate to="/signup" replace />
+  return children ?? <Outlet />
 }

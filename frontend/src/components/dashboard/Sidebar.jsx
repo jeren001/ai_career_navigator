@@ -1,4 +1,3 @@
-
 // ==========================================
 // PROJECT: AI CAREER
 // COMPONENT: Sidebar
@@ -103,6 +102,8 @@ const mainMenu = [
 // 02. ACCOUNT NAVIGATION
 // ==========================================
 
+const availableRoutes = new Set(['/dashboard', '/profile', '/settings'])
+
 const accountMenu = [
   {
     label: 'My Profile',
@@ -134,7 +135,7 @@ function SidebarItem({ item, onClose }) {
   const { t } = useLocale()
   const content = <><Icon size={21} strokeWidth={2} /><span>{t(item.label, item.labelZh)}</span></>
 
-  if (item.path !== '/dashboard') {
+  if (!availableRoutes.has(item.path)) {
     return (
       <span className="sidebar-link" aria-disabled="true" title={t('Screen unavailable', '此页面暂不可用')}>
         {content}
@@ -155,13 +156,8 @@ function SidebarItem({ item, onClose }) {
 // 04. SIDEBAR COMPONENT
 // ==========================================
 
-function Sidebar({
-  isOpen,
-  onClose,
-  language,
-  setLanguage
-}) {
-  const { t } = useLocale()
+function Sidebar({ isOpen, onClose }) {
+  const { language, setLanguage, t } = useLocale()
 
   return (
     <aside className={`dashboard-sidebar ${isOpen ? 'sidebar-open' : ''}`}>
@@ -169,7 +165,7 @@ function Sidebar({
       {/* Brand logo */}
       <div className="sidebar-header">
 
-        <Link to="/" className="sidebar-brand">
+        <Link to="/" className="sidebar-brand" onClick={onClose}>
           <img src={mascotImage} alt="" />
           <span>AI CAREER</span>
         </Link>
@@ -179,7 +175,7 @@ function Sidebar({
         type="button"
         className="sidebar-close-button"
         onClick={onClose}
-        aria-label="Close navigation menu"
+        aria-label={t('Close navigation menu', '关闭导航菜单')}
         >
         <X size={24} />
         </button>
@@ -189,7 +185,7 @@ function Sidebar({
       {/* Navigation menu */}
       <nav
         className="sidebar-navigation"
-        aria-label="Dashboard navigation"
+        aria-label={t('Dashboard navigation', '仪表板导航')}
       >
 
         {/* Main menu */}
@@ -224,30 +220,24 @@ function Sidebar({
         {/* Mobile language selector */}
         <div className="sidebar-language">
 
-        <div className="sidebar-language-label">
-            <Globe size={21} />
+          <div className="sidebar-language-label">
+            <Globe size={20} />
             <span>{t('Language', '语言')}</span>
-        </div>
+          </div>
 
-        <div className="sidebar-language-options">
-
-            <button
-            type="button"
-            className={language === 'EN' ? 'active' : ''}
-            onClick={() => setLanguage('EN')}
-            >
-            EN
-            </button>
-
-            <button
-            type="button"
-            className={language === 'CH' ? 'active' : ''}
-            onClick={() => setLanguage('CH')}
-            >
-            CH
-            </button>
-
-        </div>
+          <div className="sidebar-language-options">
+            {['EN', 'CH'].map((option) => (
+              <button
+                key={option}
+                type="button"
+                className={language === option ? 'active' : ''}
+                aria-pressed={language === option}
+                onClick={() => setLanguage(option)}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
 
         </div>
 

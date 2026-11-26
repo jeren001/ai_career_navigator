@@ -48,11 +48,11 @@ export default function SessionProvider({ children }) {
       method: 'POST', body, token: upgradeGuest ? activeToken.current : undefined
     })
     if (attempt !== revision.current) return false
-    if (!result?.access_token || !result?.user) throw new ApiError(502, 'Invalid sign-in response')
+    if (!result?.access_token || !result?.user?.id) throw new ApiError(502, 'Invalid sign-in response')
     activeToken.current = result.access_token
     storeSessionToken(result.access_token, remember)
     setSession({ status: 'authenticated', user: result.user })
-    return true
+    return result.user
   }
 
   const request = useCallback(async (path, options = {}) => {

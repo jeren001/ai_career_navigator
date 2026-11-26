@@ -1,0 +1,260 @@
+/* ==========================================
+   PROJECT: AI CAREER
+   COMPONENT: Custom Dropdown
+   ========================================== */
+
+
+/* 01. DROPDOWN CONTAINER */
+
+.custom-dropdown {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  width: 100%;
+  min-width: 0;
+}
+
+.custom-dropdown label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #526F96;
+}
+
+
+/* 02. DROPDOWN TRIGGER */
+
+.custom-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  width: 100%;
+  min-height: 46px;
+  padding: 13px 15px;
+
+  background-color: #F7FAFF;
+  border: 1px solid #DCE7F5;
+  border-radius: 10px;
+
+  color: #385781;
+  font-family: inherit;
+  font-size: 14px;
+  text-align: left;
+
+  cursor: pointer;
+  box-sizing: border-box;
+
+  transition: border-color 0.2s ease;
+}
+
+.custom-dropdown-trigger:hover:not(:disabled) {
+  border-color: #9A78F5;
+}
+
+.custom-dropdown-trigger.is-open {
+  border-color: #9A78F5;
+  box-shadow: 0 0 0 3px rgba(154, 120, 245, 0.12);
+}
+
+.custom-dropdown-trigger:disabled {
+  background-color: #F5F8FC;
+  color: #7185A3;
+  cursor: default;
+}
+
+
+/* 03. SELECTED VALUE */
+
+.custom-dropdown-value,
+.custom-dropdown-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.custom-dropdown-placeholder {
+  color: #8393AC;
+}
+
+.custom-dropdown-flag {
+  margin-right: 6px;
+}
+
+
+/* 04. DROPDOWN ARROW */
+
+.custom-dropdown-arrow {
+  flex-shrink: 0;
+  color: #8393AC;
+  transition: transform 0.2s ease;
+}
+
+.custom-dropdown-arrow.rotated {
+  transform: rotate(180deg);
+  color: #9A78F5;
+}
+
+
+/* 05. DROPDOWN MENU */
+
+.custom-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+
+  z-index: 50;
+
+  background-color: #FFFFFF;
+  border: 1px solid #DCE7F5;
+  border-radius: 12px;
+
+  padding: 8px;
+
+  box-shadow: 0 8px 24px rgba(56, 87, 129, 0.12);
+  box-sizing: border-box;
+}
+
+
+/* 06. SEARCH FIELD */
+
+.custom-dropdown-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 12px;
+  margin-bottom: 8px;
+
+  background-color: #F5F8FC;
+  border: 1px solid #DCE7F5;
+  border-radius: 8px;
+
+  color: #8393AC;
+}
+
+.custom-dropdown-search svg {
+  flex-shrink: 0;
+}
+
+.custom-dropdown-search input {
+  width: 100%;
+  min-width: 0;
+
+  background: transparent;
+  border: none;
+  outline: none;
+
+  color: #385781;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.custom-dropdown-search:focus-within {
+  border-color: #9A78F5;
+}
+
+.custom-dropdown-search input::placeholder {
+  color: #8393AC;
+}
+
+
+/* 07. OPTIONS LIST */
+
+.custom-dropdown-options {
+  max-height: 230px;
+  overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  scrollbar-width: thin;
+  scrollbar-color: #D9CBFA transparent;
+}
+
+
+/* 08. INDIVIDUAL OPTION */
+
+.custom-dropdown-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  width: 100%;
+  padding: 11px 12px;
+
+  background-color: #FFFFFF;
+  color: #385781;
+
+  border: none;
+  border-radius: 8px;
+
+  font-family: inherit;
+  font-size: 14px;
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.custom-dropdown-option:hover {
+  background-color: #EAF5FF;
+}
+
+.custom-dropdown-option.selected {
+  background-color: #F0E9FF;
+  color: #7955C4;
+  font-weight: 500;
+}
+
+.custom-dropdown-option svg {
+  flex-shrink: 0;
+  color: #9A78F5;
+}
+
+.custom-dropdown-trigger:focus-visible,
+.custom-dropdown-option:focus-visible {
+  outline: 2px solid #9A78F5;
+  outline-offset: -2px;
+}
+
+
+/* 09. EMPTY RESULTS */
+
+.custom-dropdown-empty {
+  padding: 15px;
+  color: #8393AC;
+  font-size: 13px;
+  text-align: center;
+}
+
+
+/* 10. CUSTOM ENTRY */
+
+.custom-dropdown-option.custom-entry {
+  justify-content: flex-start;
+  color: #7955C4;
+  border-top: 1px solid #EAF0F8;
+}
+
+
+/* 11. MOBILE RESPONSIVE DESIGN */
+
+@media (max-width: 600px) {
+
+  .custom-dropdown-trigger,
+  .custom-dropdown-search input,
+  .custom-dropdown-option {
+    font-size: 16px;
+  }
+
+  .custom-dropdown-options {
+    max-height: 200px;
+  }
+
+}

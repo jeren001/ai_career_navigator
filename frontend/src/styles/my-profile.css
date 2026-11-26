@@ -1,0 +1,833 @@
+/* ==========================================
+   PROJECT: AI CAREER
+   PAGE: My Profile
+   ========================================== */
+
+
+/* 01. PROFILE COMPLETENESS */
+
+.profile-completeness {
+  width: 100%;
+  margin-top: 24px;
+}
+
+.profile-completeness-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.profile-completeness-header span {
+  color: #7955C4;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.profile-completeness-header strong {
+  color: #385781;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.profile-progress-track {
+  width: 100%;
+  height: 10px;
+  background-color: #EAF5FF;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.profile-progress-fill {
+  height: 100%;
+  background-color: #9A78F5;
+  border-radius: 20px;
+  transition: width 0.4s ease;
+}
+
+
+/* ==========================================
+   02. PROFILE OVERVIEW
+   ========================================== */
+
+.profile-overview-card {
+  width: 100%;
+  padding: 28px;
+  background-color: #FFFFFF;
+  border: 1px solid #DCE7F5;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(56, 87, 129, 0.04);
+  box-sizing: border-box;
+}
+
+.profile-overview-header {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+
+/* Profile avatar */
+
+.profile-overview-avatar {
+  width: 90px;
+  height: 90px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background-color: #EDE4FF;
+  color: #9A78F5;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+}
+
+.profile-overview-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+/* User information */
+
+.profile-overview-details {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.profile-overview-details h2 {
+  margin: 0 0 5px;
+  color: #385781;
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.profile-overview-username {
+  color: #8393AC;
+  font-size: 14px;
+}
+
+.profile-overview-details p {
+  margin: 8px 0 0;
+  color: #526F96;
+  font-size: 15px;
+}
+
+
+/* Edit button */
+
+.profile-overview-edit {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: #F0E9FF;
+  color: #9A78F5;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+
+  transition: background-color 0.2s ease;
+}
+
+.profile-overview-edit:hover {
+  background-color: #E5D9FF;
+}
+
+
+/* Mobile responsive design */
+
+@media (max-width: 600px) {
+
+  .profile-overview-card {
+    padding: 20px;
+  }
+
+  .profile-overview-header {
+    gap: 12px;
+  }
+
+  .profile-overview-avatar {
+    width: 60px;
+    height: 60px;
+  }
+
+  .profile-overview-avatar svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .profile-overview-details h2 {
+    font-size: 20px;
+  }
+
+  .profile-overview-details p {
+    font-size: 12px;
+  }
+
+  .profile-overview-edit {
+    width: 34px;
+    height: 34px;
+  }
+
+}
+
+
+
+
+/* ==========================================
+   03. PROFILE PAGE STRUCTURE
+   ========================================== */
+
+.my-profile-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Page heading */
+
+.my-profile-heading h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 700;
+  color: #385781;
+}
+
+.my-profile-heading p {
+  margin: 0;
+  font-size: 15px;
+  color: #7185A3;
+}
+
+/* Profile sections */
+
+.my-profile-overview,
+.my-profile-information {
+  width: 100%;
+}
+
+/* Mobile responsive design */
+
+@media (max-width: 600px) {
+
+  .my-profile-page {
+    gap: 18px;
+  }
+
+  .my-profile-heading h1 {
+    font-size: 26px;
+  }
+
+  .my-profile-heading p {
+    font-size: 13px;
+  }
+
+}
+
+
+/* ==========================================
+   04. PERSONAL INFORMATION
+   ========================================== */
+
+.personal-information-card {
+  width: 100%;
+  padding: 28px;
+  background-color: #FFFFFF;
+  border: 1px solid #DCE7F5;
+  border-radius: 20px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 16px rgba(56, 87, 129, 0.04);
+}
+
+
+/* Section header */
+
+.personal-information-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding-bottom: 22px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #EAF0F8;
+}
+
+.personal-information-icon {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #F0E9FF;
+  color: #9A78F5;
+  border-radius: 12px;
+}
+
+.personal-information-header h2 {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 600;
+  color: #385781;
+}
+
+.personal-information-header p {
+  margin: 5px 0 0;
+  font-size: 14px;
+  color: #8393AC;
+}
+
+
+/* Form grid */
+
+.profile-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.profile-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+}
+
+.profile-form-field.full-width {
+  grid-column: 1 / -1;
+}
+
+
+/* Field labels */
+
+.profile-form-field label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #526F96;
+}
+
+
+/* Input fields */
+
+.profile-form-field input,
+.profile-form-field select,
+.profile-form-field textarea {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1px solid #DCE7F5;
+  border-radius: 10px;
+  background-color: #F7FAFF;
+  color: #385781;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.profile-form-field input,
+.profile-form-field select {
+  min-height: 46px;
+}
+
+.profile-form-field textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.profile-form-field input:focus,
+.profile-form-field select:focus,
+.profile-form-field textarea:focus {
+  border-color: #9A78F5;
+  box-shadow: 0 0 0 3px rgba(154, 120, 245, 0.12);
+}
+
+.profile-form-field input:disabled,
+.profile-form-field select:disabled,
+.profile-form-field textarea:disabled {
+  opacity: 1;
+  cursor: default;
+  background-color: #F5F8FC;
+  color: #7185A3;
+  -webkit-text-fill-color: #7185A3;
+}
+
+
+/* Character counter */
+
+.profile-character-count {
+  text-align: right;
+  font-size: 12px;
+  color: #8393AC;
+}
+
+
+/* Privacy information */
+
+.profile-privacy-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 22px;
+  font-size: 13px;
+  color: #8393AC;
+}
+
+.profile-privacy-note svg {
+  flex-shrink: 0;
+}
+
+.profile-privacy-note a {
+  color: #7955C4;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.profile-privacy-note a:hover {
+  text-decoration: underline;
+}
+
+
+/* Save Changes button */
+
+.profile-save-button {
+  width: 100%;
+  margin-top: 22px;
+  padding: 14px;
+  background-color: #9A78F5;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.profile-save-button:hover:not(:disabled) {
+  background-color: #8764DF;
+}
+
+.profile-save-button:disabled {
+  background-color: #D9CBFA;
+  cursor: not-allowed;
+}
+
+
+/* Mobile responsive design */
+
+@media (max-width: 600px) {
+
+  .personal-information-card {
+    padding: 20px;
+  }
+
+  .profile-form-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .personal-information-header h2 {
+    font-size: 18px;
+  }
+
+  .personal-information-header p {
+    font-size: 12px;
+  }
+
+  .profile-form-field input,
+  .profile-form-field select,
+  .profile-form-field textarea {
+    font-size: 16px;
+  }
+
+}
+
+
+
+/* ==========================================
+   05. PROFILE FEEDBACK AND ACTIONS
+   ========================================== */
+
+/* Success message */
+
+.profile-success-message {
+  padding: 14px 18px;
+  background-color: #EAF5FF;
+  border: 1px solid #C9E2FF;
+  border-radius: 12px;
+  color: #385781;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+
+/* Cancel editing button */
+
+.profile-cancel-button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 13px;
+  background-color: #FFFFFF;
+  border: 1px solid #DCE7F5;
+  border-radius: 10px;
+  color: #7185A3;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.profile-cancel-button:hover {
+  background-color: #EAF5FF;
+  color: #385781;
+}
+
+
+/* ==========================================
+   PROFILE AVATAR
+   ========================================== */
+
+
+/* 01. AVATAR CONTAINER */
+
+.profile-avatar-container {
+  position: relative;
+  flex-shrink: 0;
+  width: 100px;
+  height: 100px;
+}
+
+
+/* 02. PROFILE IMAGE */
+
+.profile-avatar-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+
+  background-color: #EDE4FF;
+  color: #9A78F5;
+
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.profile-avatar-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+/* 03. CAMERA BUTTON */
+
+.profile-avatar-camera {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+
+  background-color: #9A78F5;
+  color: #FFFFFF;
+
+  border: 3px solid #FFFFFF;
+  border-radius: 50%;
+
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.profile-avatar-camera:hover {
+  background-color: #8563DF;
+}
+
+
+/* 04. PHOTO MENU */
+
+.profile-avatar-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+
+  width: 190px;
+  padding: 6px;
+
+  background-color: #FFFFFF;
+  border: 1px solid #DCE7F5;
+  border-radius: 12px;
+
+  box-shadow: 0 8px 24px rgba(56, 87, 129, 0.12);
+
+  z-index: 60;
+}
+
+
+/* 05. MENU BUTTONS */
+
+.profile-avatar-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  width: 100%;
+  padding: 12px;
+
+  background-color: transparent;
+  color: #385781;
+
+  border: none;
+  border-radius: 8px;
+
+  font-family: inherit;
+  font-size: 13px;
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.profile-avatar-menu button:hover {
+  background-color: #F0E9FF;
+}
+
+.profile-avatar-menu button svg {
+  color: #9A78F5;
+}
+
+.profile-avatar-menu .remove-photo-button {
+  color: #D65C65;
+}
+
+.profile-avatar-menu .remove-photo-button svg {
+  color: #D65C65;
+}
+
+
+/* 06. ERROR MESSAGE */
+
+.profile-avatar-error {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+
+  width: 220px;
+  padding: 10px;
+
+  background-color: #FFF1F2;
+  border-radius: 8px;
+
+  color: #C94C59;
+  font-size: 12px;
+
+  z-index: 61;
+}
+
+
+/* 07. MOBILE RESPONSIVE DESIGN */
+
+@media (max-width: 600px) {
+
+  .profile-avatar-container {
+    width: 80px;
+    height: 80px;
+  }
+
+  .profile-avatar-camera {
+    width: 30px;
+    height: 30px;
+  }
+
+}
+
+
+
+/* ==========================================
+   LANGUAGE PREFERENCES CARD
+   ========================================== */
+
+.profile-language-card {
+  background: #ffffff;
+  border: 1px solid #e3eaf3;
+  border-radius: 20px;
+  padding: 26px;
+  margin-top: 24px;
+}
+
+
+/* Language card header */
+
+.profile-language-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-language-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0e9ff;
+  color: #9a78f5;
+  border-radius: 14px;
+}
+
+.profile-language-header h2 {
+  font-size: 19px;
+  font-weight: 600;
+  color: #385781;
+  margin: 0 0 5px;
+}
+
+.profile-language-header p {
+  font-size: 14px;
+  color: #8393ac;
+  margin: 0;
+}
+
+
+/* Card divider */
+
+.profile-language-divider {
+  height: 1px;
+  background: #e3eaf3;
+  margin: 22px 0;
+}
+
+
+/* Current language information */
+
+.profile-language-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.profile-current-language {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.profile-current-language span {
+  font-size: 13px;
+  color: #8393ac;
+}
+
+.profile-current-language strong {
+  font-size: 16px;
+  font-weight: 600;
+  color: #385781;
+}
+
+
+/* Change language button */
+
+.profile-language-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 20px;
+  border: 1px solid #9a78f5;
+  border-radius: 10px;
+  color: #9a78f5;
+  background: #ffffff;
+  text-decoration: none;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.profile-language-button:hover {
+  background: #9a78f5;
+  color: #ffffff;
+}
+
+.profile-language-button:focus-visible {
+  outline: 2px solid #9a78f5;
+  outline-offset: 3px;
+}
+
+
+/* ==========================================
+   MOBILE RESPONSIVE DESIGN
+   ========================================== */
+
+@media (max-width: 600px) {
+
+  .profile-language-card {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .profile-language-header h2 {
+    font-size: 17px;
+  }
+
+  .profile-language-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+  }
+
+  .profile-language-button {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+}
+
+
+
+
+
+
+/* ==========================================
+   USERNAME VALIDATION
+========================================== */
+
+.profile-username-validation {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+.profile-username-validation svg {
+  flex-shrink: 0;
+}
+
+.profile-username-validation.valid {
+  color: #15803d;
+}
+
+.profile-username-validation.invalid {
+  color: #dc2626;
+}

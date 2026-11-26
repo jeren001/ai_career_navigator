@@ -1,4 +1,3 @@
-
 // ==========================================
 // PROJECT: AI CAREER
 // COMPONENT: Welcome Section
@@ -8,6 +7,8 @@
 // Import navigation tools
 import { Link } from 'react-router-dom'
 import { useLocale } from '../../lib/locale.js'
+import { useUser } from '../../context/user.js'
+import { accountName, useSession } from '../../session/session.js'
 
 // Import icons
 import { CircleCheck, ArrowRight } from 'lucide-react'
@@ -16,8 +17,11 @@ import { CircleCheck, ArrowRight } from 'lucide-react'
 import dashboardMascot from '../../assets/dashboard-mascot.gif'
 
 
-function WelcomeSection({ userName, isGuest, onProgress, showProgress }) {
+function WelcomeSection({ isGuest, onProgress, showProgress }) {
   const { t } = useLocale()
+  const { user } = useSession()
+  const { profile } = useUser()
+  const userName = isGuest ? accountName(user, t) : profile.firstName || accountName(user, t)
 
   return (
     <section className="dashboard-welcome">
@@ -43,7 +47,7 @@ function WelcomeSection({ userName, isGuest, onProgress, showProgress }) {
           <p className="dashboard-welcome-message">
             {t("Don't just imagine your future. Design it", '亲手规划你的未来')}
             <br />
-            {' '}And <strong>{t('Make It Happen.', '付诸行动。')}</strong>
+            {t('And ', '')}<strong>{t('Make It Happen.', '付诸行动。')}</strong>
           </p>
 
         </div>
