@@ -1,373 +1,191 @@
-
-// ==========================================
-// PROJECT: AI CAREER
-// COMPONENT: CommandBar
-// PURPOSE: Global search and quick navigation
-// ==========================================
-
-// Import React hooks
-import { useState, useEffect, useRef } from 'react'
-
-// Import icons from Lucide React
-import {
-  Search,
-  LayoutDashboard,
-  Compass,
-  GraduationCap,
-  FileText,
-  MessageCircle,
-  Map,
-  Settings,
-  ClipboardList,
-  House,
-  Info,
-  X
-} from 'lucide-react'
-
-// Import component styles
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Compass, House, Info, LayoutDashboard, Search, X } from 'lucide-react'
+import { api } from '../lib/api.js'
+import { careerText, searchCareers } from '../lib/careers.js'
+import { apiErrorText, useLocale } from '../lib/locale.js'
 import '../styles/commandbar.css'
 
-
-// ==========================================
-// 01. SEARCHABLE COMMANDS
-// ==========================================
-
-// List of available pages and features
-// Keywords help users find features using different words
-const commands = [
-  {
-    name: 'Home',
-    description: 'Return to the Home Page',
-    keywords: 'home start main',
-    icon: House,
-    path: '/'
-  },
-  {
-    name: 'Dashboard',
-    description: 'View your personal dashboard',
-    keywords: 'dashboard progress overview',
-    icon: LayoutDashboard,
-    path: '/dashboard'
-  },
-  {
-    name: 'Career Assessment',
-    description: 'Discover your strengths and interests',
-    keywords: 'test quiz assessment personality',
-    icon: ClipboardList,
-    path: '/assessment'
-  },
-  {
-    name: 'Explore Careers',
-    description: 'Discover different career opportunities',
-    keywords: 'jobs career profession work',
-    icon: Compass,
-    path: '/careers'
-  },
-  {
-    name: 'Roadmap',
-    description: 'View your personalized career plan',
-    keywords: 'plan future goals steps',
-    icon: Map,
-    path: '/roadmap'
-  },
-  {
-    name: 'Learning Hub',
-    description: 'Discover courses and learning resources',
-    keywords: 'study learn courses skills education',
-    icon: GraduationCap,
-    path: '/learning'
-  },
-  {
-    name: 'My Resume',
-    description: 'Create and edit your resume',
-    keywords: 'cv resume curriculum',
-    icon: FileText,
-    path: '/resume'
-  },
-  {
-    name: 'AI Assistant',
-    description: 'Chat with your AI career assistant',
-    keywords: 'ai chat assistant advice help',
-    icon: MessageCircle,
-    path: '/assistant'
-  },
-  {
-    name: 'Settings',
-    description: 'Manage your account preferences',
-    keywords: 'settings language account preferences',
-    icon: Settings,
-    path: '/settings'
-  },
-  {
-    name: 'About',
-    description: 'Learn more about AI CAREER',
-    keywords: 'about information platform',
-    icon: Info,
-    path: '/about'
-  }
-]
-
-
-// ==========================================
-// 02. MAIN COMPONENT
-// ==========================================
-
-function CommandBar() {
-
-  // Store the text entered by the user
+export default function CommandBar() {
+  const { locale, t } = useLocale()
+  const navigate = useNavigate()
   const [query, setQuery] = useState('')
-
-  // Control whether search results are visible
   const [isOpen, setIsOpen] = useState(false)
-
-  // Track the selected search result
   const [activeIndex, setActiveIndex] = useState(0)
-
-  // Reference to the search input
+  const [careers, setCareers] = useState(null)
+  const [searchError, setSearchError] = useState(null)
+  const [retry, setRetry] = useState(0)
+  const [selectedId, setSelectedId] = useState(null)
+  const [detail, setDetail] = useState(null)
+  const [detailError, setDetailError] = useState(null)
   const inputRef = useRef(null)
-
-  // Reference to the entire search component
   const containerRef = useRef(null)
-
-
-  // ==========================================
-  // 03. SEARCH LOGIC
-  // ==========================================
-
-  // Filter commands using names, descriptions and keywords
-  const filteredCommands = commands.filter((command) => {
-
-    const searchableText = `
-      ${command.name}
-      ${command.description}
-      ${command.keywords}
-    `.toLowerCase()
-
-    return searchableText.includes(
-      query.trim().toLowerCase()
-    )
-  })
-
-
-  // ==========================================
-  // 04. GLOBAL KEYBOARD SHORTCUTS
-  // ==========================================
+  const backRef = useRef(null)
+  const searching = isOpen && Boolean(query.trim())
+  const hasCareers = careers !== null
 
   useEffect(() => {
+    if (!searching || hasCareers) return
+    const controller = new AbortController()
+    api('/api/careers', { signal: controller.signal })
+      .then((rows) => { if (!controller.signal.aborted) setCareers(rows) })
+      .catch((error) => { if (!controller.signal.aborted) setSearchError(error) })
+    return () => controller.abort()
+  }, [searching, hasCareers, retry])
 
+  useEffect(() => {
+    if (selectedId === null) return
+    const controller = new AbortController()
+    api(`/api/careers/${selectedId}`, { signal: controller.signal })
+      .then((career) => { if (!controller.signal.aborted) setDetail(career) })
+      .catch((error) => { if (!controller.signal.aborted) setDetailError(error) })
+    backRef.current?.focus()
+    return () => controller.abort()
+  }, [selectedId])
+
+  useEffect(() => {
     function handleShortcut(event) {
-
-      // Open search with Command + K or Ctrl + K
-      if (
-        (event.metaKey || event.ctrlKey) &&
-        event.key.toLowerCase() === 'k'
-      ) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault()
-        setIsOpen(true)
         inputRef.current?.focus()
-      }
-
-      // Close search with Escape
-      if (event.key === 'Escape') {
+        setIsOpen(true)
+      } else if (event.key === 'Escape' && containerRef.current?.contains(document.activeElement)) {
+        setSelectedId(null)
         setIsOpen(false)
         inputRef.current?.blur()
       }
     }
-
-    document.addEventListener('keydown', handleShortcut)
-
-    // Remove the listener when the component is removed
-    return () => {
-      document.removeEventListener('keydown', handleShortcut)
-    }
-
-  }, [])
-
-
-  // ==========================================
-  // 05. CLOSE WHEN CLICKING OUTSIDE
-  // ==========================================
-
-  useEffect(() => {
-
-    function handleOutsideClick(event) {
-
+    function outside(event) {
       if (!containerRef.current?.contains(event.target)) {
         setIsOpen(false)
+        setSelectedId(null)
       }
-
     }
-
-    document.addEventListener('mousedown', handleOutsideClick)
-
+    document.addEventListener('keydown', handleShortcut)
+    document.addEventListener('pointerdown', outside)
     return () => {
-      document.removeEventListener(
-        'mousedown',
-        handleOutsideClick
-      )
+      document.removeEventListener('keydown', handleShortcut)
+      document.removeEventListener('pointerdown', outside)
     }
-
   }, [])
 
+  const commands = [
+    { path: '/', title: t('Home', '首页'), summary: t('Return to the home page', '返回首页'), icon: House },
+    { path: '/dashboard', title: t('Dashboard', '仪表板'), summary: t('View your account and progress', '查看账户和进度'), icon: LayoutDashboard },
+    { path: '/about', title: t('About', '关于'), summary: t('Learn more about AI CAREER', '了解 AI CAREER'), icon: Info }
+  ]
+  const needle = query.trim().toLowerCase()
+  const results = [
+    ...commands.filter(({ title, path }) => title.toLowerCase().includes(needle) || path.includes(needle)),
+    ...searchCareers(careers || [], query, locale).map((career) => ({
+      id: career.id, ...careerText(career, locale), icon: Compass
+    }))
+  ]
 
-  // ==========================================
-  // 06. EXECUTE SELECTED COMMAND
-  // ==========================================
-
-  function executeCommand(command) {
-
-    // Clear the search and close the results
-    setQuery('')
-    setIsOpen(false)
-    setActiveIndex(0)
-
-    // Navigate to the selected page
-    window.location.href = command.path
+  function showResult(result) {
+    if (!result) return
+    if (result.path) {
+      setIsOpen(false)
+      setQuery('')
+      setActiveIndex(0)
+      navigate(result.path)
+      return
+    }
+    setDetail(null)
+    setDetailError(null)
+    setSelectedId(result.id)
   }
-
-
-  // ==========================================
-  // 07. KEYBOARD NAVIGATION
-  // ==========================================
 
   function handleKeyDown(event) {
-
-    if (!isOpen || filteredCommands.length === 0) return
-
-    // Move down through the results
-    if (event.key === 'ArrowDown') {
-      event.preventDefault()
-
-      setActiveIndex((previous) =>
-        (previous + 1) % filteredCommands.length
-      )
-    }
-
-    // Move up through the results
-    if (event.key === 'ArrowUp') {
-      event.preventDefault()
-
-      setActiveIndex((previous) =>
-        (previous - 1 + filteredCommands.length) %
-        filteredCommands.length
-      )
-    }
-
-    // Open the selected result
+    if (!isOpen || selectedId !== null || !results.length) return
     if (event.key === 'Enter') {
       event.preventDefault()
-
-      executeCommand(filteredCommands[activeIndex])
+      showResult(results[activeIndex] || results[0])
+    } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault()
+      const direction = event.key === 'ArrowDown' ? 1 : -1
+      setActiveIndex((index) => (index + direction + results.length) % results.length)
     }
   }
 
+  function changeQuery(value) {
+    setQuery(value)
+    setActiveIndex(0)
+    setSelectedId(null)
+    setSearchError(null)
+    if (!hasCareers && searchError) setRetry((count) => count + 1)
+    setIsOpen(true)
+  }
 
-  // ==========================================
-  // 08. USER INTERFACE
-  // ==========================================
-
+  const selected = detail && careerText(detail, locale)
   return (
-
     <div className="command-container" ref={containerRef}>
-
-      {/* Main search bar */}
       <div className="command-bar">
-
-        {/* Search icon */}
         <Search size={20} />
-
-        {/* Search input */}
         <input
           ref={inputRef}
           type="search"
-          aria-label="Search features and commands"
-          placeholder="Search anything..."
+          aria-label={t('Search careers and pages', '搜索职业和页面')}
+          placeholder={t('Search careers and pages…', '搜索职业和页面…')}
           value={query}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
-          onChange={(event) => {
-            setQuery(event.target.value)
-            setActiveIndex(0)
-            setIsOpen(true)
-          }}
+          onChange={(event) => changeQuery(event.target.value)}
         />
-
-        {/* Clear search button */}
         {query && (
-          <button
-            className="command-clear"
-            aria-label="Clear search"
-            onClick={() => {
-              setQuery('')
-              setActiveIndex(0)
-              inputRef.current?.focus()
-            }}
-          >
+          <button className="command-clear" type="button" aria-label={t('Clear search', '清除搜索')} onClick={() => {
+            changeQuery('')
+            inputRef.current?.focus()
+          }}>
             <X size={16} />
           </button>
         )}
-
-        {/* Keyboard shortcut indicator */}
-        <kbd className="command-shortcut">
-          ⌘ K
-        </kbd>
-
+        <kbd className="command-shortcut">⌘ K</kbd>
       </div>
-
-
-      {/* Search results dropdown */}
       {isOpen && (
-
         <div className="command-results">
-
-          {/* Results section title */}
-          <div className="command-results-title">
-            {query ? 'Search results' : 'Quick actions'}
-          </div>
-
-          {/* Display matching commands */}
-          {filteredCommands.map((command, index) => {
-
-            const Icon = command.icon
-
-            return (
-              <button
-                key={command.name}
-                className={`command-item ${
-                  index === activeIndex ? 'active' : ''
-                }`}
-                onMouseEnter={() => setActiveIndex(index)}
-                onClick={() => executeCommand(command)}
-              >
-
-                {/* Feature icon */}
-                <div className="command-item-icon">
-                  <Icon size={20} />
-                </div>
-
-                {/* Feature name and description */}
-                <div className="command-item-text">
-                  <span>{command.name}</span>
-                  <small>{command.description}</small>
-                </div>
-
-              </button>
-            )
-          })}
-
-          {/* Message when no results are found */}
-          {filteredCommands.length === 0 && (
+          {selectedId !== null ? (
             <div className="command-empty">
-              No results found.
+              <button type="button" ref={backRef} className="integration-retry" onClick={() => {
+                setSelectedId(null)
+                inputRef.current?.focus()
+              }}>{t('Back to results', '返回结果')}</button>
+              {selected ? <><h3>{selected.title}</h3><p>{selected.field}</p><p>{selected.summary}</p></>
+                : detailError ? <p role="alert">{apiErrorText(detailError, t)}</p>
+                  : <p role="status">{t('Loading career…', '正在加载职业…')}</p>}
             </div>
+          ) : (
+            <>
+              <div className="command-results-title">{query ? t('Search results', '搜索结果') : t('Quick actions', '快捷操作')}</div>
+              {results.map((result, index) => {
+                const Icon = result.icon
+                return (
+                  <button
+                    type="button"
+                    key={result.path ?? result.id}
+                    className={`command-item ${index === activeIndex ? 'active' : ''}`}
+                    onMouseEnter={() => setActiveIndex(index)}
+                    onClick={() => showResult(result)}
+                  >
+                    <span className="command-item-icon"><Icon size={20} /></span>
+                    <span className="command-item-text"><span>{result.title}</span><small>{result.summary}</small></span>
+                  </button>
+                )
+              })}
+              {searching && !hasCareers && (searchError ? (
+                <div className="command-empty" role="alert">
+                  {apiErrorText(searchError, t)}{' '}
+                  <button type="button" className="integration-retry" onClick={() => {
+                    setSearchError(null)
+                    setRetry((count) => count + 1)
+                  }}>{t('Retry', '重试')}</button>
+                </div>
+              ) : <div className="command-empty" role="status">{t('Loading careers…', '正在加载职业…')}</div>)}
+              {!results.length && hasCareers && <div className="command-empty">{t('No results found.', '未找到结果。')}</div>}
+            </>
           )}
-
         </div>
       )}
-
     </div>
   )
 }
-
-// Export the component for use on other pages
-export default CommandBar

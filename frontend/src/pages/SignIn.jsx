@@ -7,7 +7,7 @@
 
 // Import React and navigation tools
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 // Import social authentication icons
 import { FcGoogle } from 'react-icons/fc'
@@ -29,22 +29,39 @@ import mascotImage from '../assets/mascot.png'
 
 // Import page styles
 import '../styles/signin.css'
+import { apiErrorText, useLocale } from '../lib/locale.js'
+import { useSession } from '../session/session.js'
 
 function SignIn() {
 
   // Control password visibility
   const [showPassword, setShowPassword] = useState(false)
 
-  // Control selected language
-  const [language, setLanguage] = useState('EN')
+  const { language, setLanguage, t } = useLocale()
+  const { authenticate, status } = useSession()
+  const navigate = useNavigate()
+  const [pending, setPending] = useState(false)
 
   // Temporary form feedback
   const [message, setMessage] = useState('')
 
-  // Handle form submission
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-    setMessage('Authentication is not connected yet.')
+    if (pending || status === 'loading') return
+    const fields = new FormData(event.currentTarget)
+    setPending(true)
+    setMessage('')
+    try {
+      const signedIn = await authenticate('/api/auth/login', {
+        body: { email: fields.get('email').trim(), password: fields.get('password') },
+        remember: fields.has('remember')
+      })
+      if (signedIn) navigate('/dashboard', { replace: true })
+    } catch (error) {
+      setMessage(apiErrorText(error, t, 'login'))
+    } finally {
+      setPending(false)
+    }
   }
 
   return (
@@ -66,6 +83,7 @@ function SignIn() {
               key={lang}
               type="button"
               className={language === lang ? 'selected' : ''}
+              aria-pressed={language === lang}
               onClick={() => setLanguage(lang)}
             >
               {lang}
@@ -90,7 +108,7 @@ function SignIn() {
           <div className="signin-heading">
 
             <h1 className="signin-title">
-              Sign In
+              {t('Sign In', '登录')}
 
               {/* Decorative yellow rays */}
               <svg
@@ -105,7 +123,7 @@ function SignIn() {
 
             </h1>
 
-            <p>Welcome back to AI CAREER! 👋</p>
+            <p>{t("Welcome back to AI CAREER! 👋", "欢迎回到 AI CAREER！👋")}</p>
 
           </div>
 
@@ -113,6 +131,8 @@ function SignIn() {
           <form
             className="signin-form"
             onSubmit={handleSubmit}
+            aria-busy={pending}
+            onChange={() => setMessage('')}
           >
 
             {/* Email field */}
@@ -121,8 +141,9 @@ function SignIn() {
 
               <input
                 type="email"
-                placeholder="Email"
-                aria-label="Email"
+                name="email"
+                placeholder={t("Email", "邮箱")}
+                aria-label={t("Email", "邮箱")}
                 autoComplete="email"
                 required
               />
@@ -134,8 +155,9 @@ function SignIn() {
 
               <input
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Password"
-                aria-label="Password"
+                name="password"
+                placeholder={t("Password", "密码")}
+                aria-label={t("Password", "密码")}
                 autoComplete="current-password"
                 required
               />
@@ -145,7 +167,7 @@ function SignIn() {
                 type="button"
                 className="password-toggle"
                 aria-label={
-                  showPassword ? 'Hide password' : 'Show password'
+                  showPassword ? t("Hide password", "隐藏密码") : t("Show password", "显示密码")
                 }
                 onClick={() => setShowPassword(!showPassword)}
               >
@@ -161,25 +183,25 @@ function SignIn() {
             <div className="signin-options">
 
               <label className="remember-me">
-                <input type="checkbox" />
-                Remember me
+                <input type="checkbox" name="remember" />
+                {t("Remember me", "记住我")}
               </label>
 
               <button
                 type="button"
                 className="forgot-password"
                 onClick={() =>
-                  setMessage('Password recovery coming soon.')
+                  setMessage(t("Password recovery coming soon.", "暂不支持密码找回。"))
                 }
               >
-                Forgot your password?
+                {t("Forgot your password?", "忘记密码？")}
               </button>
 
             </div>
 
             {/* Submit button */}
-            <button type="submit" className="signin-submit">
-              Sign In
+            <button type="submit" className="signin-submit" disabled={pending || status === 'loading'}>
+              {pending ? t('Signing in…', '正在登录…') : t('Sign In', '登录')}
               <ArrowRight size={18} />
             </button>
 
@@ -187,7 +209,7 @@ function SignIn() {
 
           {/* 04. SOCIAL AUTHENTICATION */}
           <div className="signin-divider">
-            <span>or continue with</span>
+            <span>{t("or continue with", "或使用以下方式继续")}</span>
           </div>
 
           <div className="social-buttons">
@@ -196,7 +218,7 @@ function SignIn() {
             <button
               type="button"
               onClick={() =>
-                setMessage('Google Sign In coming soon.')
+                setMessage(t("Google Sign In coming soon.", "暂不支持 Google 登录。"))
               }
             >
               <FcGoogle size={22} />
@@ -207,7 +229,7 @@ function SignIn() {
             <button
               type="button"
               onClick={() =>
-                setMessage('Apple Sign In coming soon.')
+                setMessage(t("Apple Sign In coming soon.", "暂不支持 Apple 登录。"))
               }
             >
               <FaApple size={22} />
@@ -218,17 +240,17 @@ function SignIn() {
 
           {/* Temporary feedback */}
           {message && (
-            <p className="signin-message" role="status">
+            <p className="signin-message" role="alert">
               {message}
             </p>
           )}
 
           {/* 05. CREATE AN ACCOUNT */}
           <div className="signin-register">
-            Don't have an account?{' '}
+            {t("Don't have an account?", "还没有账户？")}{' '}
 
             <Link to="/signup">
-              Create an Account
+              {t("Create an Account", "创建账户")}
             </Link>
 
           </div>

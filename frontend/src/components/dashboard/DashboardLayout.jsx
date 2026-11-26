@@ -7,6 +7,7 @@
 
 // Import React tools
 import { useState } from 'react'
+import { useLocale } from '../../lib/locale.js'
 
 // Import reusable components
 import Sidebar from './Sidebar'
@@ -24,7 +25,7 @@ function DashboardLayout({ children }) {
 
   // 02. SHARED LANGUAGE STATE
 
-  const [language, setLanguage] = useState('EN')
+  const { language, setLanguage, t } = useLocale()
 
 
   // 03. SIDEBAR CONTROLS
@@ -49,7 +50,7 @@ function DashboardLayout({ children }) {
           type="button"
           className="sidebar-overlay"
           onClick={closeSidebar}
-          aria-label="Close navigation menu"
+          aria-label={t('Close navigation menu', '关闭导航菜单')}
         />
       )}
 

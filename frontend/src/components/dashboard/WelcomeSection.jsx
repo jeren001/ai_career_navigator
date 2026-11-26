@@ -7,6 +7,7 @@
 
 // Import navigation tools
 import { Link } from 'react-router-dom'
+import { useLocale } from '../../lib/locale.js'
 
 // Import icons
 import { CircleCheck, ArrowRight } from 'lucide-react'
@@ -15,7 +16,8 @@ import { CircleCheck, ArrowRight } from 'lucide-react'
 import dashboardMascot from '../../assets/dashboard-mascot.gif'
 
 
-function WelcomeSection({ userName = 'Alex' }) {
+function WelcomeSection({ userName, isGuest, onProgress, showProgress }) {
+  const { t } = useLocale()
 
   return (
     <section className="dashboard-welcome">
@@ -25,23 +27,23 @@ function WelcomeSection({ userName = 'Alex' }) {
       <div className="dashboard-welcome-content">
 
         <h1 className="dashboard-welcome-title">
-          Hello, {userName}!
+          {t(`Hello, ${userName}!`, `你好，${userName}！`)}
         </h1>
 
         <div className="dashboard-welcome-description">
 
           <p>
-            Your future deserves more than a guess.
+            {t('Your future deserves more than a guess.', '你的未来值得认真探索。')}
           </p>
 
           <h2>
-            Discover Who You Can Become.
+            {t('Discover Who You Can Become.', '发现更多职业可能。')}
           </h2>
 
           <p className="dashboard-welcome-message">
-            Don't just imagine your future. Design it
+            {t("Don't just imagine your future. Design it", '亲手规划你的未来')}
             <br />
-            {' '}And <strong>Make It Happen.</strong>
+            {' '}And <strong>{t('Make It Happen.', '付诸行动。')}</strong>
           </p>
 
         </div>
@@ -49,18 +51,24 @@ function WelcomeSection({ userName = 'Alex' }) {
 
         {/* 02. PROGRESS BUTTON */}
 
-        <Link
-          to="/progress"
-          className="dashboard-progress-button"
-        >
-
-          <CircleCheck size={25} />
-
-          <span>Check Your Progress</span>
-
-          <ArrowRight size={23} />
-
-        </Link>
+        {isGuest ? (
+          <Link to="/signup" className="dashboard-progress-button">
+            <CircleCheck size={25} />
+            <span>{t('Create an account to track progress', '创建账户以跟踪进度')}</span>
+            <ArrowRight size={23} />
+          </Link>
+        ) : (
+          <button
+            type="button"
+            className="dashboard-progress-button"
+            onClick={onProgress}
+            aria-expanded={showProgress}
+          >
+            <CircleCheck size={25} />
+            <span>{showProgress ? t('Hide Progress', '隐藏进度') : t('Check Your Progress', '查看进度')}</span>
+            <ArrowRight size={23} />
+          </button>
+        )}
 
       </div>
 
@@ -71,7 +79,7 @@ function WelcomeSection({ userName = 'Alex' }) {
 
         <img
           src={dashboardMascot}
-          alt="AI Career animated mascot"
+          alt={t("AI Career animated mascot", "AI Career 动画吉祥物")}
         />
 
       </div>

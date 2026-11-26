@@ -7,6 +7,7 @@
 
 // Import navigation tools
 import { Link, NavLink } from 'react-router-dom'
+import { useLocale } from '../../lib/locale.js'
 // Import sidebar styles
 import '../../styles/sidebar.css'
 // Import navigation icons
@@ -38,51 +39,61 @@ import mascotImage from '../../assets/mascot.png'
 const mainMenu = [
   {
     label: 'Dashboard',
+    labelZh: '仪表板',
     path: '/dashboard',
     icon: LayoutDashboard
   },
   {
     label: 'Career Test',
+    labelZh: '职业测评',
     path: '/career-test',
     icon: ShieldCheck
   },
   {
     label: 'My Skills',
+    labelZh: '我的技能',
     path: '/my-skills',
     icon: GraduationCap
   },
   {
     label: 'AI Career Match',
+    labelZh: 'AI 职业匹配',
     path: '/career-match',
     icon: TrendingUp
   },
   {
     label: 'My Roadmap',
+    labelZh: '我的路线图',
     path: '/roadmap',
     icon: Route
   },
   {
     label: 'Learning Hub',
+    labelZh: '学习中心',
     path: '/learning-hub',
     icon: BookOpen
   },
   {
     label: 'Job and Internship Finder',
+    labelZh: '工作与实习搜索',
     path: '/job-finder',
     icon: BriefcaseBusiness
   },
   {
     label: 'Interview Simulator',
+    labelZh: '模拟面试',
     path: '/interview-simulator',
     icon: ClipboardList
   },
   {
     label: 'My Resume',
+    labelZh: '我的简历',
     path: '/resume',
     icon: FileText
   },
   {
     label: 'AI Assistant',
+    labelZh: 'AI 助手',
     path: '/ai-assistant',
     icon: Bot
   }
@@ -95,16 +106,19 @@ const mainMenu = [
 const accountMenu = [
   {
     label: 'My Profile',
+    labelZh: '我的资料',
     path: '/profile',
     icon: UserRound
   },
   {
     label: 'Support',
+    labelZh: '帮助',
     path: '/support',
     icon: CircleHelp
   },
   {
     label: 'Settings',
+    labelZh: '设置',
     path: '/settings',
     icon: Settings
   }
@@ -117,21 +131,24 @@ const accountMenu = [
 function SidebarItem({ item, onClose }) {
 
   const Icon = item.icon
+  const { t } = useLocale()
+  const content = <><Icon size={21} strokeWidth={2} /><span>{t(item.label, item.labelZh)}</span></>
+
+  if (item.path !== '/dashboard') {
+    return (
+      <span className="sidebar-link" aria-disabled="true" title={t('Screen unavailable', '此页面暂不可用')}>
+        {content}
+      </span>
+    )
+  }
 
   return (
-    <NavLink
-      to={item.path}
-      onClick={onClose}
-      className={({ isActive }) =>
-        `sidebar-link ${isActive ? 'active' : ''}`
-      }
-    >
-      <Icon size={21} strokeWidth={2} />
-
-      <span>{item.label}</span>
-
+    <NavLink to={item.path} onClick={onClose}
+      className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+      {content}
     </NavLink>
   )
+
 }
 
 // ==========================================
@@ -144,6 +161,7 @@ function Sidebar({
   language,
   setLanguage
 }) {
+  const { t } = useLocale()
 
   return (
     <aside className={`dashboard-sidebar ${isOpen ? 'sidebar-open' : ''}`}>
@@ -208,7 +226,7 @@ function Sidebar({
 
         <div className="sidebar-language-label">
             <Globe size={21} />
-            <span>Language</span>
+            <span>{t('Language', '语言')}</span>
         </div>
 
         <div className="sidebar-language-options">

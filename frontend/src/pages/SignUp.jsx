@@ -7,7 +7,7 @@
 
 // Import React and navigation tools
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 // Import social authentication icons
 import { FcGoogle } from 'react-icons/fc'
@@ -34,11 +34,15 @@ import mascotImage from '../assets/mascot.png'
 // Import styles
 import '../styles/signin.css'
 import '../styles/signup.css'
+import { apiErrorText, useLocale } from '../lib/locale.js'
+import { useSession } from '../session/session.js'
 
 function SignUp() {
 
-  // Control selected language
-  const [language, setLanguage] = useState('EN')
+  const { language, setLanguage, t } = useLocale()
+  const { authenticate, status, user } = useSession()
+  const navigate = useNavigate()
+  const [pending, setPending] = useState(false)
 
   // Control password visibility
   const [showPassword, setShowPassword] = useState(false)
@@ -57,88 +61,29 @@ function SignUp() {
   // PASSWORD VALIDATION
   // ==========================================
 
-  // Check minimum password length
-  const hasMinLength = password.length >= 8
-
-  // Check if password contains a number
-  const hasNumber = /[0-9]/.test(password)
-
-  // Check if password contains an uppercase letter
-  const hasUppercase = /[A-Z]/.test(password)
-
-  // Check if both passwords match
-  const passwordsMatch =
-    password === confirmPassword &&
-    confirmPassword.length > 0
-
-  // Define password requirements
+  const passwordsMatch = password === confirmPassword && confirmPassword.length > 0
+  const hasValidLength = password.length >= 10 && password.length <= 128
   const passwordRules = [
-    {
-      label: 'At least 8 characters',
-      valid: hasMinLength
-    },
-    {
-      label: 'At least one number',
-      valid: hasNumber
-    },
-    {
-      label: 'At least one uppercase letter',
-      valid: hasUppercase
-    }
+    { label: t('10–128 characters', '10 至 128 个字符'), valid: hasValidLength }
   ]
+  const isFormValid = Boolean(fullName.trim() && email.trim() && hasValidLength && passwordsMatch)
 
-  // Check if password meets all requirements
-  const isPasswordValid =
-    hasMinLength &&
-    hasNumber &&
-    hasUppercase &&
-    passwordsMatch
-
-  // Check if all required fields are completed
-  const isFormValid =
-    fullName.trim().length > 0 &&
-    email.trim().length > 0 &&
-    isPasswordValid
-
-  // ==========================================
-  // FORM SUBMISSION
-  // ==========================================
-
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-
-    // Validate password length
-    if (!hasMinLength) {
-      setMessage('Password must contain at least 8 characters.')
-      return
+    if (!isFormValid || pending || status === 'loading') return
+    setPending(true)
+    setMessage('')
+    try {
+      const signedUp = await authenticate('/api/auth/register', {
+        body: { display_name: fullName.trim(), email: email.trim(), password },
+        upgradeGuest: user?.is_guest === true
+      })
+      if (signedUp) navigate('/dashboard', { replace: true })
+    } catch (error) {
+      setMessage(apiErrorText(error, t, 'register'))
+    } finally {
+      setPending(false)
     }
-
-    // Validate number requirement
-    if (!hasNumber) {
-      setMessage('Password must contain at least one number.')
-      return
-    }
-
-    // Validate uppercase letter requirement
-    if (!hasUppercase) {
-      setMessage('Password must contain at least one uppercase letter.')
-      return
-    }
-
-    // Check if passwords match
-    if (!passwordsMatch) {
-      setMessage('Passwords do not match.')
-      return
-    }
-
-    // Validate required fields
-    if (!isFormValid) {
-      setMessage('Please complete all required fields.')
-      return
-    }
-
-    // Backend integration will be added later
-    setMessage('Registration is not connected yet.')
   }
 
   return (
@@ -160,6 +105,7 @@ function SignUp() {
               key={lang}
               type="button"
               className={language === lang ? 'selected' : ''}
+              aria-pressed={language === lang}
               onClick={() => setLanguage(lang)}
             >
               {lang}
@@ -184,7 +130,7 @@ function SignUp() {
           <div className="signin-heading">
 
             <h1 className="signin-title">
-              Create an Account
+              {t("Create an Account", "创建账户")}
 
               {/* Decorative yellow rays */}
               <svg
@@ -199,7 +145,7 @@ function SignUp() {
 
             </h1>
 
-            <p>Let's start your career journey! ✨</p>
+            <p>{t("Let's start your career journey! ✨", "开启你的职业探索之旅！✨")}</p>
 
           </div>
 
@@ -207,6 +153,7 @@ function SignUp() {
           <form
             className="signin-form signup-form"
             onSubmit={handleSubmit}
+            aria-busy={pending}
             onChange={() => setMessage('')}
           >
 
@@ -216,9 +163,10 @@ function SignUp() {
 
               <input
                 type="text"
-                placeholder="Full Name"
-                aria-label="Full name"
+                placeholder={t("Full Name", "姓名")}
+                aria-label={t("Full name", "姓名")}
                 autoComplete="name"
+                maxLength={120}
                 value={fullName}
                 onChange={(event) => setFullName(event.target.value)}
                 required
@@ -231,8 +179,8 @@ function SignUp() {
 
               <input
                 type="email"
-                placeholder="Email"
-                aria-label="Email"
+                placeholder={t("Email", "邮箱")}
+                aria-label={t("Email", "邮箱")}
                 autoComplete="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
@@ -246,8 +194,8 @@ function SignUp() {
 
               <input
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Password"
-                aria-label="Password"
+                placeholder={t("Password", "密码")}
+                aria-label={t("Password", "密码")}
                 autoComplete="new-password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
@@ -256,14 +204,15 @@ function SignUp() {
                     ? 'password-requirements'
                     : undefined
                 }
-                minLength={8}
+                minLength={10}
+                maxLength={128}
                 required
               />
 
               <button
                 type="button"
                 className="password-toggle"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? t("Hide password", "隐藏密码") : t("Show password", "显示密码")}
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -279,7 +228,7 @@ function SignUp() {
               >
 
                 <p className="password-requirements-title">
-                  Password requirements
+                  {t("Password requirements", "密码要求")}
                 </p>
 
                 {passwordRules.map((rule) => (
@@ -307,8 +256,8 @@ function SignUp() {
 
               <input
                 type={showConfirmPassword ? 'text' : 'password'}
-                placeholder="Confirm Password"
-                aria-label="Confirm password"
+                placeholder={t("Confirm Password", "确认密码")}
+                aria-label={t("Confirm password", "确认密码")}
                 autoComplete="new-password"
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
@@ -321,7 +270,7 @@ function SignUp() {
               <button
                 type="button"
                 className="password-toggle"
-                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                aria-label={showConfirmPassword ? t("Hide password", "隐藏密码") : t("Show password", "显示密码")}
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -335,7 +284,7 @@ function SignUp() {
                 className={`password-match ${
                   passwordsMatch ? 'valid' : 'invalid'
                 }`}
-                role="status"
+                role="alert"
               >
 
                 {passwordsMatch
@@ -345,8 +294,8 @@ function SignUp() {
 
                 <span>
                   {passwordsMatch
-                    ? 'Passwords match'
-                    : 'Passwords do not match'
+                    ? t("Passwords match", "两次密码一致")
+                    : t("Passwords do not match", "两次密码不一致")
                   }
                 </span>
 
@@ -357,9 +306,9 @@ function SignUp() {
             <button
               type="submit"
               className="signin-submit"
-              disabled={!isFormValid}
+              disabled={!isFormValid || pending || status === 'loading'}
             >
-              Create an Account
+              {pending ? t('Creating account…', '正在创建账户…') : t('Create an Account', '创建账户')}
               <ArrowRight size={18} />
             </button>
 
@@ -367,7 +316,7 @@ function SignUp() {
 
           {/* 04. SOCIAL AUTHENTICATION */}
           <div className="signin-divider">
-            <span>or continue with</span>
+            <span>{t("or continue with", "或使用以下方式继续")}</span>
           </div>
 
           <div className="social-buttons">
@@ -375,7 +324,7 @@ function SignUp() {
             {/* Google authentication */}
             <button
               type="button"
-              onClick={() => setMessage('Google registration coming soon.')}
+              onClick={() => setMessage(t("Google registration coming soon.", "暂不支持通过 Google 注册。"))}
             >
               <FcGoogle size={22} />
               Google
@@ -384,7 +333,7 @@ function SignUp() {
             {/* Apple authentication */}
             <button
               type="button"
-              onClick={() => setMessage('Apple registration coming soon.')}
+              onClick={() => setMessage(t("Apple registration coming soon.", "暂不支持通过 Apple 注册。"))}
             >
               <FaApple size={22} />
               Apple
@@ -394,15 +343,15 @@ function SignUp() {
 
           {/* Temporary feedback */}
           {message && (
-            <p className="signin-message" role="status">
+            <p className="signin-message" role="alert">
               {message}
             </p>
           )}
 
           {/* 05. EXISTING ACCOUNT */}
           <div className="signin-register">
-            Already have an account?{' '}
-            <Link to="/signin">Sign In</Link>
+            {t("Already have an account?", "已有账户？")}{' '}
+            <Link to="/signin">{t("Sign In", "登录")}</Link>
           </div>
 
         </section>

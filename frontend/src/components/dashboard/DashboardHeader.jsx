@@ -9,13 +9,14 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import '../../styles/dashboard-header.css'
+import { useLocale } from '../../lib/locale.js'
+import { accountName, useSession } from '../../session/session.js'
 
 // Import icons
 import {
   Bell,
   UserRound,
   ChevronDown,
-  Settings,
   LogOut,
   Menu
 } from 'lucide-react'
@@ -35,13 +36,15 @@ function DashboardHeader({
   const [notificationsOpen, setNotificationsOpen] = useState(false)
 
   const navigate = useNavigate()
+  const { user, signOut } = useSession()
+  const { t } = useLocale()
 
 
   // 02. SIGN OUT
 
   function handleSignOut() {
 
-    // TODO: Connect to backend authentication
+    signOut()
 
     setProfileOpen(false)
     navigate('/signin', { replace: true })
@@ -65,7 +68,7 @@ function DashboardHeader({
         setNotificationsOpen(false)
         onMenuClick()
         }}
-        aria-label="Open navigation menu"
+        aria-label={t('Open navigation menu', '打开导航菜单')}
     >
         <Menu size={26} />
     </button>
@@ -111,7 +114,7 @@ function DashboardHeader({
           <button
             type="button"
             className="notification-button"
-            aria-label="Notifications"
+            aria-label={t('Notifications', '通知')}
             aria-expanded={notificationsOpen}
             onClick={() => {
               setNotificationsOpen(!notificationsOpen)
@@ -124,8 +127,8 @@ function DashboardHeader({
           {notificationsOpen && (
             <div className="notification-dropdown">
 
-              <h3>Notifications</h3>
-              <p>No new notifications.</p>
+              <h3>{t('Notifications', '通知')}</h3>
+              <p>{t('Notifications are unavailable.', '暂不支持通知。')}</p>
 
             </div>
           )}
@@ -151,8 +154,8 @@ function DashboardHeader({
             </div>
 
             <div className="profile-information">
-              <span className="profile-name">Alex</span>
-              <span className="profile-role">Explorer</span>
+              <span className="profile-name">{accountName(user, t)}</span>
+              <span className="profile-role">{user.is_guest ? t('Guest session', '访客会话') : t('Account', '账户')}</span>
             </div>
 
             <ChevronDown size={16} />
@@ -164,27 +167,16 @@ function DashboardHeader({
           {profileOpen && (
             <div className="profile-dropdown">
 
-              <h3>My Account</h3>
+              <h3>{t('My Account', '我的账户')}</h3>
 
               <div className="profile-divider" />
 
-              <Link
-                to="/profile"
-                onClick={() => setProfileOpen(false)}
-              >
-                <UserRound size={18} />
-                My Profile
-              </Link>
-
-              <Link
-                to="/settings"
-                onClick={() => setProfileOpen(false)}
-              >
-                <Settings size={18} />
-                Settings
-              </Link>
-
-              <div className="profile-divider" />
+              {user.is_guest && (
+                <Link to="/signup" onClick={() => setProfileOpen(false)}>
+                  <UserRound size={18} />
+                  {t('Create an Account', '创建账户')}
+                </Link>
+              )}
 
               <button
                 type="button"
@@ -192,7 +184,7 @@ function DashboardHeader({
                 onClick={handleSignOut}
               >
                 <LogOut size={18} />
-                Sign Out
+                {t('Sign Out', '退出登录')}
               </button>
 
             </div>

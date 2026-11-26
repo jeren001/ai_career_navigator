@@ -1,0 +1,38 @@
+.integration-status {
+  padding: 1.5rem;
+}
+
+.integration-status button,
+.integration-progress button,
+.command-results .integration-retry {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.integration-progress {
+  margin: 1rem 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 1rem;
+}
+
+.integration-progress ul {
+  list-style: none;
+  padding: 0;
+}
+
+.integration-progress li {
+  margin-block: 0.35rem;
+}
+
+.integration-guest {
+  display: inline-block;
+  margin-top: 0.75rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.sidebar-link[aria-disabled='true'] {
+  opacity: 0.55;
+  cursor: default;
+}
