@@ -5,6 +5,7 @@ import pool from './db/pool.js';
 import { openapi } from './docs/openapi.js';
 import assessmentRouter from './routes/assessment.js';
 import authRouter from './routes/auth.js';
+import careerAssistantRouter from './routes/career-assistant.js';
 import careerMatchRouter from './routes/career-match.js';
 import careersRouter from './routes/careers.js';
 import challengesRouter from './routes/challenges.js';
@@ -31,6 +32,7 @@ export function createApp(database = pool) {
   app.use('/api/challenges', challengesRouter(database));
   app.use('/api/interviews', interviewsRouter(database));
   app.use('/api/careers', careersRouter(database));
+  app.use('/api/career-assistant', careerAssistantRouter(database));
   app.use('/api/career-match', careerMatchRouter(database));
   app.get('/api/learning/resources', (request, response) => response.json(discoverResources(request.query)));
   app.use('/api/assessment', assessmentRouter(database));

@@ -78,6 +78,24 @@ Assessment completion saves the recommendation response, including the AI guidan
 
 The response includes both self-reported and practically assessed skill records when available. Practical challenge activity reports submissions and evaluations as practice history. Challenge points never change proficiency or rankings. GET shows current skill and challenge data alongside the last saved guidance. Call refresh to regenerate that guidance after profile or evidence changes. A refresh that encounters an AI outage saves the deterministic result and a fallback reason.
 
+## Career Assistant API
+
+Run `npm run migrate` from `backend`, then open **Career Assistant** in Swagger UI at `/api-docs`. All operations require a registered account bearer token.
+
+| Method and path | Purpose |
+| --- | --- |
+| `POST /api/career-assistant/conversations` | Create a conversation. Supply `en` or `zh-CN` as `language`, or use the account preference. |
+| `GET /api/career-assistant/conversations` | List your conversations. Continue with `next_offset` when present. |
+| `GET /api/career-assistant/conversations/{id}` | Read the most recent saved turns in chronological order. Use `next_before` to load the previous page. |
+| `POST /api/career-assistant/conversations/{id}/messages` | Send a message with the current `revision` and optional context sources. Saves the message and reply together and returns the next revision. |
+| `DELETE /api/career-assistant/conversations/{id}` | Permanently delete the conversation and its saved turns from the application database. |
+
+A new conversation starts at revision `0`. If a message returns HTTP 409, reload the history before retrying. Omit `context` for general guidance. Select any of `profile`, `assessment`, `career_match`, `skills`, `roadmap`, and `practice` per turn. Roadmap context uses the latest saved Career Match learning steps, when available. Practice context includes challenge activity and interview metadata. Assessment context uses trait summaries. Email, raw assessment answers, skill notes, practice artifacts, and interview transcripts are excluded from the automatic context payload.
+
+The selected context summary, the message, and up to four previous exchanges go to the configured AI providers. Prior replies can contain information shared in an earlier turn. The application disables AI response caching for these conversations. Deletion removes local history and cannot retract requests already sent to a provider. Use the existing Gemini and optional Ollama configuration. Provider attempts count against the shared daily account allowance, including retries and failover. The API saves a bilingual local fallback when generation is unavailable, and guidance has no live vacancy or salary source.
+
+Run `RUN_SKILLS_POSTGRES_TEST=1 npm test` against a disposable, migrated and seeded database to include the Assistant's HTTP/PostgreSQL tests. Migration `008_career_assistant.sql` follows `006` and leaves `007` available for the parallel Resume module. Confirm Resume's actual migration number before integrating the branches.
+
 ## My Skills API
 
 Run `npm run migrate` from `backend`, then authorize in Swagger UI with a registered account token. The `My Skills` section documents these endpoints.

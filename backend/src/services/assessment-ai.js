@@ -140,7 +140,12 @@ async function runProviders(providers, request, options) {
 export async function generateAssessmentJson(options) {
   const { userId, contents, schema, maxOutputTokens } = options;
   const providers = injectedProviders || [geminiProvider(injectedGemini), ollamaProvider()].filter(Boolean);
-  const systemInstruction = ASSESSMENT_SYSTEM_PROMPT;
+  const systemInstruction = options.systemInstruction ?? ASSESSMENT_SYSTEM_PROMPT;
+  const executionOptions = { quotaReason: 'daily_limit', ...options };
+  // Private chat prompts and replies must not outlive their database conversation in our cache.
+  if (options.cache === false) {
+    return runProviders(providers, { contents, systemInstruction, schema, maxOutputTokens }, executionOptions);
+  }
   const request = { contents, systemInstruction, schema, maxOutputTokens };
   const scope = providers.map(({ id, model, cacheScope }) => ({ id, model, cacheScope }));
   const key = createHash('sha256').update(JSON.stringify({ userId, scope, request })).digest('hex');
@@ -153,7 +158,7 @@ export async function generateAssessmentJson(options) {
 
   const pending = inFlight.get(key);
   if (pending) return pending;
-  const operation = runProviders(providers, request, { quotaReason: 'daily_limit', ...options });
+  const operation = runProviders(providers, request, executionOptions);
   inFlight.set(key, operation);
   try {
     const result = await operation;
