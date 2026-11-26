@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import { after, before, test } from 'node:test';
 import { createApp } from '../src/app.js';
 import { clearAssessmentSessions } from '../src/routes/assessment.js';
-import { collectSignals, QUESTIONS, selectNextQuestion } from '../src/services/assessment.js';
+import { localizeBankQuestion } from '../src/services/assessment-language.js';
+import { collectSignals, GENERAL_QUESTION_IDS, getQuestion, QUESTIONS, selectNextQuestion, validateAnswers } from '../src/services/assessment.js';
 
 const roles = [
   {
@@ -140,6 +141,41 @@ test('adaptive selection uses general answers before focusing on a signal', () =
 
   assert.notEqual(next.id, 'q1');
   assert.ok(next.focus.includes('analytics') || next.focus.includes('coding') || next.focus.includes('structure'));
+});
+
+test('expanded bank uses stable bilingual options, balanced selection and deterministic weights', () => {
+  const bank = QUESTIONS.filter(({ category }) => category);
+  assert.equal(bank.length, 105);
+  assert.equal(new Set(bank.map(({ id }) => id)).size, 105);
+  for (const item of bank) {
+    const localized = localizeBankQuestion(item, 'zh-CN');
+    assert.match(localized.text, /\p{Script=Han}/u);
+    assert.deepEqual(localized.options.map(({ id }) => id), item.options.map(({ id }) => id));
+    for (const option of item.options) {
+      assert.doesNotThrow(() => validateAnswers([{ question_id: item.id, option_id: option.id }]));
+    }
+  }
+  for (const choice of [0, 1, 2, 3]) {
+    const answers = GENERAL_QUESTION_IDS.map((id) => ({
+      question_id: id, option_id: getQuestion(id).options[choice].id,
+    }));
+    const selected = Array.from({ length: 8 }, () => {
+      const question = selectNextQuestion(answers);
+      answers.push({ question_id: question.id, option_id: question.options[choice].id });
+      return question;
+    });
+    assert.equal(new Set(selected.map(({ id }) => id)).size, 8);
+    assert.equal(new Set(selected.map(({ category }) => category)).size, 7);
+    const fieldGroups = selected.flatMap(({ options }) => options.map(({ fieldWeights }) => Object.keys(fieldWeights || {})));
+    assert.ok(new Set(fieldGroups.flat()).size >= 6);
+    assert.ok(selected.filter(({ options }) => options.some(({ fieldWeights }) => Object.keys(fieldWeights || {}).length > 1)).length >= 2);
+  }
+  const [item] = bank;
+  const [option] = item.options;
+  assert.deepEqual(collectSignals([{ question_id: item.id, option_id: option.id, note: 'coding and photography' }]), {
+    fields: option.fieldWeights, tags: option.weights,
+  });
+  assert.deepEqual(collectSignals([{ question_id: item.id, custom_answer: 'I love coding and photography' }]), { fields: {}, tags: {} });
 });
 
 test('weighted scoring keeps non-leading fields available', async () => {

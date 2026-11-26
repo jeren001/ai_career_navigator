@@ -24,6 +24,19 @@ const skillErrors = {
   401: 'A registered account bearer token is required.',
   503: 'The authentication configuration or skills migration is unavailable.',
 };
+const catalogQuery = (name, description, schema = string) => ({ name, in: 'query', description, schema });
+const catalogLanguage = catalogQuery('language', 'Display language.', { type: 'string', enum: ['en', 'zh-CN'], default: 'en' });
+const catalogField = catalogQuery('career_field', 'Exact career field label from the catalog.');
+const catalogSkill = catalogQuery('skill', 'Skill name or dataset skill slug.');
+const pathId = (schema, example) => ({ name: 'id', in: 'path', required: true, schema, example });
+const challengeId = pathId(string, 'sc-ta-query-library');
+const submissionId = pathId({ ...string, format: 'uuid' }, demoId);
+const challengeErrors = {
+  400: 'Invalid submission ID or request body.',
+  401: 'A registered account bearer token is required.',
+  404: 'Challenge or owned submission not found.',
+  503: 'Authentication configuration or practical challenges schema unavailable.',
+};
 const demoResult = {
   assessment_id: demoId, session_id: 12, user_id: 7, completed_at: '2026-11-25T08:30:00Z', language: 'en',
   trait_scores: { analytics: 100, creativity: 42, people: 38, structure: 65, autonomy: 59 },
@@ -163,7 +176,7 @@ export const openapi = {
       '1. Leave **Authorize** empty. Open **POST /api/assessment/start**, click **Try it out**, then **Execute**.',
       '2. Copy the returned `access_token` into **Authorize** as the token value. Swagger adds the Bearer prefix. Keep the returned `assessment_id`.',
       '3. Open **POST /api/assessment/answer** and click **Try it out**. Replace the example ID with your assessment ID. Set `question_id` from the last response and use an option ID or custom text. Click **Execute** for each of the 18 questions.',
-      '4. Follow the next `question` returned after each answer. The stages are six general, eight adaptive, and four clarification questions. The clarification batch begins after answer 14.',
+      '4. Follow the next `question` returned after each answer. The stages are six general, eight adaptive questions selected from the 105-question bilingual bank, and four clarification questions. The clarification batch begins after answer 14.',
       '5. On `complete: true`, inspect `result.clarifications`, `result.custom_analysis`, and `result.personalization`. If guidance uses fallback, its `reason` explains why. Career scores are computed by the rules in either case.',
       '',
       'Registered users can log in, authorize with the returned token, and follow the same assessment steps. You can also create a guest explicitly with **POST /api/auth/guest**.',
@@ -172,7 +185,8 @@ export const openapi = {
   servers: [{ url: '/', description: 'Current backend' }],
   tags: [
     { name: 'Health' }, { name: 'Authentication' }, { name: 'Profile' },
-    { name: 'Careers' }, { name: 'My Skills' }, { name: 'Assessment' }, { name: 'Quiz aliases' },
+    { name: 'Careers' }, { name: 'My Skills' }, { name: 'Practical Challenges' }, { name: 'Learning Hub' },
+    { name: 'Assessment' }, { name: 'Quiz aliases' },
   ],
   paths: {
     '/api/health': { get: {
@@ -317,6 +331,73 @@ export const openapi = {
       responses: {
         200: response('Prioritized comparisons and guidance. Inspect guidance.status, provider, and reason.', ref('SkillComparison')),
         ...errors({ ...skillErrors, 400: 'Invalid comparison options.', 404: 'At least one selected active career was not found.' }),
+      },
+    } },
+    '/api/challenges': { get: {
+      tags: ['Practical Challenges'], operationId: 'discoverChallenges', summary: 'Find practical challenges',
+      parameters: [
+        catalogLanguage, catalogField, catalogSkill,
+        catalogQuery('profession_slug', 'Career slug from /api/careers.'),
+        catalogQuery('difficulty', 'Estimated difficulty.', { type: 'string', enum: ['beginner', 'intermediate', 'advanced'] }),
+      ],
+      responses: {
+        200: response('Matching localized challenges.', ref('ChallengeList')),
+        ...errors({ 400: 'Invalid catalog filters.' }),
+      },
+    } },
+    '/api/challenges/{id}': { get: {
+      tags: ['Practical Challenges'], operationId: 'getChallenge', summary: 'Read a challenge and its rubric',
+      parameters: [challengeId, catalogLanguage],
+      responses: {
+        200: response('Localized challenge and practice guidance.', ref('ChallengeDetail')),
+        ...errors({ 400: 'Invalid language.', 404: 'Challenge not found.' }),
+      },
+    } },
+    '/api/challenges/{id}/submissions': { post: {
+      tags: ['Practical Challenges'], operationId: 'submitChallenge', summary: 'Save an attempt',
+      description: 'Submit a plain-text artifact. Code is stored as text. Use the evaluation endpoint to request rubric feedback.',
+      parameters: [challengeId],
+      security: requireBearer,
+      requestBody: body('ChallengeSubmit', {
+        sql: example('Submit a practice artifact', { artifact: 'East 2\nWest 1\nNorth 0', language: 'en' }),
+      }),
+      responses: {
+        201: response('Attempt saved.', ref('ChallengeSubmissionResponse')), ...errors(challengeErrors),
+      },
+    } },
+    '/api/challenges/submissions/{id}': { get: {
+      tags: ['Practical Challenges'], operationId: 'getChallengeSubmission', summary: 'Read your attempt and feedback',
+      parameters: [submissionId],
+      security: requireBearer,
+      responses: {
+        200: response('Owned attempt.', ref('ChallengeSubmissionResponse')), ...errors(challengeErrors),
+      },
+    } },
+    '/api/challenges/submissions/{id}/evaluate': { post: {
+      tags: ['Practical Challenges'], operationId: 'evaluateChallengeSubmission', summary: 'Request AI rubric feedback',
+      description: 'Evaluates the saved artifact against its rubric snapshot. Scores describe this submission only. Retry attempts with status unavailable when AI is accessible. While an evaluation is in progress, poll the submission endpoint.',
+      parameters: [submissionId],
+      security: requireBearer,
+      responses: {
+        200: response('Evaluated attempt or saved unavailable status with a reason.', ref('ChallengeSubmissionResponse')),
+        202: response('An evaluation is already running.', ref('ChallengeSubmissionResponse')),
+        ...errors(challengeErrors),
+      },
+    } },
+    '/api/challenges/progress': { get: {
+      tags: ['Practical Challenges'], operationId: 'getChallengeProgress', summary: 'Read your progress by challenge',
+      security: requireBearer,
+      responses: {
+        200: response('Attempt and evaluation counts with the latest attempt ID.', ref('ChallengeProgress')),
+        ...errors({ 401: challengeErrors[401], 503: challengeErrors[503] }),
+      },
+    } },
+    '/api/learning/resources': { get: {
+      tags: ['Learning Hub'], operationId: 'discoverLearningResources', summary: 'Find learning resources',
+      parameters: [catalogLanguage, catalogField, catalogSkill],
+      responses: {
+        200: response('Matching resources with localized descriptions and provider metadata.', ref('LearningResourceList')),
+        ...errors({ 400: 'Invalid catalog filters.' }),
       },
     } },
     ...Object.fromEntries(Object.entries(assessmentPaths).flatMap(([action, operation]) => [

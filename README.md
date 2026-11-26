@@ -29,6 +29,7 @@ Apply the schema and career seed from `backend/database/` to the intended databa
 ```sh
 psql -d career_compass -v ON_ERROR_STOP=1 -f backend/database/schema.sql
 psql -d career_compass -v ON_ERROR_STOP=1 -f backend/database/seed.sql
+psql -d career_compass -v ON_ERROR_STOP=1 -f backend/database/seed-expansion.sql
 ```
 
 Copy the sample environment file only if `backend/.env` does not already exist, then set its `DATABASE_URL` to match your local PostgreSQL credentials:
@@ -84,11 +85,29 @@ Guidance covers up to five prioritized gaps. It defaults to the account language
 
 Career Match, My Roadmap, Learning Hub, and future Resume integration can reuse `listUserSkills(database, userId)` and `compareSkillsToCareers(skills, careers)` without making AI calls.
 
-After migrating and seeding the local database, run `RUN_SKILLS_POSTGRES_TEST=1 npm test` from `backend` to include the PostgreSQL integration test. The test rolls back its fixtures and uses a simulated AI provider to verify caching and the shared account allowance.
+After migrating and seeding the local database, run `RUN_SKILLS_POSTGRES_TEST=1 npm test` from `backend` to include the PostgreSQL integration tests. They roll back the fixtures and use simulated AI responses to verify the shared account allowance and evaluation handling.
+
+## Practical Challenges and Learning Hub
+
+Run `npm run migrate` from `backend` to add challenge submissions. Discovery supports `language=en` and `language=zh-CN`. A registered account bearer token is required to save work, request evaluation, and read progress.
+
+| Method and path | Purpose |
+| --- | --- |
+| `GET /api/challenges` | Browse 100 challenges, with optional `career_field`, `profession_slug`, `skill`, and `difficulty` filters |
+| `GET /api/challenges/{id}` | Read the scenario, deliverable, and rubric |
+| `POST /api/challenges/{id}/submissions` | Save an `artifact` of up to 6000 characters, with an optional `language` |
+| `POST /api/challenges/submissions/{id}/evaluate` | Request feedback using the saved rubric and the account's shared AI allowance |
+| `GET /api/challenges/submissions/{id}` | Read an owned attempt and its evaluation |
+| `GET /api/challenges/progress` | Read attempt counts, evaluation counts, and latest status per challenge |
+| `GET /api/learning/resources` | Browse 169 resources, with optional `career_field` and `skill` filters |
+
+Evaluation sends plain text to the configured AI provider. The API sums rubric points from validated criterion results and attaches evidence quoted from the submitted text. Points describe the submitted practice artifact. Matching skills in `GET /api/skills` show a separate `challenge_practice` summary.
+
+While another request is evaluating the same submission, the evaluation endpoint returns HTTP 202. If the provider is unavailable, the submission retains its artifact and exposes the failure reason. It can be evaluated again later. Swagger UI includes example requests under **Practical Challenges** and **Learning Hub**.
 
 ## Adaptive assessment API
 
-The hybrid assessment asks 6 general questions, 8 adaptive bank questions selected from the answers so far, and 4 personalized clarification questions. Gemini prepares the clarification batch after answer 14. Each clarification uses one distinct topic and a validated reference to a previous answer. The API fills missing or invalid questions from its predefined bank.
+The hybrid assessment asks 6 general questions, 8 adaptive questions selected from the 105-question bilingual bank, and 4 personalized clarification questions. The adaptive stage covers all seven bank categories and at least two interdisciplinary questions. New bank options carry deterministic weights. Custom answers and notes on new items provide context for AI analysis. Gemini prepares the clarification batch after answer 14. Each clarification uses one distinct topic and a validated reference to a previous answer. The API supplies predefined clarification questions when AI cannot provide a valid question.
 
 Start an assessment. When no bearer token is supplied, the API creates a guest in `users` and returns a guest bearer token. A caller cannot select a user by sending `user_id`.
 

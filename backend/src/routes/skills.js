@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { optionalAuthentication, requireAuthentication } from '../services/auth.js';
+import { addChallengePractice } from '../services/practical-challenges.js';
 import { compareUserSkills } from '../services/skill-comparison.js';
 import { createUserSkill, deleteUserSkill, listUserSkills, skillsError, updateUserSkill } from '../services/user-skills.js';
 
@@ -15,7 +16,9 @@ export default function createSkillsRouter(database) {
 
   router.get('/', async (request, response, next) => {
     try {
-      return response.json({ skills: await listUserSkills(database, request.auth.userId) });
+      const { userId } = request.auth;
+      const skills = await listUserSkills(database, userId);
+      return response.json({ skills: await addChallengePractice(database, userId, skills) });
     } catch (error) {
       return next(error);
     }

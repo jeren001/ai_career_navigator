@@ -22,6 +22,13 @@ const chineseQuestions = {
 
 export function localizeBankQuestion(question, language) {
   if (language !== 'zh-CN') return question;
+  if (question.translations?.[language]) {
+    return {
+      ...question,
+      text: question.translations[language].text,
+      options: question.options.map((option) => ({ ...option, label: option.translations[language].label })),
+    };
+  }
   const [text, ...labels] = chineseQuestions[question.id];
   return { ...question, text, options: question.options.map((option, index) => ({ ...option, label: labels[index] })) };
 }

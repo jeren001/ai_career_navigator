@@ -127,6 +127,26 @@ const skillRequirement = {
   evidence: { ...choices('practical', 'self_reported', null), nullable: true },
 };
 const skillCareerIds = array(id, { minItems: 1, maxItems: 5, uniqueItems: true });
+const challengeDifficulty = choices('beginner', 'intermediate', 'advanced');
+const submissionStatus = choices('submitted', 'evaluating', 'evaluated', 'unavailable');
+const practiceCounts = {
+  submitted_count: integer, evaluated_count: integer, latest_submission_id: uuid,
+};
+const criterion = { id: string, points: integer };
+const practiceScope = choices('practice_artifact');
+const challengeEvaluation = {
+  ...object({
+    status: choices('ai', 'unavailable'),
+    scope: practiceScope,
+    provider, cached: bool, reason: fallbackReason,
+    points: integer, max_points: integer,
+    criteria: array(object({
+      ...criterion, max_points: integer, evidence: { ...nullableText, maxLength: 240 },
+      feedback: { ...string, maxLength: 280 },
+    })),
+  }, ['status', 'scope']),
+  nullable: true,
+};
 
 export const schemas = {
   Error: object({ error: string }),
@@ -240,7 +260,9 @@ export const schemas = {
     updated_at: dateTime,
   }),
   SkillResponse: object({ skill: ref('UserSkill') }),
-  SkillList: object({ skills: array(ref('UserSkill')) }),
+  SkillList: object({ skills: array({
+    allOf: [ref('UserSkill'), object({ challenge_practice: { ...object(practiceCounts), nullable: true } })],
+  }) }),
   SkillCompare: {
     ...object({ career_ids: skillCareerIds, language, include_ai: { ...bool, default: true } }, ['career_ids']),
     additionalProperties: false,
@@ -261,5 +283,43 @@ export const schemas = {
       reason: fallbackReason,
       recommendations: array(object({ skill_key: string, action: { ...string, maxLength: 280 } }), { maxItems: 5 }),
     }, ['status', 'recommendations']),
+  }),
+  Challenge: object({
+    id: string, career_field: string, profession_slugs: strings, skills: strings, difficulty: challengeDifficulty,
+    estimated_minutes: integer, title: string, description: string, instructions: string, expected_deliverable: string,
+    rubric: object({ max_points: integer, criteria: array(object({ ...criterion, full_credit_when: string })) }),
+  }),
+  ChallengeList: object({ language, challenges: array(ref('Challenge')) }),
+  ChallengeDetail: object({
+    language, challenge: ref('Challenge'), execution_guidance: string, rubric_interpretation: string,
+  }),
+  ChallengeSubmit: {
+    ...object({ artifact: { ...untrimmed, maxLength: 6000 }, language: { ...language, default: 'en' } }, ['artifact']),
+    additionalProperties: false,
+  },
+  ChallengeProgress: object({ progress: array(object({
+    challenge_id: string, ...practiceCounts, latest_status: submissionStatus, last_submitted_at: dateTime,
+  })) }),
+  ChallengeEvaluation: challengeEvaluation,
+  ChallengeSubmissionResponse: object({
+    submission: object({
+      id: uuid, challenge_id: string, artifact: string, language, skill_keys: strings, status: submissionStatus,
+      evaluation: ref('ChallengeEvaluation'),
+      created_at: dateTime, updated_at: dateTime,
+    }),
+  }),
+  LearningResourceList: object({
+    language,
+    resources: array(object({
+      id: string, title: string, description: string, primaryCareerField: string, careerFields: strings,
+      skills: strings, catalogSkillMatches: strings, difficulty: choices(...challengeDifficulty.enum, 'mixed'),
+      difficultyBasis: string, prerequisites: object({ basis: string, skills: strings }),
+      type: string, provider: string, url: { ...string, format: 'uri' },
+      learningLanguages: strings, languageEditions: array(object({ language: string, url: { ...string, format: 'uri' } })),
+      access: { type: 'object', additionalProperties: true },
+      studyTime: { ...object({ estimatedMinutes: integer, basis: string, sourceUrl: string }), nullable: true },
+      geography: object({ contentJurisdictions: strings, availabilityCountries: { ...strings, nullable: true } }),
+      verification: object({ method: string, checkedOn: { ...string, format: 'date' } }),
+    })),
   }),
 };

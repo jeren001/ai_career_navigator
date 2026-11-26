@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import questionBank from '../../database/assessment-question-bank.json' with { type: 'json' };
 
 export const GENERAL_QUESTION_IDS = ['q1', 'q2', 'q3', 'q4', 'q5', 'q19'];
 export const CLARIFICATION_START = GENERAL_QUESTION_IDS.length + 8;
@@ -40,7 +41,7 @@ const FIELD_ALIASES = {
   'Communication & Law/Operations': ['Media & Communication', 'Law & Legal'],
 };
 
-const QUESTIONS = [
+const LEGACY_QUESTIONS = [
   {
     id: 'q1',
     dimension: 'personality',
@@ -265,6 +266,8 @@ const QUESTIONS = [
   },
 ];
 
+const ADAPTIVE_QUESTIONS = questionBank.questions;
+const QUESTIONS = [...LEGACY_QUESTIONS, ...ADAPTIVE_QUESTIONS];
 const QUESTIONS_BY_ID = new Map(QUESTIONS.map((question) => [question.id, question]));
 
 function cleanOption(option) {
@@ -301,12 +304,11 @@ export function collectSignals(answers) {
     const question = getQuestion(answer.question_id);
     const option = question?.options.find((candidate) => candidate.id === answer.option_id);
     if (!question) continue;
-    if (answer.custom_answer) {
-      for (const tag of customKeywordMatches(answer.custom_answer)) addScores(signals.tags, { [tag]: 1 });
-    }
+    for (const tag of scoringKeywords(answer)) addScores(signals.tags, { [tag]: 1 });
     if (!option) continue;
     addScores(signals.tags, option.weights);
     addScores(signals.fields, option.fieldWeights);
+    if (question.category) continue;
     for (const match of answer.note?.toLowerCase().matchAll(/[a-z]+/g) || []) {
       if (Object.hasOwn(NOTE_SIGNALS, match[0])) {
         addScores(signals.tags, Object.fromEntries(NOTE_SIGNALS[match[0]].map((tag) => [tag, 1])));
@@ -339,6 +341,11 @@ export function customKeywordMatches(text) {
   return [...tags].slice(0, 3);
 }
 
+export function scoringKeywords({ question_id, custom_answer }) {
+  const question = getQuestion(question_id);
+  return custom_answer && question && !question.category ? customKeywordMatches(custom_answer) : [];
+}
+
 export function hasExplicitNegation(text) {
   return /\b(?:no|not|never|without|avoid|dislike|don['’]t|cannot)\b|不|没有|无意/iu.test(text);
 }
@@ -357,18 +364,29 @@ export function selectNextQuestion(answers) {
 
   const signals = collectSignals(answers);
   const strongest = strongestSignals(signals);
-  // Keep the adaptive stage from revisiting the same broad preference.
-  const related = { q13: 'q5', q17: 'q4', q12: 'q15', q15: 'q12' };
-  const adaptive = QUESTIONS.filter(({ id }) => !answered.has(id) && !answered.has(related[id]));
-  const candidate = adaptive
-    .map((question, index) => ({
+  const shown = ADAPTIVE_QUESTIONS.filter(({ id }) => answered.has(id));
+  const categories = new Set(shown.map(({ category }) => category));
+  const fields = new Set(shown.flatMap(offeredFields));
+  const needsInterdisciplinary = shown.filter(isInterdisciplinary).length < 2;
+  return ADAPTIVE_QUESTIONS.filter(({ id }) => !answered.has(id))
+    .map((question) => ({
       question,
+      coverage: Number(!categories.has(question.category)),
+      interdisciplinary: Number(needsInterdisciplinary && isInterdisciplinary(question)),
+      newFields: offeredFields(question).filter((field) => !fields.has(field)).length,
       score: Math.max(0, ...(question.focus || []).map((focus) => strongest.indexOf(focus) === -1 ? 0 : strongest.length - strongest.indexOf(focus))),
-      index,
     }))
-    .sort((left, right) => right.score - left.score || left.index - right.index)[0];
+    .sort((a, b) => b.coverage - a.coverage || b.interdisciplinary - a.interdisciplinary ||
+      (fields.size < 6 ? b.newFields - a.newFields : 0) ||
+      b.score - a.score || b.newFields - a.newFields)[0]?.question;
+}
 
-  return candidate?.question;
+function offeredFields(question) {
+  return [...new Set(question.options.flatMap((option) => Object.keys(option.fieldWeights || {})))];
+}
+
+function isInterdisciplinary(question) {
+  return question.options.some((option) => Object.keys(option.fieldWeights || {}).length > 1);
 }
 
 function traitScores(signals) {

@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import {
   CLARIFICATION_START,
-  customKeywordMatches,
   GENERAL_QUESTION_IDS,
   getQuestion,
   MAX_QUESTIONS,
   createAssessmentState,
   evaluateAnswers,
   publicQuestion,
+  scoringKeywords,
   selectNextQuestion,
   validateAnswers,
 } from '../services/assessment.js';
@@ -73,7 +73,7 @@ function customAnalysis(answers, earlierEvidence, enrichment) {
     question_id,
     source: evidence.has(question_id) ? 'ai' : 'fallback',
     evidence: evidence.get(question_id) || null,
-    scoring_keywords: getQuestion(question_id) ? customKeywordMatches(custom_answer) : [],
+    scoring_keywords: scoringKeywords({ question_id, custom_answer }),
   }));
 }
 
