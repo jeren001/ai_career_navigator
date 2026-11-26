@@ -58,6 +58,34 @@ Verify the seeded data with:
 psql -d career_compass -c "SELECT count(*) AS active_careers, count(DISTINCT cluster) AS clusters FROM career_roles WHERE is_active = TRUE;"
 ```
 
+## Interactive API documentation
+
+With the backend running on port 3000, open [Swagger UI](http://localhost:3000/api-docs). The [OpenAPI 3 document](http://localhost:3000/api-docs/openapi.json) is also available as JSON.
+
+To complete an assessment, execute **POST /api/assessment/start** in Swagger UI. For a guest assessment, copy the returned `access_token` into **Authorize**. In **POST /api/assessment/answer**, submit the same assessment ID and the current question ID with an option ID or custom text. Repeat until `complete` is true. The response shows the clarification source and final personalization status, including the fallback reason when applicable.
+
+## My Skills API
+
+Run `npm run migrate` from `backend`, then authorize in Swagger UI with a registered account token. The `My Skills` section documents these endpoints.
+
+| Method and path | Purpose |
+| --- | --- |
+| `GET /api/skills` | List your skill inventory with self-ratings and practical results |
+| `POST /api/skills` | Add a skill, optional notes, and an optional self-rating |
+| `PATCH /api/skills/{id}` | Change a skill or set and clear its self-rating |
+| `DELETE /api/skills/{id}` | Remove a skill from your inventory |
+| `POST /api/skills/compare` | Compare your inventory with one to five active careers |
+
+Proficiency runs from 1 (beginner) to 5 (expert), with 3 representing independent use. Users can write `self_assessed_level`. Trusted backend assessment workflows can write a separate `practical_assessment` through `recordPracticalAssessment` with a result reference. The inventory retains both ratings and the comparison uses the practical rating when available. The existing `/api/profile` skills list remains a separate field.
+
+Comparisons use the career catalog’s `market_pulse.key_skills` and level 3 as a planning target. Missing skills and shortfalls of two or more levels are high priority. A one-level shortfall is medium priority. An unrated skill is flagged for review. Ties favor gaps shared by more selected careers. Skill names are matched by normalized text and selected English–Chinese aliases.
+
+Guidance covers up to five prioritized gaps. It defaults to the account language and accepts an explicit `en` or `zh-CN` override. AI calls share the account’s existing allowance. The response includes rule-based guidance if AI is unavailable, or when `include_ai` is false. Career and skill names retain their stored labels so clients can link to the original records.
+
+Career Match, My Roadmap, Learning Hub, and future Resume integration can reuse `listUserSkills(database, userId)` and `compareSkillsToCareers(skills, careers)` without making AI calls.
+
+After migrating and seeding the local database, run `RUN_SKILLS_POSTGRES_TEST=1 npm test` from `backend` to include the PostgreSQL integration test. The test rolls back its fixtures and uses a simulated AI provider to verify caching and the shared account allowance.
+
 ## Adaptive assessment API
 
 The hybrid assessment asks 6 general questions, 8 adaptive bank questions selected from the answers so far, and 4 personalized clarification questions. Gemini prepares the clarification batch after answer 14. Each clarification uses one distinct topic and a validated reference to a previous answer. The API fills missing or invalid questions from its predefined bank.
