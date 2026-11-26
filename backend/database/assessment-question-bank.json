@@ -1,0 +1,1757 @@
+{
+  "schemaVersion": 1,
+  "locales": [
+    "en",
+    "zh-CN"
+  ],
+  "defaultLocale": "en",
+  "title": {
+    "en": "Career exploration question bank",
+    "zh-CN": "职业探索题库"
+  },
+  "purpose": {
+    "en": "Explore self-reported interests, preferences, and confidence. This bank does not assess actual skills, diagnose personality, or establish career eligibility.",
+    "zh-CN": "探索自我报告的兴趣、偏好与信心。本题库不检验实际技能，不诊断个性，也不判定从业资格。"
+  },
+  "categories": [
+    {
+      "id": "interests",
+      "dimension": "interests",
+      "label": {
+        "en": "Interests",
+        "zh-CN": "兴趣"
+      },
+      "description": {
+        "en": "Exploratory activities and topics",
+        "zh-CN": "想探索的活动与主题"
+      }
+    },
+    {
+      "id": "personality",
+      "dimension": "personality",
+      "label": {
+        "en": "Personality and working style",
+        "zh-CN": "个性与做事方式"
+      },
+      "description": {
+        "en": "Self-described tendencies in context",
+        "zh-CN": "在具体场景中自我描述的倾向"
+      }
+    },
+    {
+      "id": "abilities",
+      "dimension": "abilities",
+      "label": {
+        "en": "Self-reported abilities",
+        "zh-CN": "自我报告的能力"
+      },
+      "description": {
+        "en": "Perceived readiness with no right or wrong answers",
+        "zh-CN": "自我感知的准备程度，无对错之分"
+      }
+    },
+    {
+      "id": "hobbies",
+      "dimension": "hobbies",
+      "label": {
+        "en": "Hobbies and leisure",
+        "zh-CN": "爱好与休闲活动"
+      },
+      "description": {
+        "en": "Optional leisure interests without assuming access or prior participation",
+        "zh-CN": "可自由选择的休闲兴趣，不假设有相关资源或经历"
+      }
+    },
+    {
+      "id": "values",
+      "dimension": "values",
+      "label": {
+        "en": "Values",
+        "zh-CN": "价值观"
+      },
+      "description": {
+        "en": "Unscored priorities and tradeoffs",
+        "zh-CN": "不计分的优先事项与取舍"
+      }
+    },
+    {
+      "id": "preferences",
+      "dimension": "work_preferences",
+      "label": {
+        "en": "Work preferences",
+        "zh-CN": "工作偏好"
+      },
+      "description": {
+        "en": "Preferred settings and routines, with limited style signals",
+        "zh-CN": "偏好的工作场景与安排，仅提供少量工作风格信号"
+      }
+    },
+    {
+      "id": "goals",
+      "dimension": "career_goals",
+      "label": {
+        "en": "Career goals",
+        "zh-CN": "职业目标"
+      },
+      "description": {
+        "en": "Exploration goals and preferred next steps",
+        "zh-CN": "探索目标和偏好的后续步骤"
+      }
+    }
+  ],
+  "careerFields": [
+    "Technology & AI",
+    "Art & Design",
+    "Law & Legal",
+    "Medicine & Healthcare",
+    "Psychology & Mental Health",
+    "Business & Finance",
+    "Education & Research",
+    "Engineering & Architecture",
+    "Media & Communication",
+    "Environment & Social Impact"
+  ],
+  "selection": {
+    "sessionSize": {
+      "min": 12,
+      "max": 18
+    },
+    "openingCategories": [
+      "interests",
+      "personality",
+      "preferences"
+    ],
+    "minimumPerCategory": 1,
+    "maximumPerCategory": 3,
+    "minimumDistinctFieldsAcrossOfferedChoices": 6,
+    "minimumInterdisciplinaryQuestions": 2,
+    "criteria": [
+      {
+        "en": "Open with broad questions, cover all seven categories, then fill remaining slots with a mix of relevant and unfamiliar contexts. Keep within the existing 18-answer limit. Do not use unanswered items, logistical preferences, language, or self-reported confidence to exclude fields.",
+        "zh-CN": "以广泛的问题开场，覆盖全部七类，再用相关与陌生情境相结合的问题补足。遵守现有最多十八题的限制。不得根据未作答的题目、工作安排偏好、使用语言或自我报告的信心排除职业领域。"
+      },
+      {
+        "en": "Count field coverage across the choices shown, not only the choices selected. Include opportunities outside the strongest current field signal.",
+        "zh-CN": "按展示的选项统计领域覆盖度，不只看已选答案。给当前得分最高的领域之外的选项留出机会。"
+      },
+      {
+        "en": "An interdisciplinary item offers at least one choice with two career field weights. Include at least two such items before filling adaptive slots.",
+        "zh-CN": "跨学科题目至少有一个选项对应两个职业领域。先纳入至少两道此类题目，再补充自适应选题。"
+      },
+      {
+        "en": "Within a category, optionally use focus tag overlap as a tie-breaker. Avoid two questions with nearly the same scenario or tradeoff, keep IDs stable, and keep the custom choice last if shuffling other choices.",
+        "zh-CN": "同一类别内可用关注标签的重合度作为排序依据。避免选入场景或取舍过于相似的问题；保持标识符稳定，打乱其他选项时把自定义选项留在最后。"
+      },
+      {
+        "en": "Use the same question IDs, option IDs, and scoring maps in either language. The engine must register this bank before accepting answers with these IDs.",
+        "zh-CN": "两种语言使用相同的题目标识、选项标识与计分映射。引擎须先注册本题库，才能接受这些标识对应的作答。"
+      }
+    ]
+  },
+  "scoring": {
+    "mode": "suggested",
+    "weights": {
+      "en": "Option weights add to the existing tag totals. Abilities use at most one point as a self-report signal. Scores indicate exploration preferences, never proficiency.",
+      "zh-CN": "选项权重累加到现有标签分值。能力题作为自我报告信号，最多加一分。分值用于探索偏好，不代表熟练程度。"
+    },
+    "fieldWeights": {
+      "en": "Use existing catalog field labels. Field points require a field-relevant activity. The current engine multiplies field points by eight, so use them sparingly and keep other fields eligible. A single response does not identify a career.",
+      "zh-CN": "使用现有目录中的职业领域名称。只为明确涉及相关领域的活动赋分。当前引擎会将领域分值乘以八，因此应谨慎使用，并保留探索其他领域的机会。单个回答不能确定职业。"
+    },
+    "unscored": {
+      "en": "Empty mappings capture context for reflection. In particular, stability, income, access, and scheduling preferences should not contribute to trait or field scores.",
+      "zh-CN": "空映射记录用于反思的背景信息。尤其不应把稳定性、收入、可及条件和日程偏好纳入特质或领域计分。"
+    },
+    "customAnswer": {
+      "noteField": "note",
+      "maximumLength": 1000,
+      "defaultWeights": {},
+      "defaultFieldWeights": {},
+      "prompt": {
+        "en": "Describe what fits you, or say that you are unsure or prefer not to answer.",
+        "zh-CN": "可以描述更符合你的情况，也可以说明尚不确定或不想回答。"
+      },
+      "handling": {
+        "en": "Treat notes as optional context. If notes must remain unscored, omit them when calling the current score collector. Its built-in note matcher recognizes only English keywords, so do not use it for bilingual scoring parity.",
+        "zh-CN": "将备注视为可选背景。如果备注必须不计分，调用当前计分函数时应省略备注。内置备注匹配器仅识别英语关键词，因此不应用于需要中英双语计分一致的场景。"
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": "bank-int-01",
+      "category": "interests",
+      "dimension": "interests",
+      "text": "A museum wants visitors to explore how a city changes. Which part would you volunteer to explore?",
+      "translations": {"zh-CN":{"text":"博物馆想向观众展示城市如何变化。你愿意探索哪一部分？"}},
+      "focus": ["research","creativity","people","analytics"],
+      "options": [
+        {"id":"bank-int-01-1","label":"Compare maps and archive records","translations":{"zh-CN":{"label":"比较地图和档案"}},"weights":{"research":2},"fieldWeights":{"Education & Research":1}},
+        {"id":"bank-int-01-2","label":"Plan the visitor journey through the exhibition","translations":{"zh-CN":{"label":"规划观众的参观动线"}},"weights":{"creativity":2},"fieldWeights":{"Art & Design":1}},
+        {"id":"bank-int-01-3","label":"Interview residents about neighborhood change","translations":{"zh-CN":{"label":"采访居民，了解街区变化"}},"weights":{"people":2},"fieldWeights":{"Environment & Social Impact":1}},
+        {"id":"bank-int-01-4","label":"Trace how transport and utilities shaped growth","translations":{"zh-CN":{"label":"追踪交通和市政设施如何影响发展"}},"weights":{"analytics":2},"fieldWeights":{"Engineering & Architecture":1}},
+        {"id":"bank-int-01-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-int-02",
+      "category": "interests",
+      "dimension": "interests",
+      "text": "At a community health project, which question would you most want to follow?",
+      "translations": {"zh-CN":{"text":"参与社区健康项目时，你最想追踪哪个问题？"}},
+      "focus": ["research","analytics","accessibility","operations"],
+      "options": [
+        {"id":"bank-int-02-1","label":"Explore how stress and past experiences affect whether people seek care","translations":{"zh-CN":{"label":"探索压力和过往经历如何影响人们是否寻求医疗服务"}},"weights":{"research":2},"fieldWeights":{"Medicine & Healthcare":1,"Psychology & Mental Health":1}},
+        {"id":"bank-int-02-2","label":"Which outcomes are changing over time?","translations":{"zh-CN":{"label":"哪些健康结果随时间发生变化？"}},"weights":{"analytics":2},"fieldWeights":{"Medicine & Healthcare":1}},
+        {"id":"bank-int-02-3","label":"Which instructions are hardest to follow?","translations":{"zh-CN":{"label":"哪些指导说明最难理解或执行？"}},"weights":{"accessibility":2},"fieldWeights":{"Art & Design":1,"Medicine & Healthcare":1}},
+        {"id":"bank-int-02-4","label":"Where do appointments and referrals get delayed?","translations":{"zh-CN":{"label":"预约和转诊在哪些环节延误？"}},"weights":{"operations":2},"fieldWeights":{"Business & Finance":1}},
+        {"id":"bank-int-02-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-int-03",
+      "category": "interests",
+      "dimension": "interests",
+      "text": "Which corner of a food market would hold your attention longest?",
+      "translations": {"zh-CN":{"text":"在食品市场里，哪个方面最吸引你持续观察？"}},
+      "focus": ["science","strategy","storytelling","quality"],
+      "options": [
+        {"id":"bank-int-03-1","label":"How producers grow and store ingredients","translations":{"zh-CN":{"label":"生产者如何种植和储存食材"}},"weights":{"science":2},"fieldWeights":{"Environment & Social Impact":1}},
+        {"id":"bank-int-03-2","label":"How vendors choose prices and stock","translations":{"zh-CN":{"label":"摊商如何定价和备货"}},"weights":{"strategy":2},"fieldWeights":{"Business & Finance":1}},
+        {"id":"bank-int-03-3","label":"How regional recipes and customs travel","translations":{"zh-CN":{"label":"地方食谱和习俗如何传播"}},"weights":{"storytelling":2},"fieldWeights":{"Media & Communication":1}},
+        {"id":"bank-int-03-4","label":"How teams keep food safe during service","translations":{"zh-CN":{"label":"团队如何在供餐时保障食品安全"}},"weights":{"quality":2},"fieldWeights":{"Medicine & Healthcare":1}},
+        {"id":"bank-int-03-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-int-04",
+      "category": "interests",
+      "dimension": "interests",
+      "text": "A town is debating what to do with an unused station. Which proposal would you like to investigate?",
+      "translations": {"zh-CN":{"text":"一座小镇正在讨论如何利用闲置车站。你想研究哪个方案？"}},
+      "focus": ["spatial-design","public-service","law","creativity"],
+      "options": [
+        {"id":"bank-int-04-1","label":"Adapt the building for new uses","translations":{"zh-CN":{"label":"改造建筑以适应新用途"}},"weights":{"spatial-design":2},"fieldWeights":{"Engineering & Architecture":1}},
+        {"id":"bank-int-04-2","label":"Create a shared place for local services","translations":{"zh-CN":{"label":"建设供本地服务共用的场所"}},"weights":{"public-service":2},"fieldWeights":{"Environment & Social Impact":1}},
+        {"id":"bank-int-04-3","label":"Resolve ownership and access questions","translations":{"zh-CN":{"label":"理清产权和通行问题"}},"weights":{"law":2},"fieldWeights":{"Law & Legal":1}},
+        {"id":"bank-int-04-4","label":"Turn part of it into a flexible exhibition space","translations":{"zh-CN":{"label":"把部分空间改造成灵活的展览场地"}},"weights":{"creativity":2},"fieldWeights":{"Art & Design":1}},
+        {"id":"bank-int-04-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-int-05",
+      "category": "interests",
+      "dimension": "interests",
+      "text": "Which aspect of a public transport project would you want to understand first?",
+      "translations": {"zh-CN":{"text":"面对一个公共交通项目，你最想先了解哪方面？"}},
+      "focus": ["research","structure","analytics","accessibility"],
+      "options": [
+        {"id":"bank-int-05-1","label":"Which journeys residents struggle to make","translations":{"zh-CN":{"label":"居民在哪些出行场景中遇到困难"}},"weights":{"research":2},"fieldWeights":{"Environment & Social Impact":1}},
+        {"id":"bank-int-05-2","label":"How vehicles and schedules fit together","translations":{"zh-CN":{"label":"车辆和班次如何衔接"}},"weights":{"structure":2},"fieldWeights":{"Engineering & Architecture":1}},
+        {"id":"bank-int-05-3","label":"What the service costs and how it is funded","translations":{"zh-CN":{"label":"服务的成本和资金来源"}},"weights":{"analytics":2},"fieldWeights":{"Business & Finance":1}},
+        {"id":"bank-int-05-4","label":"How people navigate stations and signs","translations":{"zh-CN":{"label":"乘客如何借助标识在站内找到方向"}},"weights":{"accessibility":2},"fieldWeights":{"Art & Design":1}},
+        {"id":"bank-int-05-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-int-06",
+      "category": "interests",
+      "dimension": "interests",
+      "text": "When a news report makes a claim about weather risk, what do you most want to explore?",
+      "translations": {"zh-CN":{"text":"看到新闻报道提出某种天气风险时，你最想探索什么？"}},
+      "focus": ["research","storytelling","public-service","law"],
+      "options": [
+        {"id":"bank-int-06-1","label":"Where the evidence came from and how it was collected","translations":{"zh-CN":{"label":"证据的来源和收集方式"}},"weights":{"research":2},"fieldWeights":{"Education & Research":1}},
+        {"id":"bank-int-06-2","label":"How to explain the uncertainty clearly","translations":{"zh-CN":{"label":"如何清晰解释其中的不确定性"}},"weights":{"storytelling":2},"fieldWeights":{"Media & Communication":1}},
+        {"id":"bank-int-06-3","label":"How neighborhoods might prepare differently","translations":{"zh-CN":{"label":"不同社区可以如何做好准备"}},"weights":{"public-service":2},"fieldWeights":{"Environment & Social Impact":1}},
+        {"id":"bank-int-06-4","label":"Who is responsible for issuing or acting on warnings","translations":{"zh-CN":{"label":"谁负责发布预警或采取行动"}},"weights":{"law":2},"fieldWeights":{"Law & Legal":1}},
+        {"id":"bank-int-06-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-int-07",
+      "category": "interests",
+      "dimension": "interests",
+      "text": "Which aspect of a school garden would you like to work on?",
+      "translations": {"zh-CN":{"text":"在校园菜园项目中，你最想参与哪个方面？"}},
+      "focus": ["science","education","spatial-design","organization"],
+      "options": [
+        {"id":"bank-int-07-1","label":"Observe which plants thrive in different conditions","translations":{"zh-CN":{"label":"观察哪些植物在不同条件下长势良好"}},"weights":{"science":2},"fieldWeights":{"Environment & Social Impact":1}},
+        {"id":"bank-int-07-2","label":"Use the garden to compare how students learn through observation and practice","translations":{"zh-CN":{"label":"利用菜园比较学生通过观察和实践学习的方式"}},"weights":{"education":2},"fieldWeights":{"Education & Research":1}},
+        {"id":"bank-int-07-3","label":"Design beds and paths that are easy to maintain","translations":{"zh-CN":{"label":"设计易于维护的种植床和小径"}},"weights":{"spatial-design":2},"fieldWeights":{"Engineering & Architecture":1}},
+        {"id":"bank-int-07-4","label":"Plan supplies and schedules across the term","translations":{"zh-CN":{"label":"规划整个学期的物资和日程"}},"weights":{"organization":2},"fieldWeights":{"Business & Finance":1}},
+        {"id":"bank-int-07-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-int-08",
+      "category": "interests",
+      "dimension": "interests",
+      "text": "If an archive is moving online, which part would most interest you?",
+      "translations": {"zh-CN":{"text":"如果一批档案要迁移到线上，你最感兴趣的是哪部分？"}},
+      "focus": ["accessibility","law","research","storytelling"],
+      "options": [
+        {"id":"bank-int-08-1","label":"Design an accessible search tool for researchers and the public","translations":{"zh-CN":{"label":"为研究者和公众设计无障碍的检索工具"}},"weights":{"accessibility":2},"fieldWeights":{"Technology & AI":1,"Education & Research":1}},
+        {"id":"bank-int-08-2","label":"Clarify permissions for publishing sensitive materials","translations":{"zh-CN":{"label":"厘清公开敏感材料所需的许可"}},"weights":{"law":2},"fieldWeights":{"Law & Legal":1}},
+        {"id":"bank-int-08-3","label":"Describe and organize the historical records","translations":{"zh-CN":{"label":"编目并说明历史档案"}},"weights":{"research":2},"fieldWeights":{"Education & Research":1}},
+        {"id":"bank-int-08-4","label":"Build a public story around selected materials","translations":{"zh-CN":{"label":"围绕精选档案制作面向公众的故事"}},"weights":{"storytelling":2},"fieldWeights":{"Media & Communication":1}},
+        {"id":"bank-int-08-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-int-09",
+      "category": "interests",
+      "dimension": "interests",
+      "text": "Which question about sleep would you find most worth exploring?",
+      "translations": {"zh-CN":{"text":"关于睡眠，你最想探索哪个问题？"}},
+      "focus": ["science","psychology","structure","communication"],
+      "options": [
+        {"id":"bank-int-09-1","label":"How sleep patterns relate to health","translations":{"zh-CN":{"label":"睡眠规律与健康有何关联"}},"weights":{"science":2},"fieldWeights":{"Medicine & Healthcare":1}},
+        {"id":"bank-int-09-2","label":"Explore how routines and worry affect sleep habits","translations":{"zh-CN":{"label":"探索日常习惯和担忧如何影响睡眠习惯"}},"weights":{"psychology":2},"fieldWeights":{"Psychology & Mental Health":1}},
+        {"id":"bank-int-09-3","label":"How lighting and noise in buildings affect rest","translations":{"zh-CN":{"label":"建筑物内的灯光和噪声如何影响休息"}},"weights":{"structure":2},"fieldWeights":{"Engineering & Architecture":1}},
+        {"id":"bank-int-09-4","label":"How advice about sleep is understood and shared","translations":{"zh-CN":{"label":"人们如何理解和传播睡眠建议"}},"weights":{"communication":2},"fieldWeights":{"Media & Communication":1}},
+        {"id":"bank-int-09-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-int-10",
+      "category": "interests",
+      "dimension": "interests",
+      "text": "Which part of a music event would you like to see behind the scenes?",
+      "translations": {"zh-CN":{"text":"你最想了解音乐活动的哪个幕后环节？"}},
+      "focus": ["creativity","operations","storytelling","law"],
+      "options": [
+        {"id":"bank-int-10-1","label":"How sound and lighting shape the performance","translations":{"zh-CN":{"label":"声音和灯光如何塑造演出效果"}},"weights":{"creativity":2},"fieldWeights":{"Art & Design":1}},
+        {"id":"bank-int-10-2","label":"How the schedule and venue logistics work","translations":{"zh-CN":{"label":"时间安排和场馆运营如何衔接"}},"weights":{"operations":2},"fieldWeights":{"Business & Finance":1}},
+        {"id":"bank-int-10-3","label":"Explore the recording and streaming tools that make the performance available to listeners","translations":{"zh-CN":{"label":"探索让听众能够收听演出的录音与流媒体工具"}},"weights":{"storytelling":2},"fieldWeights":{"Media & Communication":1,"Technology & AI":1}},
+        {"id":"bank-int-10-4","label":"How performance and recording rights are arranged","translations":{"zh-CN":{"label":"演出权和录音权如何约定"}},"weights":{"law":2},"fieldWeights":{"Law & Legal":1}},
+        {"id":"bank-int-10-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-int-11",
+      "category": "interests",
+      "dimension": "interests",
+      "text": "A service introduces an automated decision tool. What would you most want to understand?",
+      "translations": {"zh-CN":{"text":"某项服务引入了自动决策工具。你最想了解什么？"}},
+      "focus": ["analytics","law","research","operations"],
+      "options": [
+        {"id":"bank-int-11-1","label":"When the output is reliable and when it is uncertain","translations":{"zh-CN":{"label":"输出何时可靠、何时存在不确定性"}},"weights":{"analytics":2},"fieldWeights":{"Technology & AI":1}},
+        {"id":"bank-int-11-2","label":"How someone can challenge or appeal an outcome","translations":{"zh-CN":{"label":"当事人如何质疑结果或提出申诉"}},"weights":{"law":2},"fieldWeights":{"Law & Legal":1,"Technology & AI":1}},
+        {"id":"bank-int-11-3","label":"How the decision process feels to the people affected","translations":{"zh-CN":{"label":"受影响的人如何体验决策过程"}},"weights":{"research":2},"fieldWeights":{"Psychology & Mental Health":1}},
+        {"id":"bank-int-11-4","label":"How staff combine the tool with existing workflows","translations":{"zh-CN":{"label":"员工如何把工具与现有流程结合"}},"weights":{"operations":2},"fieldWeights":{"Business & Finance":1}},
+        {"id":"bank-int-11-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-int-12",
+      "category": "interests",
+      "dimension": "interests",
+      "text": "Which part of an inclusive playground project draws you in?",
+      "translations": {"zh-CN":{"text":"在建设包容性游乐场时，哪个方面最吸引你？"}},
+      "focus": ["research","prototyping","healthcare","public-service"],
+      "options": [
+        {"id":"bank-int-12-1","label":"Explore how the layout affects how children play together","translations":{"zh-CN":{"label":"探索空间布局如何影响儿童共同玩耍的方式"}},"weights":{"research":2},"fieldWeights":{"Psychology & Mental Health":1,"Art & Design":1}},
+        {"id":"bank-int-12-2","label":"Prototype play features for different ways of moving","translations":{"zh-CN":{"label":"为不同的活动方式制作游乐设施原型"}},"weights":{"prototyping":2},"fieldWeights":{"Art & Design":1,"Engineering & Architecture":1}},
+        {"id":"bank-int-12-3","label":"Explore what supports safer movement and participation","translations":{"zh-CN":{"label":"探索如何支持更安全的活动和参与"}},"weights":{"healthcare":2},"fieldWeights":{"Medicine & Healthcare":1}},
+        {"id":"bank-int-12-4","label":"Work out how the community will share and maintain it","translations":{"zh-CN":{"label":"研究社区如何共同使用和维护游乐场"}},"weights":{"public-service":2},"fieldWeights":{"Environment & Social Impact":1}},
+        {"id":"bank-int-12-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-int-13",
+      "category": "interests",
+      "dimension": "interests",
+      "text": "A team is researching textiles that last longer. Which part would you choose to explore?",
+      "translations": {"zh-CN":{"text":"团队正在研究更耐用的纺织品。你想探索哪个环节？"}},
+      "focus": ["analytics","creativity","strategy","public-service"],
+      "options": [
+        {"id":"bank-int-13-1","label":"Compare material wear using sensors and a simple data tool","translations":{"zh-CN":{"label":"使用传感器和简单的数据工具比较材料磨损情况"}},"weights":{"analytics":2},"fieldWeights":{"Engineering & Architecture":1,"Technology & AI":1}},
+        {"id":"bank-int-13-2","label":"Explore forms and textures people want to keep","translations":{"zh-CN":{"label":"探索人们愿意长期保留的外形和质感"}},"weights":{"creativity":2},"fieldWeights":{"Art & Design":1}},
+        {"id":"bank-int-13-3","label":"See whether repair and resale would be viable","translations":{"zh-CN":{"label":"了解维修和转售模式是否可行"}},"weights":{"strategy":2},"fieldWeights":{"Business & Finance":1}},
+        {"id":"bank-int-13-4","label":"Examine where waste can be reduced across the product lifecycle","translations":{"zh-CN":{"label":"研究如何在产品生命周期中减少废弃物"}},"weights":{"public-service":2},"fieldWeights":{"Environment & Social Impact":1}},
+        {"id":"bank-int-13-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-int-14",
+      "category": "interests",
+      "dimension": "interests",
+      "text": "A library wants to help people navigate public services. Which contribution sounds most interesting?",
+      "translations": {"zh-CN":{"text":"图书馆希望帮助居民使用公共服务。你对哪项工作最感兴趣？"}},
+      "focus": ["communication","education","law","coding"],
+      "options": [
+        {"id":"bank-int-14-1","label":"Rewrite explanations in plain language","translations":{"zh-CN":{"label":"用通俗语言改写说明"}},"weights":{"communication":2},"fieldWeights":{"Media & Communication":1}},
+        {"id":"bank-int-14-2","label":"Run practice sessions and examine where learners still feel unsure","translations":{"zh-CN":{"label":"组织练习活动，了解学习者在哪些环节仍缺乏把握"}},"weights":{"education":2},"fieldWeights":{"Education & Research":1,"Psychology & Mental Health":1}},
+        {"id":"bank-int-14-3","label":"Clarify eligibility rules and escalation paths","translations":{"zh-CN":{"label":"厘清资格规则及问题反馈渠道"}},"weights":{"law":2},"fieldWeights":{"Law & Legal":1}},
+        {"id":"bank-int-14-4","label":"Improve how people find current information online","translations":{"zh-CN":{"label":"改善人们在线查询最新信息的方式"}},"weights":{"coding":2},"fieldWeights":{"Technology & AI":1}},
+        {"id":"bank-int-14-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-int-15",
+      "category": "interests",
+      "dimension": "interests",
+      "text": "If a waterfront is changing, which piece of the story would you follow?",
+      "translations": {"zh-CN":{"text":"如果滨水区正在发生变化，你最想追踪哪一部分？"}},
+      "focus": ["science","structure","storytelling","strategy"],
+      "options": [
+        {"id":"bank-int-15-1","label":"How the habitat is changing","translations":{"zh-CN":{"label":"栖息地如何变化"}},"weights":{"science":2},"fieldWeights":{"Environment & Social Impact":1}},
+        {"id":"bank-int-15-2","label":"How defenses and public paths are designed","translations":{"zh-CN":{"label":"防护设施和公共步道如何设计"}},"weights":{"structure":2},"fieldWeights":{"Engineering & Architecture":1}},
+        {"id":"bank-int-15-3","label":"How people remember and describe the waterfront","translations":{"zh-CN":{"label":"人们如何记忆和描述这片滨水区"}},"weights":{"storytelling":2},"fieldWeights":{"Media & Communication":1}},
+        {"id":"bank-int-15-4","label":"How changing rents affect small businesses","translations":{"zh-CN":{"label":"租金变化如何影响小商户"}},"weights":{"strategy":2},"fieldWeights":{"Business & Finance":1}},
+        {"id":"bank-int-15-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-per-01",
+      "category": "personality",
+      "dimension": "personality",
+      "text": "When a discussion is moving quickly, what role do you naturally lean toward?",
+      "translations": {"zh-CN":{"text":"讨论节奏很快时，你通常倾向扮演什么角色？"}},
+      "focus": ["people","structure","analytics","creativity"],
+      "options": [
+        {"id":"bank-per-01-1","label":"Invite someone who has not spoken yet","translations":{"zh-CN":{"label":"邀请还没有发言的人参与"}},"weights":{"people":1}},
+        {"id":"bank-per-01-2","label":"Summarize the decisions still open","translations":{"zh-CN":{"label":"总结仍待决定的问题"}},"weights":{"structure":1}},
+        {"id":"bank-per-01-3","label":"Check which assumptions the group is making","translations":{"zh-CN":{"label":"核查大家基于哪些假设"}},"weights":{"analytics":1}},
+        {"id":"bank-per-01-4","label":"Draw a connection the group has not explored","translations":{"zh-CN":{"label":"提出大家还未注意到的联系"}},"weights":{"creativity":1}},
+        {"id":"bank-per-01-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-per-02",
+      "category": "personality",
+      "dimension": "personality",
+      "text": "An early idea is received with mixed reactions. What would you most naturally do next?",
+      "translations": {"zh-CN":{"text":"一个初步想法收到褒贬不一的反馈。你通常会怎么做？"}},
+      "focus": ["research","creativity","people","autonomy"],
+      "options": [
+        {"id":"bank-per-02-1","label":"Look for patterns in the feedback","translations":{"zh-CN":{"label":"寻找反馈中的共通点"}},"weights":{"research":1}},
+        {"id":"bank-per-02-2","label":"Sketch a few alternate versions","translations":{"zh-CN":{"label":"勾画几个不同版本"}},"weights":{"creativity":1}},
+        {"id":"bank-per-02-3","label":"Ask people what mattered most to them","translations":{"zh-CN":{"label":"询问大家最在意什么"}},"weights":{"people":1}},
+        {"id":"bank-per-02-4","label":"Try a small revision and see how it feels","translations":{"zh-CN":{"label":"先做一处小改动，看看效果"}},"weights":{"autonomy":1}},
+        {"id":"bank-per-02-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-per-03",
+      "category": "personality",
+      "dimension": "personality",
+      "text": "When you are absorbed in a long task, what most often keeps you engaged?",
+      "translations": {"zh-CN":{"text":"专注于一项耗时的任务时，什么最能让你持续投入？"}},
+      "focus": ["analytics","structure","creativity","people"],
+      "options": [
+        {"id":"bank-per-03-1","label":"Getting closer to an explanation","translations":{"zh-CN":{"label":"逐步接近一个有依据的解释"}},"weights":{"analytics":1}},
+        {"id":"bank-per-03-2","label":"Seeing a clear sequence of steps take shape","translations":{"zh-CN":{"label":"看到一系列清晰的步骤逐渐成形"}},"weights":{"structure":1}},
+        {"id":"bank-per-03-3","label":"Finding a new angle midway through","translations":{"zh-CN":{"label":"在过程中找到新的切入角度"}},"weights":{"creativity":1}},
+        {"id":"bank-per-03-4","label":"Knowing who will use the result and how","translations":{"zh-CN":{"label":"清楚谁会使用成果以及如何使用"}},"weights":{"people":1}},
+        {"id":"bank-per-03-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-per-04",
+      "category": "personality",
+      "dimension": "personality",
+      "text": "A team has two reasonable plans. What are you most inclined to contribute?",
+      "translations": {"zh-CN":{"text":"团队有两套都合理的方案。你最倾向贡献什么？"}},
+      "focus": ["analytics","people","creativity","structure"],
+      "options": [
+        {"id":"bank-per-04-1","label":"Compare the evidence behind each plan","translations":{"zh-CN":{"label":"比较两套方案各自的依据"}},"weights":{"analytics":1}},
+        {"id":"bank-per-04-2","label":"Surface the different needs behind the preferences","translations":{"zh-CN":{"label":"梳理不同偏好背后的需求"}},"weights":{"people":1}},
+        {"id":"bank-per-04-3","label":"Suggest a third plan that blends their strengths","translations":{"zh-CN":{"label":"提出结合两者优点的第三套方案"}},"weights":{"creativity":1}},
+        {"id":"bank-per-04-4","label":"Define a way to decide and revisit the choice","translations":{"zh-CN":{"label":"明确如何作决定以及何时重新评估"}},"weights":{"structure":1}},
+        {"id":"bank-per-04-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-per-05",
+      "category": "personality",
+      "dimension": "personality",
+      "text": "When your role on a project is loosely defined, what feels most natural?",
+      "translations": {"zh-CN":{"text":"当项目没有明确界定你的角色时，哪种做法最自然？"}},
+      "focus": ["autonomy","people","structure","experimentation"],
+      "options": [
+        {"id":"bank-per-05-1","label":"Choose a useful piece and take ownership","translations":{"zh-CN":{"label":"选定有用的一部分并主动负责"}},"weights":{"autonomy":1}},
+        {"id":"bank-per-05-2","label":"Ask where teammates most need support","translations":{"zh-CN":{"label":"询问队友哪里最需要支持"}},"weights":{"people":1}},
+        {"id":"bank-per-05-3","label":"Clarify responsibilities and dependencies first","translations":{"zh-CN":{"label":"先厘清各项职责及其依赖关系"}},"weights":{"structure":1}},
+        {"id":"bank-per-05-4","label":"Try a small contribution and adjust as needed","translations":{"zh-CN":{"label":"先做一次小尝试，再视情况调整"}},"weights":{"experimentation":1}},
+        {"id":"bank-per-05-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-per-06",
+      "category": "personality",
+      "dimension": "personality",
+      "text": "What type of uncertainty is easiest for you to sit with?",
+      "translations": {"zh-CN":{"text":"哪种不确定性你比较容易接受？"}},
+      "focus": ["research","creativity","people","autonomy"],
+      "options": [
+        {"id":"bank-per-06-1","label":"An answer that may take time to verify","translations":{"zh-CN":{"label":"答案可能需要较长时间才能验证"}},"weights":{"research":1}},
+        {"id":"bank-per-06-2","label":"An end product that is still taking shape","translations":{"zh-CN":{"label":"最终成果仍在逐渐成形"}},"weights":{"creativity":1}},
+        {"id":"bank-per-06-3","label":"A conversation whose outcome is open","translations":{"zh-CN":{"label":"交流结果尚不确定"}},"weights":{"people":1}},
+        {"id":"bank-per-06-4","label":"A route I can choose even if the next step changes","translations":{"zh-CN":{"label":"我可以自行选择路径，即使下一步会发生变化"}},"weights":{"autonomy":1}},
+        {"id":"bank-per-06-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-per-07",
+      "category": "personality",
+      "dimension": "personality",
+      "text": "A colleague gives feedback in broad terms. What do you instinctively look for?",
+      "translations": {"zh-CN":{"text":"同事给出的反馈比较笼统。你会本能地寻找什么？"}},
+      "focus": ["analytics","people","structure","creativity"],
+      "options": [
+        {"id":"bank-per-07-1","label":"Specific examples so I can infer the pattern","translations":{"zh-CN":{"label":"通过具体事例推断共通之处"}},"weights":{"analytics":1}},
+        {"id":"bank-per-07-2","label":"The expectation or concern behind the feedback","translations":{"zh-CN":{"label":"反馈背后的期望或担忧"}},"weights":{"people":1}},
+        {"id":"bank-per-07-3","label":"An agreed priority to work on first","translations":{"zh-CN":{"label":"优先处理的明确共识"}},"weights":{"structure":1}},
+        {"id":"bank-per-07-4","label":"Several ways to interpret or respond to it","translations":{"zh-CN":{"label":"几种理解或回应反馈的方式"}},"weights":{"creativity":1}},
+        {"id":"bank-per-07-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-per-08",
+      "category": "personality",
+      "dimension": "personality",
+      "text": "A group debrief ends with several unresolved observations. What do you tend to carry forward?",
+      "translations": {"zh-CN":{"text":"团队复盘结束时还有几项观察尚无结论。你通常会带走哪一类线索？"}},
+      "focus": ["structure","people","analytics","creativity"],
+      "options": [
+        {"id":"bank-per-08-1","label":"A record of what changed and what stayed the same","translations":{"zh-CN":{"label":"记录哪些情况发生了变化、哪些没有变化"}},"weights":{"structure":1}},
+        {"id":"bank-per-08-2","label":"A perspective the group did not hear in depth","translations":{"zh-CN":{"label":"小组还未充分听取的观点"}},"weights":{"people":1}},
+        {"id":"bank-per-08-3","label":"A possible explanation I would like to check","translations":{"zh-CN":{"label":"一个我想进一步核实的解释"}},"weights":{"analytics":1}},
+        {"id":"bank-per-08-4","label":"A different way of representing what happened","translations":{"zh-CN":{"label":"一种呈现事情经过的新方式"}},"weights":{"creativity":1}},
+        {"id":"bank-per-08-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-per-09",
+      "category": "personality",
+      "dimension": "personality",
+      "text": "On a new team, what tends to help you settle in?",
+      "translations": {"zh-CN":{"text":"加入新团队时，什么通常能帮助你适应？"}},
+      "focus": ["people","structure","autonomy","research"],
+      "options": [
+        {"id":"bank-per-09-1","label":"Learning how teammates like to communicate","translations":{"zh-CN":{"label":"了解队友喜欢怎样沟通"}},"weights":{"people":1}},
+        {"id":"bank-per-09-2","label":"Seeing how recurring decisions are made","translations":{"zh-CN":{"label":"了解团队如何处理经常遇到的决策"}},"weights":{"structure":1}},
+        {"id":"bank-per-09-3","label":"Having a manageable task I can own","translations":{"zh-CN":{"label":"拥有一项可独立负责、范围适中的任务"}},"weights":{"autonomy":1}},
+        {"id":"bank-per-09-4","label":"Reading past work to understand the context","translations":{"zh-CN":{"label":"阅读过往成果以了解背景"}},"weights":{"research":1}},
+        {"id":"bank-per-09-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-per-10",
+      "category": "personality",
+      "dimension": "personality",
+      "text": "After making a mistake, which response comes most easily?",
+      "translations": {"zh-CN":{"text":"犯错后，哪种回应方式对你来说最自然？"}},
+      "focus": ["analytics","people","structure","experimentation"],
+      "options": [
+        {"id":"bank-per-10-1","label":"Trace how it happened","translations":{"zh-CN":{"label":"追溯错误如何发生"}},"weights":{"analytics":1}},
+        {"id":"bank-per-10-2","label":"Check who was affected and what they need","translations":{"zh-CN":{"label":"了解谁受到了影响以及他们需要什么"}},"weights":{"people":1}},
+        {"id":"bank-per-10-3","label":"Adjust the process to make it easier to catch next time","translations":{"zh-CN":{"label":"调整流程，便于下次及时发现"}},"weights":{"structure":1}},
+        {"id":"bank-per-10-4","label":"Try a revised approach on a small scale","translations":{"zh-CN":{"label":"小范围试用调整后的方法"}},"weights":{"experimentation":1}},
+        {"id":"bank-per-10-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-per-11",
+      "category": "personality",
+      "dimension": "personality",
+      "text": "What tends to make a repetitive task feel more engaging to you?",
+      "translations": {"zh-CN":{"text":"什么会让重复任务对你更有吸引力？"}},
+      "focus": ["quality","analytics","creativity","people"],
+      "options": [
+        {"id":"bank-per-11-1","label":"Seeing that the result stays consistent","translations":{"zh-CN":{"label":"看到成果一直保持一致"}},"weights":{"quality":1}},
+        {"id":"bank-per-11-2","label":"Finding where small variations matter","translations":{"zh-CN":{"label":"发现哪些小差异会产生影响"}},"weights":{"analytics":1}},
+        {"id":"bank-per-11-3","label":"Changing the presentation while keeping the purpose","translations":{"zh-CN":{"label":"在目标不变的情况下改变呈现方式"}},"weights":{"creativity":1}},
+        {"id":"bank-per-11-4","label":"Linking each round of work to a real need","translations":{"zh-CN":{"label":"把每一轮工作与实际需求联系起来"}},"weights":{"people":1}},
+        {"id":"bank-per-11-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-per-12",
+      "category": "personality",
+      "dimension": "personality",
+      "text": "In a conversation with someone who sees an issue differently, what comes most naturally?",
+      "translations": {"zh-CN":{"text":"和看法不同的人交流时，你最自然的做法是什么？"}},
+      "focus": ["empathy","analytics","structure","creativity"],
+      "options": [
+        {"id":"bank-per-12-1","label":"Restate their view to check I understood it","translations":{"zh-CN":{"label":"复述对方观点，确认自己理解正确"}},"weights":{"empathy":1}},
+        {"id":"bank-per-12-2","label":"Identify which facts the disagreement turns on","translations":{"zh-CN":{"label":"找出分歧取决于哪些事实"}},"weights":{"analytics":1}},
+        {"id":"bank-per-12-3","label":"Separate agreed points from unresolved points","translations":{"zh-CN":{"label":"区分共识与尚未解决的问题"}},"weights":{"structure":1}},
+        {"id":"bank-per-12-4","label":"Suggest another way to frame the issue","translations":{"zh-CN":{"label":"提出一种不同的表述方式"}},"weights":{"creativity":1}},
+        {"id":"bank-per-12-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-per-13",
+      "category": "personality",
+      "dimension": "personality",
+      "text": "A task involves a long wait before results are visible. What habit would you most likely rely on?",
+      "translations": {"zh-CN":{"text":"一项任务要等很久才能看到成果。你最可能依靠哪种习惯？"}},
+      "focus": ["planning","research","people","autonomy"],
+      "options": [
+        {"id":"bank-per-13-1","label":"Set smaller milestones","translations":{"zh-CN":{"label":"设立较小的里程碑"}},"weights":{"planning":1}},
+        {"id":"bank-per-13-2","label":"Keep a record of new observations along the way","translations":{"zh-CN":{"label":"持续记录过程中的新观察"}},"weights":{"research":1}},
+        {"id":"bank-per-13-3","label":"Arrange occasional conversations to check direction","translations":{"zh-CN":{"label":"定期沟通以确认方向"}},"weights":{"people":1}},
+        {"id":"bank-per-13-4","label":"Build a routine I can sustain on my own","translations":{"zh-CN":{"label":"建立自己能长期维持的节奏"}},"weights":{"autonomy":1}},
+        {"id":"bank-per-13-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-per-14",
+      "category": "personality",
+      "dimension": "personality",
+      "text": "What usually helps you notice an overlooked detail?",
+      "translations": {"zh-CN":{"text":"什么通常能帮助你注意到被忽略的细节？"}},
+      "focus": ["structure","creativity","people","analytics"],
+      "options": [
+        {"id":"bank-per-14-1","label":"Comparing work with a known standard","translations":{"zh-CN":{"label":"对照已知标准检查工作"}},"weights":{"structure":1}},
+        {"id":"bank-per-14-2","label":"Looking at the same thing in a different format","translations":{"zh-CN":{"label":"用不同形式重新看同一件事"}},"weights":{"creativity":1}},
+        {"id":"bank-per-14-3","label":"Hearing how someone else experienced it","translations":{"zh-CN":{"label":"听别人讲述实际体验"}},"weights":{"people":1}},
+        {"id":"bank-per-14-4","label":"Checking outliers instead of averages","translations":{"zh-CN":{"label":"检查异常值，而不是只看平均情况"}},"weights":{"analytics":1}},
+        {"id":"bank-per-14-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-per-15",
+      "category": "personality",
+      "dimension": "personality",
+      "text": "When two tasks both matter but time is short, which instinct do you recognize in yourself?",
+      "translations": {"zh-CN":{"text":"当两项任务都重要而时间不足时，哪种做法更像你的本能反应？"}},
+      "focus": ["analytics","people","structure","autonomy"],
+      "options": [
+        {"id":"bank-per-15-1","label":"Compare the consequence of delaying each task","translations":{"zh-CN":{"label":"比较推迟两项任务分别会有什么后果"}},"weights":{"analytics":1}},
+        {"id":"bank-per-15-2","label":"Check who is waiting on each result","translations":{"zh-CN":{"label":"了解哪些人正在等待各项结果"}},"weights":{"people":1}},
+        {"id":"bank-per-15-3","label":"Break each task into a minimum workable step","translations":{"zh-CN":{"label":"把各项任务拆出一个最小可行步骤"}},"weights":{"structure":1}},
+        {"id":"bank-per-15-4","label":"Pick a reasonable first task and review after starting","translations":{"zh-CN":{"label":"先选一项合理的任务着手，再回顾决定"}},"weights":{"autonomy":1}},
+        {"id":"bank-per-15-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-abl-01",
+      "category": "abilities",
+      "dimension": "abilities",
+      "text": "When a group has scattered notes, which contribution feels most within reach for you right now?",
+      "translations": {"zh-CN":{"text":"小组的笔记零散时，哪项贡献对现在的你来说最容易着手？"}},
+      "focus": ["structure","writing","analytics","people"],
+      "options": [
+        {"id":"bank-abl-01-1","label":"Arrange them into a usable sequence","translations":{"zh-CN":{"label":"把笔记整理成可用的顺序"}},"weights":{"structure":1}},
+        {"id":"bank-abl-01-2","label":"Write a brief summary in plain language","translations":{"zh-CN":{"label":"用浅显语言写一份简短总结"}},"weights":{"writing":1}},
+        {"id":"bank-abl-01-3","label":"Identify contradictions and gaps","translations":{"zh-CN":{"label":"找出矛盾和缺失之处"}},"weights":{"analytics":1}},
+        {"id":"bank-abl-01-4","label":"Ask contributors to clarify their points","translations":{"zh-CN":{"label":"请记录者澄清各自的要点"}},"weights":{"people":1}},
+        {"id":"bank-abl-01-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-abl-02",
+      "category": "abilities",
+      "dimension": "abilities",
+      "text": "Which task would you feel most comfortable trying with a little guidance?",
+      "translations": {"zh-CN":{"text":"在获得一点指导的情况下，你最有把握尝试哪项任务？"}},
+      "focus": ["visual-design","communication","statistics","quality"],
+      "options": [
+        {"id":"bank-abl-02-1","label":"Sketch a clearer layout","translations":{"zh-CN":{"label":"画出更清晰的布局草图"}},"weights":{"visual-design":1}},
+        {"id":"bank-abl-02-2","label":"Explain a process to a newcomer","translations":{"zh-CN":{"label":"向初次接触的人说明流程"}},"weights":{"communication":1}},
+        {"id":"bank-abl-02-3","label":"Spot a pattern in a simple table","translations":{"zh-CN":{"label":"在简单表格中找出规律"}},"weights":{"statistics":1}},
+        {"id":"bank-abl-02-4","label":"Check a batch against written criteria","translations":{"zh-CN":{"label":"按照书面标准逐项检查"}},"weights":{"quality":1}},
+        {"id":"bank-abl-02-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-abl-03",
+      "category": "abilities",
+      "dimension": "abilities",
+      "text": "In a project with several handoffs, where do you feel able to help?",
+      "translations": {"zh-CN":{"text":"在多次交接的项目中，你觉得自己在哪方面能帮上忙？"}},
+      "focus": ["planning","communication","documentation","analytics"],
+      "options": [
+        {"id":"bank-abl-03-1","label":"Keep track of who needs what and when","translations":{"zh-CN":{"label":"跟踪谁需要什么以及何时需要"}},"weights":{"planning":1}},
+        {"id":"bank-abl-03-2","label":"Make responsibilities clear in a short conversation","translations":{"zh-CN":{"label":"通过简短交流厘清职责"}},"weights":{"communication":1}},
+        {"id":"bank-abl-03-3","label":"Prepare a record others can easily follow","translations":{"zh-CN":{"label":"准备别人容易查阅的记录"}},"weights":{"documentation":1}},
+        {"id":"bank-abl-03-4","label":"Spot dependencies that might cause delays","translations":{"zh-CN":{"label":"找出可能造成延误的依赖关系"}},"weights":{"analytics":1}},
+        {"id":"bank-abl-03-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-abl-04",
+      "category": "abilities",
+      "dimension": "abilities",
+      "text": "Which kind of unfamiliar material feels easiest for you to get started with?",
+      "translations": {"zh-CN":{"text":"面对不熟悉的材料，哪一种对你来说最容易入手？"}},
+      "focus": ["research","analytics","visual-design","people"],
+      "options": [
+        {"id":"bank-abl-04-1","label":"Several short accounts of the same event","translations":{"zh-CN":{"label":"关于同一事件的几份简短记录"}},"weights":{"research":1}},
+        {"id":"bank-abl-04-2","label":"A table with comparable entries","translations":{"zh-CN":{"label":"一张各项数据可比较的表格"}},"weights":{"analytics":1}},
+        {"id":"bank-abl-04-3","label":"A picture or diagram I can annotate","translations":{"zh-CN":{"label":"一张可以标注的图片或示意图"}},"weights":{"visual-design":1}},
+        {"id":"bank-abl-04-4","label":"A conversation I can ask questions in","translations":{"zh-CN":{"label":"一场可以提出问题的交流"}},"weights":{"people":1}},
+        {"id":"bank-abl-04-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-abl-05",
+      "category": "abilities",
+      "dimension": "abilities",
+      "text": "What kind of revision do you feel most comfortable making independently?",
+      "translations": {"zh-CN":{"text":"你最有把握独立完成哪种修改？"}},
+      "focus": ["writing","structure","creativity","analytics"],
+      "options": [
+        {"id":"bank-abl-05-1","label":"Make a paragraph easier to read","translations":{"zh-CN":{"label":"让一段文字更易读"}},"weights":{"writing":1}},
+        {"id":"bank-abl-05-2","label":"Reorder a sequence of steps","translations":{"zh-CN":{"label":"重新排列流程步骤"}},"weights":{"structure":1}},
+        {"id":"bank-abl-05-3","label":"Try a different visual or sound treatment","translations":{"zh-CN":{"label":"尝试不同的视觉或声音处理"}},"weights":{"creativity":1}},
+        {"id":"bank-abl-05-4","label":"Correct a comparison that uses inconsistent figures","translations":{"zh-CN":{"label":"修正使用了不一致数据的比较"}},"weights":{"analytics":1}},
+        {"id":"bank-abl-05-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-abl-06",
+      "category": "abilities",
+      "dimension": "abilities",
+      "text": "Which part of learning to use a new tool tends to feel manageable for you?",
+      "translations": {"zh-CN":{"text":"学习使用新工具时，你觉得哪个环节比较好掌握？"}},
+      "focus": ["experimentation","documentation","people","troubleshooting"],
+      "options": [
+        {"id":"bank-abl-06-1","label":"Try one function and observe what changes","translations":{"zh-CN":{"label":"尝试一个功能并观察变化"}},"weights":{"experimentation":1}},
+        {"id":"bank-abl-06-2","label":"Follow a guide and mark where it is unclear","translations":{"zh-CN":{"label":"照着指南操作，并标记说明不清之处"}},"weights":{"documentation":1}},
+        {"id":"bank-abl-06-3","label":"Ask someone to demonstrate, then explain it back","translations":{"zh-CN":{"label":"请人示范，再试着复述操作"}},"weights":{"people":1}},
+        {"id":"bank-abl-06-4","label":"Compare expected and actual behavior when it fails","translations":{"zh-CN":{"label":"遇到故障时比较预期和实际表现"}},"weights":{"troubleshooting":1}},
+        {"id":"bank-abl-06-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-abl-07",
+      "category": "abilities",
+      "dimension": "abilities",
+      "text": "With a small event approaching, which task would you feel ready to take on?",
+      "translations": {"zh-CN":{"text":"一场小型活动即将举行，你觉得自己准备好承担哪项任务？"}},
+      "focus": ["planning","people","visualization","operations"],
+      "options": [
+        {"id":"bank-abl-07-1","label":"Build the timetable from known deadlines","translations":{"zh-CN":{"label":"根据已知截止时间编排日程"}},"weights":{"planning":1}},
+        {"id":"bank-abl-07-2","label":"Welcome participants and help them get oriented","translations":{"zh-CN":{"label":"接待参加者并帮助他们熟悉情况"}},"weights":{"people":1}},
+        {"id":"bank-abl-07-3","label":"Make directions easy to see at a glance","translations":{"zh-CN":{"label":"让导引信息一目了然"}},"weights":{"visualization":1}},
+        {"id":"bank-abl-07-4","label":"Check that supplies and spaces are ready","translations":{"zh-CN":{"label":"检查物资和场地是否就绪"}},"weights":{"operations":1}},
+        {"id":"bank-abl-07-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-abl-08",
+      "category": "abilities",
+      "dimension": "abilities",
+      "text": "Which contribution to a draft proposal is closest to something you feel able to do already?",
+      "translations": {"zh-CN":{"text":"在方案草稿阶段，哪项贡献最接近你觉得自己已经能做的事？"}},
+      "focus": ["research","analytics","writing","people"],
+      "options": [
+        {"id":"bank-abl-08-1","label":"Find examples that provide context","translations":{"zh-CN":{"label":"找出能提供背景的案例"}},"weights":{"research":1}},
+        {"id":"bank-abl-08-2","label":"List the assumptions the proposal depends on","translations":{"zh-CN":{"label":"列出方案依赖的假设"}},"weights":{"analytics":1}},
+        {"id":"bank-abl-08-3","label":"Make the main request clearer","translations":{"zh-CN":{"label":"把核心请求写得更明确"}},"weights":{"writing":1}},
+        {"id":"bank-abl-08-4","label":"Gather feedback from people affected","translations":{"zh-CN":{"label":"向受影响的人收集反馈"}},"weights":{"people":1}},
+        {"id":"bank-abl-08-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-abl-09",
+      "category": "abilities",
+      "dimension": "abilities",
+      "text": "When a physical object does not work as expected, where would you feel most confident starting?",
+      "translations": {"zh-CN":{"text":"实物没有按预期工作时，你最有把握从哪里着手？"}},
+      "focus": ["hands-on","documentation","analytics","communication"],
+      "options": [
+        {"id":"bank-abl-09-1","label":"Inspect how the parts fit together","translations":{"zh-CN":{"label":"检查部件如何连接"}},"weights":{"hands-on":1}},
+        {"id":"bank-abl-09-2","label":"Find and compare relevant instructions","translations":{"zh-CN":{"label":"查找并比较相关说明"}},"weights":{"documentation":1}},
+        {"id":"bank-abl-09-3","label":"Record when the problem occurs","translations":{"zh-CN":{"label":"记录问题出现的条件"}},"weights":{"analytics":1}},
+        {"id":"bank-abl-09-4","label":"Describe the symptom clearly to someone experienced","translations":{"zh-CN":{"label":"向有经验的人清楚描述故障现象"}},"weights":{"communication":1}},
+        {"id":"bank-abl-09-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-abl-10",
+      "category": "abilities",
+      "dimension": "abilities",
+      "text": "Which task involving a limited budget feels most approachable to you?",
+      "translations": {"zh-CN":{"text":"在预算有限的情况下，哪项任务你觉得最容易着手？"}},
+      "focus": ["analytics","planning","strategy","communication"],
+      "options": [
+        {"id":"bank-abl-10-1","label":"Compare quantities and unit prices","translations":{"zh-CN":{"label":"比较数量和单位价格"}},"weights":{"analytics":1}},
+        {"id":"bank-abl-10-2","label":"Fit purchases to dates and needs","translations":{"zh-CN":{"label":"让采购安排与时间和需求相匹配"}},"weights":{"planning":1}},
+        {"id":"bank-abl-10-3","label":"Look for alternatives that meet the main need","translations":{"zh-CN":{"label":"寻找能满足核心需求的替代方案"}},"weights":{"strategy":1}},
+        {"id":"bank-abl-10-4","label":"Explain the tradeoffs to the group","translations":{"zh-CN":{"label":"向小组说明取舍"}},"weights":{"communication":1}},
+        {"id":"bank-abl-10-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-abl-11",
+      "category": "abilities",
+      "dimension": "abilities",
+      "text": "When a conversation covers a sensitive topic, which contribution feels realistic for you?",
+      "translations": {"zh-CN":{"text":"交流涉及敏感话题时，哪项贡献是你觉得自己能做到的？"}},
+      "focus": ["empathy","structure","research","writing"],
+      "options": [
+        {"id":"bank-abl-11-1","label":"Listen and reflect back what I heard","translations":{"zh-CN":{"label":"倾听并复述我理解到的内容"}},"weights":{"empathy":1}},
+        {"id":"bank-abl-11-2","label":"Clarify what the conversation can and cannot decide","translations":{"zh-CN":{"label":"厘清这次交流能决定和不能决定什么"}},"weights":{"structure":1}},
+        {"id":"bank-abl-11-3","label":"Offer to look up a reliable resource later","translations":{"zh-CN":{"label":"提出之后查找可靠资料"}},"weights":{"research":1}},
+        {"id":"bank-abl-11-4","label":"Help record mutually agreed next steps","translations":{"zh-CN":{"label":"帮助记录双方同意的后续步骤"}},"weights":{"writing":1}},
+        {"id":"bank-abl-11-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-abl-12",
+      "category": "abilities",
+      "dimension": "abilities",
+      "text": "What sort of task would you feel comfortable showing someone how to do?",
+      "translations": {"zh-CN":{"text":"你有把握向别人示范哪类任务？"}},
+      "focus": ["education","hands-on","organization","communication"],
+      "options": [
+        {"id":"bank-abl-12-1","label":"Work through a familiar example together","translations":{"zh-CN":{"label":"一起做一个熟悉的例子"}},"weights":{"education":1}},
+        {"id":"bank-abl-12-2","label":"Demonstrate a physical sequence slowly","translations":{"zh-CN":{"label":"慢速示范一套动手步骤"}},"weights":{"hands-on":1}},
+        {"id":"bank-abl-12-3","label":"Set up a checklist or tracking system","translations":{"zh-CN":{"label":"建立核对表或跟踪系统"}},"weights":{"organization":1}},
+        {"id":"bank-abl-12-4","label":"Explain how to phrase a common request","translations":{"zh-CN":{"label":"说明如何表达一个常见请求"}},"weights":{"communication":1}},
+        {"id":"bank-abl-12-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-abl-13",
+      "category": "abilities",
+      "dimension": "abilities",
+      "text": "Which part of an evidence-based discussion feels most accessible to you?",
+      "translations": {"zh-CN":{"text":"在以证据为基础的讨论中，哪个部分对你来说比较容易参与？"}},
+      "focus": ["research","analytics","visualization","people"],
+      "options": [
+        {"id":"bank-abl-13-1","label":"Find where a claim originally came from","translations":{"zh-CN":{"label":"找到某个说法最初的来源"}},"weights":{"research":1}},
+        {"id":"bank-abl-13-2","label":"Explain what a comparison can support","translations":{"zh-CN":{"label":"解释一项比较能支持哪些结论"}},"weights":{"analytics":1}},
+        {"id":"bank-abl-13-3","label":"Show the difference with a simple graphic","translations":{"zh-CN":{"label":"用简单图示呈现差异"}},"weights":{"visualization":1}},
+        {"id":"bank-abl-13-4","label":"Translate the implication into a question for the group","translations":{"zh-CN":{"label":"把可能的影响转化为一个问题，与团队讨论"}},"weights":{"people":1}},
+        {"id":"bank-abl-13-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-abl-14",
+      "category": "abilities",
+      "dimension": "abilities",
+      "text": "When a workspace is disorganized, which adjustment do you feel most able to make?",
+      "translations": {"zh-CN":{"text":"工作空间比较混乱时，你觉得自己最能做出哪种调整？"}},
+      "focus": ["organization","spatial-design","research","people"],
+      "options": [
+        {"id":"bank-abl-14-1","label":"Classify items by when they are needed","translations":{"zh-CN":{"label":"按照物品的使用时机分类"}},"weights":{"organization":1}},
+        {"id":"bank-abl-14-2","label":"Arrange the space so movement is easier","translations":{"zh-CN":{"label":"重新布置空间，让活动更方便"}},"weights":{"spatial-design":1}},
+        {"id":"bank-abl-14-3","label":"Observe what actually gets in the way","translations":{"zh-CN":{"label":"观察真正造成阻碍的因素"}},"weights":{"research":1}},
+        {"id":"bank-abl-14-4","label":"Ask the people sharing the space what would work","translations":{"zh-CN":{"label":"询问共用空间的人觉得怎样安排合适"}},"weights":{"people":1}},
+        {"id":"bank-abl-14-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-abl-15",
+      "category": "abilities",
+      "dimension": "abilities",
+      "text": "Which of these feels most achievable when sharing an unfinished idea?",
+      "translations": {"zh-CN":{"text":"分享尚未成形的想法时，哪项任务对你来说最可行？"}},
+      "focus": ["prototyping","writing","presenting","analytics"],
+      "options": [
+        {"id":"bank-abl-15-1","label":"Make a rough example others can react to","translations":{"zh-CN":{"label":"做出粗略示例供他人反馈"}},"weights":{"prototyping":1}},
+        {"id":"bank-abl-15-2","label":"State the idea and its limits in a short note","translations":{"zh-CN":{"label":"用简短文字说明想法及其局限"}},"weights":{"writing":1}},
+        {"id":"bank-abl-15-3","label":"Explain it aloud and invite questions","translations":{"zh-CN":{"label":"口头解释并邀请别人提问"}},"weights":{"presenting":1}},
+        {"id":"bank-abl-15-4","label":"Describe what would count as useful feedback","translations":{"zh-CN":{"label":"说明什么样的反馈有参考价值"}},"weights":{"analytics":1}},
+        {"id":"bank-abl-15-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-hob-01",
+      "category": "hobbies",
+      "dimension": "hobbies",
+      "text": "When looking through a secondhand shop, what might you linger over?",
+      "translations": {"zh-CN":{"text":"逛二手店时，你可能会在哪些物品前多停留一会儿？"}},
+      "focus": ["materials","storytelling","visual-design","research"],
+      "options": [
+        {"id":"bank-hob-01-1","label":"Objects whose construction I can examine","translations":{"zh-CN":{"label":"能观察制作方式的物品"}},"weights":{"materials":1}},
+        {"id":"bank-hob-01-2","label":"Items that hint at a previous owner's life","translations":{"zh-CN":{"label":"能看出前主人生活痕迹的东西"}},"weights":{"storytelling":1}},
+        {"id":"bank-hob-01-3","label":"Interesting colors, shapes, or lettering","translations":{"zh-CN":{"label":"色彩、形状或字样有趣的东西"}},"weights":{"visual-design":1}},
+        {"id":"bank-hob-01-4","label":"Labels or records I could look up later","translations":{"zh-CN":{"label":"之后可以查询的标签或记录"}},"weights":{"research":1}},
+        {"id":"bank-hob-01-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-hob-02",
+      "category": "hobbies",
+      "dimension": "hobbies",
+      "text": "If you chose to make something for a gathering, what part might you enjoy?",
+      "translations": {"zh-CN":{"text":"如果你为聚会准备一点东西，可能最享受哪个环节？"}},
+      "focus": ["creativity","hands-on","people","planning"],
+      "options": [
+        {"id":"bank-hob-02-1","label":"Choose a theme and turn it into a design","translations":{"zh-CN":{"label":"挑选主题并做成具体设计"}},"weights":{"creativity":1}},
+        {"id":"bank-hob-02-2","label":"Work with ingredients or materials","translations":{"zh-CN":{"label":"动手处理食材或材料"}},"weights":{"hands-on":1}},
+        {"id":"bank-hob-02-3","label":"Include preferences and needs from the group","translations":{"zh-CN":{"label":"把大家的偏好和需求考虑进去"}},"weights":{"people":1}},
+        {"id":"bank-hob-02-4","label":"Work out timing so everything comes together","translations":{"zh-CN":{"label":"安排时间，让各环节顺利衔接"}},"weights":{"planning":1}},
+        {"id":"bank-hob-02-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-hob-03",
+      "category": "hobbies",
+      "dimension": "hobbies",
+      "text": "What kind of detail might make you pause on a walk or local outing?",
+      "translations": {"zh-CN":{"text":"散步或在附近出游时，哪种细节可能让你停下来看看？"}},
+      "focus": ["science","spatial-design","storytelling","visual-design"],
+      "options": [
+        {"id":"bank-hob-03-1","label":"How a plant or animal uses its surroundings","translations":{"zh-CN":{"label":"动植物如何利用周边环境"}},"weights":{"science":1}},
+        {"id":"bank-hob-03-2","label":"How a route guides or confuses people","translations":{"zh-CN":{"label":"路线如何引导人，或让人迷路"}},"weights":{"spatial-design":1}},
+        {"id":"bank-hob-03-3","label":"A place with an interesting history","translations":{"zh-CN":{"label":"有趣的地方历史"}},"weights":{"storytelling":1}},
+        {"id":"bank-hob-03-4","label":"The way light or color changes the scene","translations":{"zh-CN":{"label":"光线或色彩怎样改变眼前的景象"}},"weights":{"visual-design":1}},
+        {"id":"bank-hob-03-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-hob-04",
+      "category": "hobbies",
+      "dimension": "hobbies",
+      "text": "In a puzzle or board game, what tends to hold your interest?",
+      "translations": {"zh-CN":{"text":"玩益智游戏或桌游时，什么通常能吸引你继续玩？"}},
+      "focus": ["analytics","strategy","people","creativity"],
+      "options": [
+        {"id":"bank-hob-04-1","label":"Work out the pattern behind the rules","translations":{"zh-CN":{"label":"推断规则背后的规律"}},"weights":{"analytics":1}},
+        {"id":"bank-hob-04-2","label":"Adapt a plan as the situation changes","translations":{"zh-CN":{"label":"随着局势变化调整计划"}},"weights":{"strategy":1}},
+        {"id":"bank-hob-04-3","label":"Notice how the group makes decisions together","translations":{"zh-CN":{"label":"观察大家如何一起作决定"}},"weights":{"people":1}},
+        {"id":"bank-hob-04-4","label":"Invent house rules or alternate scenarios","translations":{"zh-CN":{"label":"自创玩法或不同的情境"}},"weights":{"creativity":1}},
+        {"id":"bank-hob-04-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-hob-05",
+      "category": "hobbies",
+      "dimension": "hobbies",
+      "text": "Which personal collection would you most enjoy organizing, if any?",
+      "translations": {"zh-CN":{"text":"如果要整理一项个人收藏，你最可能喜欢整理哪类？"}},
+      "focus": ["research","visual-design","structure","storytelling"],
+      "options": [
+        {"id":"bank-hob-05-1","label":"Maps or records I can compare across periods","translations":{"zh-CN":{"label":"可以跨时期比较的地图或记录"}},"weights":{"research":1}},
+        {"id":"bank-hob-05-2","label":"Images arranged by motif or style","translations":{"zh-CN":{"label":"可以按主题或风格整理的图片"}},"weights":{"visual-design":1}},
+        {"id":"bank-hob-05-3","label":"A library of useful examples and references","translations":{"zh-CN":{"label":"收集实用示例及参考资料"}},"weights":{"structure":1}},
+        {"id":"bank-hob-05-4","label":"Memories grouped around people or events","translations":{"zh-CN":{"label":"按人物或事件整理的回忆"}},"weights":{"storytelling":1}},
+        {"id":"bank-hob-05-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-hob-06",
+      "category": "hobbies",
+      "dimension": "hobbies",
+      "text": "If you had time to join a casual local project, what activity would sound appealing?",
+      "translations": {"zh-CN":{"text":"如果有空参加一个轻松的本地项目，哪项活动对你更有吸引力？"}},
+      "focus": ["science","people","hands-on","storytelling"],
+      "options": [
+        {"id":"bank-hob-06-1","label":"Record the kinds of wildlife seen nearby","translations":{"zh-CN":{"label":"记录附近观察到的野生动物"}},"weights":{"science":1},"fieldWeights":{"Environment & Social Impact":1}},
+        {"id":"bank-hob-06-2","label":"Welcome newcomers to a regular meetup","translations":{"zh-CN":{"label":"欢迎新成员参加定期聚会"}},"weights":{"people":1},"fieldWeights":{"Psychology & Mental Health":1}},
+        {"id":"bank-hob-06-3","label":"Repair shared objects alongside others","translations":{"zh-CN":{"label":"与别人一起修理公共用品"}},"weights":{"hands-on":1},"fieldWeights":{"Engineering & Architecture":1}},
+        {"id":"bank-hob-06-4","label":"Collect local stories for a small publication","translations":{"zh-CN":{"label":"收集地方故事，做成小型刊物"}},"weights":{"storytelling":1},"fieldWeights":{"Media & Communication":1}},
+        {"id":"bank-hob-06-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-hob-07",
+      "category": "hobbies",
+      "dimension": "hobbies",
+      "text": "Which part of taking or looking at photos tends to catch your attention?",
+      "translations": {"zh-CN":{"text":"拍照或看照片时，哪个环节往往更吸引你？"}},
+      "focus": ["visual-design","storytelling","research","quality"],
+      "options": [
+        {"id":"bank-hob-07-1","label":"Framing and the balance of elements","translations":{"zh-CN":{"label":"构图以及元素之间的平衡"}},"weights":{"visual-design":1}},
+        {"id":"bank-hob-07-2","label":"What the image communicates without words","translations":{"zh-CN":{"label":"图像无需文字就能传达的信息"}},"weights":{"storytelling":1}},
+        {"id":"bank-hob-07-3","label":"What details reveal where or when it was made","translations":{"zh-CN":{"label":"哪些细节能透露拍摄时间或地点"}},"weights":{"research":1}},
+        {"id":"bank-hob-07-4","label":"How small adjustments change clarity and consistency","translations":{"zh-CN":{"label":"小幅调整如何改变清晰度和一致性"}},"weights":{"quality":1}},
+        {"id":"bank-hob-07-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-hob-08",
+      "category": "hobbies",
+      "dimension": "hobbies",
+      "text": "If you explore a recipe in your own time, what might be most satisfying?",
+      "translations": {"zh-CN":{"text":"空闲时研究菜谱，什么最可能让你有满足感？"}},
+      "focus": ["experimentation","structure","people","research"],
+      "options": [
+        {"id":"bank-hob-08-1","label":"Change one ingredient and compare the result","translations":{"zh-CN":{"label":"更换一种食材并比较效果"}},"weights":{"experimentation":1}},
+        {"id":"bank-hob-08-2","label":"Get the same result reliably several times","translations":{"zh-CN":{"label":"多次稳定做出同样效果"}},"weights":{"structure":1}},
+        {"id":"bank-hob-08-3","label":"Adapt it to suit someone else's needs","translations":{"zh-CN":{"label":"根据他人的需求调整做法"}},"weights":{"people":1}},
+        {"id":"bank-hob-08-4","label":"Find out where the technique comes from","translations":{"zh-CN":{"label":"了解这项做法的历史来源"}},"weights":{"research":1}},
+        {"id":"bank-hob-08-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-hob-09",
+      "category": "hobbies",
+      "dimension": "hobbies",
+      "text": "Which activity involving music or sound would you choose for yourself?",
+      "translations": {"zh-CN":{"text":"围绕音乐或声音，你会为自己选择哪项活动？"}},
+      "focus": ["creativity","research","structure","people"],
+      "options": [
+        {"id":"bank-hob-09-1","label":"Play with the arrangement or sound","translations":{"zh-CN":{"label":"尝试改编或调整声音"}},"weights":{"creativity":1}},
+        {"id":"bank-hob-09-2","label":"Learn how a style developed over time","translations":{"zh-CN":{"label":"了解某种风格随时间的发展"}},"weights":{"research":1}},
+        {"id":"bank-hob-09-3","label":"Build a practice routine for a piece","translations":{"zh-CN":{"label":"为一首曲目制定练习安排"}},"weights":{"structure":1}},
+        {"id":"bank-hob-09-4","label":"Share and discuss favorite recordings with others","translations":{"zh-CN":{"label":"与别人分享并讨论喜欢的录音"}},"weights":{"people":1}},
+        {"id":"bank-hob-09-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-hob-10",
+      "category": "hobbies",
+      "dimension": "hobbies",
+      "text": "If you keep notes while reading or watching something, what do you tend to save?",
+      "translations": {"zh-CN":{"text":"如果你在阅读或观看时做笔记，通常会记下什么？"}},
+      "focus": ["research","storytelling","creativity","structure"],
+      "options": [
+        {"id":"bank-hob-10-1","label":"A claim I want to check later","translations":{"zh-CN":{"label":"之后想核实的说法"}},"weights":{"research":1}},
+        {"id":"bank-hob-10-2","label":"A scene or line that captures a point well","translations":{"zh-CN":{"label":"特别能说明某个观点的场景或句子"}},"weights":{"storytelling":1}},
+        {"id":"bank-hob-10-3","label":"An idea to adapt into something of my own","translations":{"zh-CN":{"label":"能发展成自己作品的点子"}},"weights":{"creativity":1}},
+        {"id":"bank-hob-10-4","label":"A useful sequence of instructions","translations":{"zh-CN":{"label":"一套有用的操作步骤"}},"weights":{"structure":1}},
+        {"id":"bank-hob-10-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-hob-11",
+      "category": "hobbies",
+      "dimension": "hobbies",
+      "text": "What would you enjoy making for a personal trip, if you chose to prepare something?",
+      "translations": {"zh-CN":{"text":"如果要为个人出行做点准备，你会喜欢做什么？"}},
+      "focus": ["planning","research","visualization","storytelling"],
+      "options": [
+        {"id":"bank-hob-11-1","label":"An itinerary with flexible options","translations":{"zh-CN":{"label":"一份保留灵活选项的行程单"}},"weights":{"planning":1}},
+        {"id":"bank-hob-11-2","label":"Notes on the place's background","translations":{"zh-CN":{"label":"关于目的地背景的笔记"}},"weights":{"research":1}},
+        {"id":"bank-hob-11-3","label":"A map or visual guide to share","translations":{"zh-CN":{"label":"可分享的地图或图示指南"}},"weights":{"visualization":1}},
+        {"id":"bank-hob-11-4","label":"A record of observations from the trip","translations":{"zh-CN":{"label":"记录旅途中的所见所想"}},"weights":{"storytelling":1}},
+        {"id":"bank-hob-11-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-hob-12",
+      "category": "hobbies",
+      "dimension": "hobbies",
+      "text": "When you encounter an unfamiliar craft, what would you most want to try?",
+      "translations": {"zh-CN":{"text":"接触陌生的手工艺时，你最想尝试什么？"}},
+      "focus": ["materials","structure","creativity","people"],
+      "options": [
+        {"id":"bank-hob-12-1","label":"Handle different materials to see how they behave","translations":{"zh-CN":{"label":"亲手感受不同材料的特性"}},"weights":{"materials":1}},
+        {"id":"bank-hob-12-2","label":"Follow a traditional process from start to finish","translations":{"zh-CN":{"label":"从头到尾体验一次传统流程"}},"weights":{"structure":1}},
+        {"id":"bank-hob-12-3","label":"Make an unusual variation on a basic form","translations":{"zh-CN":{"label":"在基础形态上做一种不常见的变化"}},"weights":{"creativity":1}},
+        {"id":"bank-hob-12-4","label":"Talk with someone about how they learned it","translations":{"zh-CN":{"label":"请人聊聊自己是怎么学会的"}},"weights":{"people":1}},
+        {"id":"bank-hob-12-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-hob-13",
+      "category": "hobbies",
+      "dimension": "hobbies",
+      "text": "Which kind of local gathering would you most enjoy helping with in your free time?",
+      "translations": {"zh-CN":{"text":"空闲时，你最愿意帮忙筹办哪类本地聚会？"}},
+      "focus": ["education","creativity","people","operations"],
+      "options": [
+        {"id":"bank-hob-13-1","label":"A session for people to exchange practical skills","translations":{"zh-CN":{"label":"让大家交换实用技能的活动"}},"weights":{"education":1}},
+        {"id":"bank-hob-13-2","label":"A small showcase of creative work","translations":{"zh-CN":{"label":"一个小型创意作品展示"}},"weights":{"creativity":1}},
+        {"id":"bank-hob-13-3","label":"A welcoming activity where neighbors can meet","translations":{"zh-CN":{"label":"让邻里相识的迎新活动"}},"weights":{"people":1}},
+        {"id":"bank-hob-13-4","label":"A swap event for unused household items","translations":{"zh-CN":{"label":"闲置家用品交换活动"}},"weights":{"operations":1}},
+        {"id":"bank-hob-13-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-hob-14",
+      "category": "hobbies",
+      "dimension": "hobbies",
+      "text": "What would make a home or personal project worth doing even if nobody saw it?",
+      "translations": {"zh-CN":{"text":"即使没有人看到，什么也会让个人或居家项目值得做？"}},
+      "focus": ["autonomy","experimentation","hands-on","creativity"],
+      "options": [
+        {"id":"bank-hob-14-1","label":"I can make decisions at my own pace","translations":{"zh-CN":{"label":"我可以按自己的节奏作决定"}},"weights":{"autonomy":1}},
+        {"id":"bank-hob-14-2","label":"I can explore a question through trial and error","translations":{"zh-CN":{"label":"我可以通过试错探索一个问题"}},"weights":{"experimentation":1}},
+        {"id":"bank-hob-14-3","label":"I finish with something useful in my daily life","translations":{"zh-CN":{"label":"最后得到一个日常能用的成果"}},"weights":{"hands-on":1}},
+        {"id":"bank-hob-14-4","label":"It gives me a way to express an idea","translations":{"zh-CN":{"label":"它让我有机会表达一个想法"}},"weights":{"creativity":1}},
+        {"id":"bank-hob-14-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-hob-15",
+      "category": "hobbies",
+      "dimension": "hobbies",
+      "text": "When you follow a sport or performance casually, what would you most enjoy figuring out?",
+      "translations": {"zh-CN":{"text":"休闲观看体育赛事或表演时，你最想弄懂什么？"}},
+      "focus": ["analytics","research","people","creativity"],
+      "options": [
+        {"id":"bank-hob-15-1","label":"How small changes in tactics affect the outcome","translations":{"zh-CN":{"label":"战术上的小变化如何影响结果"}},"weights":{"analytics":1}},
+        {"id":"bank-hob-15-2","label":"How rules or conventions have changed over time","translations":{"zh-CN":{"label":"规则或惯例如何随时间变化"}},"weights":{"research":1}},
+        {"id":"bank-hob-15-3","label":"How a group coordinates without much instruction","translations":{"zh-CN":{"label":"团队如何在很少指示的情况下配合"}},"weights":{"people":1}},
+        {"id":"bank-hob-15-4","label":"How performers make a recognizable style their own","translations":{"zh-CN":{"label":"选手或表演者如何形成可辨识的个人风格"}},"weights":{"creativity":1}},
+        {"id":"bank-hob-15-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-val-01",
+      "category": "values",
+      "dimension": "values",
+      "text": "Imagine several offers meet your basic needs. What would most influence your decision?",
+      "translations": {"zh-CN":{"text":"假设几份工作邀约都能满足你的基本需求。什么最影响你的决定？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-val-01-1","label":"Confidence that income and hours will be predictable","translations":{"zh-CN":{"label":"收入和工时可以预期"}},"weights":{}},
+        {"id":"bank-val-01-2","label":"Freedom to make choices about how work is done","translations":{"zh-CN":{"label":"可以自主决定如何开展工作"}},"weights":{}},
+        {"id":"bank-val-01-3","label":"A clear benefit for people I care about serving","translations":{"zh-CN":{"label":"对我希望服务的人群有明确益处"}},"weights":{}},
+        {"id":"bank-val-01-4","label":"A realistic path to learning something I value","translations":{"zh-CN":{"label":"有机会学到自己重视的东西"}},"weights":{}},
+        {"id":"bank-val-01-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-val-02",
+      "category": "values",
+      "dimension": "values",
+      "text": "If a project's outcome is hard to measure, what would still make it feel worthwhile?",
+      "translations": {"zh-CN":{"text":"如果项目成果难以衡量，什么仍会让它值得投入？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-val-02-1","label":"People who use the result say it made life easier","translations":{"zh-CN":{"label":"成果的使用者表示事情变得容易了"}},"weights":{}},
+        {"id":"bank-val-02-2","label":"It leaves behind knowledge others can build on","translations":{"zh-CN":{"label":"留下别人可以继续利用的知识"}},"weights":{}},
+        {"id":"bank-val-02-3","label":"It meets a standard I can stand behind","translations":{"zh-CN":{"label":"达到我认可并愿意担保的标准"}},"weights":{}},
+        {"id":"bank-val-02-4","label":"It creates something distinctive or expressive","translations":{"zh-CN":{"label":"创造出独特或富有表现力的成果"}},"weights":{}},
+        {"id":"bank-val-02-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-val-03",
+      "category": "values",
+      "dimension": "values",
+      "text": "Which practice would most strengthen your trust in an employer?",
+      "translations": {"zh-CN":{"text":"哪种做法最能增强你对雇主的信任？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-val-03-1","label":"Explain who makes decisions and how they can be questioned","translations":{"zh-CN":{"label":"说明谁作决定，以及如何提出质疑"}},"weights":{}},
+        {"id":"bank-val-03-2","label":"Follow through on commitments about workload and scheduling","translations":{"zh-CN":{"label":"兑现工作量和排班方面的承诺"}},"weights":{}},
+        {"id":"bank-val-03-3","label":"Share credit openly for individual and team contributions","translations":{"zh-CN":{"label":"公开认可个人和团队的贡献"}},"weights":{}},
+        {"id":"bank-val-03-4","label":"Give staff informed choices about development and role changes","translations":{"zh-CN":{"label":"让员工在了解情况后选择发展和岗位调整方向"}},"weights":{}},
+        {"id":"bank-val-03-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-val-04",
+      "category": "values",
+      "dimension": "values",
+      "text": "If you saw someone receive recognition for work, which reason would you most want to hear?",
+      "translations": {"zh-CN":{"text":"如果看到某人的工作受到认可，你最希望听到哪种理由？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-val-04-1","label":"They quietly kept an important service dependable","translations":{"zh-CN":{"label":"他们默默保障了一项重要服务的稳定运行"}},"weights":{}},
+        {"id":"bank-val-04-2","label":"They improved a situation for people who were overlooked","translations":{"zh-CN":{"label":"他们改善了被忽视人群的处境"}},"weights":{}},
+        {"id":"bank-val-04-3","label":"They produced work that showed exceptional craft","translations":{"zh-CN":{"label":"他们的作品体现出出色的专业技艺"}},"weights":{}},
+        {"id":"bank-val-04-4","label":"They helped others develop confidence and independence","translations":{"zh-CN":{"label":"他们帮助他人建立信心和独立性"}},"weights":{}},
+        {"id":"bank-val-04-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-val-05",
+      "category": "values",
+      "dimension": "values",
+      "text": "When a project needs to scale back, which commitment would you most want to preserve?",
+      "translations": {"zh-CN":{"text":"当项目需要缩减规模时，你最想保留哪项承诺？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-val-05-1","label":"The accessibility of the result for its intended users","translations":{"zh-CN":{"label":"确保预期使用者仍能无障碍地使用成果"}},"weights":{}},
+        {"id":"bank-val-05-2","label":"The quality of the core work","translations":{"zh-CN":{"label":"核心工作的质量"}},"weights":{}},
+        {"id":"bank-val-05-3","label":"The team's agreed limits on workload","translations":{"zh-CN":{"label":"团队商定的工作量上限"}},"weights":{}},
+        {"id":"bank-val-05-4","label":"Transparency about what will and will not be delivered","translations":{"zh-CN":{"label":"透明说明哪些内容会交付、哪些不会"}},"weights":{}},
+        {"id":"bank-val-05-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-val-06",
+      "category": "values",
+      "dimension": "values",
+      "text": "How important is it that paid work connects to interests you pursue outside work?",
+      "translations": {"zh-CN":{"text":"对你来说，有偿工作与业余兴趣相联系有多重要？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-val-06-1","label":"I would prefer a close connection","translations":{"zh-CN":{"label":"我希望两者紧密相关"}},"weights":{}},
+        {"id":"bank-val-06-2","label":"A partial connection would be enough","translations":{"zh-CN":{"label":"有部分联系就足够了"}},"weights":{}},
+        {"id":"bank-val-06-3","label":"I prefer to keep work and personal interests separate","translations":{"zh-CN":{"label":"我更愿意把工作和个人兴趣分开"}},"weights":{}},
+        {"id":"bank-val-06-4","label":"It depends on what the work would require of me","translations":{"zh-CN":{"label":"这取决于工作会对我提出什么要求"}},"weights":{}},
+        {"id":"bank-val-06-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-val-07",
+      "category": "values",
+      "dimension": "values",
+      "text": "What kind of responsibility would you be most willing to carry when the decision is difficult?",
+      "translations": {"zh-CN":{"text":"当决定不容易时，你最愿意承担哪类责任？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-val-07-1","label":"Protect the consistency of a fair process","translations":{"zh-CN":{"label":"维护公正程序的一致性"}},"weights":{}},
+        {"id":"bank-val-07-2","label":"Represent needs that could otherwise go unheard","translations":{"zh-CN":{"label":"代表那些可能得不到倾听的需求"}},"weights":{}},
+        {"id":"bank-val-07-3","label":"Explain the limits of the available evidence","translations":{"zh-CN":{"label":"解释现有证据的局限"}},"weights":{}},
+        {"id":"bank-val-07-4","label":"Manage resources so the work can continue over time","translations":{"zh-CN":{"label":"管理资源，让工作可以长期持续"}},"weights":{}},
+        {"id":"bank-val-07-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-val-08",
+      "category": "values",
+      "dimension": "values",
+      "text": "What would you value most in the way a team handles a disagreement?",
+      "translations": {"zh-CN":{"text":"团队处理分歧时，你最看重什么？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-val-08-1","label":"People can disagree without risking their standing","translations":{"zh-CN":{"label":"表达不同意见不会影响个人处境"}},"weights":{}},
+        {"id":"bank-val-08-2","label":"The decision process is agreed and visible","translations":{"zh-CN":{"label":"决策流程有共识，并且公开可见"}},"weights":{}},
+        {"id":"bank-val-08-3","label":"The group makes space for the people most affected","translations":{"zh-CN":{"label":"团队给最受影响的人表达意见的机会"}},"weights":{}},
+        {"id":"bank-val-08-4","label":"A decision can be revisited when new information appears","translations":{"zh-CN":{"label":"出现新信息后可以重新审视决定"}},"weights":{}},
+        {"id":"bank-val-08-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-val-09",
+      "category": "values",
+      "dimension": "values",
+      "text": "If work involves a public audience, what would you most want to be accountable for?",
+      "translations": {"zh-CN":{"text":"如果工作面向公众，你最希望对什么负责？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-val-09-1","label":"Accuracy and clear explanations","translations":{"zh-CN":{"label":"准确性和清晰的说明"}},"weights":{}},
+        {"id":"bank-val-09-2","label":"Protecting people's privacy and choices","translations":{"zh-CN":{"label":"保护个人隐私和选择权"}},"weights":{}},
+        {"id":"bank-val-09-3","label":"A service people can use with confidence","translations":{"zh-CN":{"label":"提供让使用者安心的服务"}},"weights":{}},
+        {"id":"bank-val-09-4","label":"Making public feedback possible and useful","translations":{"zh-CN":{"label":"让公众能反馈，并使反馈发挥作用"}},"weights":{}},
+        {"id":"bank-val-09-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-val-10",
+      "category": "values",
+      "dimension": "values",
+      "text": "Which kind of progress would you most value in a typical year?",
+      "translations": {"zh-CN":{"text":"在通常的一年里，你最重视哪种进展？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-val-10-1","label":"More secure and predictable circumstances","translations":{"zh-CN":{"label":"生活或工作条件更加稳定、可预期"}},"weights":{}},
+        {"id":"bank-val-10-2","label":"A deeper understanding of an issue or craft","translations":{"zh-CN":{"label":"对某个议题或技艺有更深入的理解"}},"weights":{}},
+        {"id":"bank-val-10-3","label":"A stronger network of people I can learn with","translations":{"zh-CN":{"label":"建立更紧密的学习伙伴网络"}},"weights":{}},
+        {"id":"bank-val-10-4","label":"More ability to choose assignments or working conditions","translations":{"zh-CN":{"label":"在任务或工作条件上有更多选择"}},"weights":{}},
+        {"id":"bank-val-10-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-val-11",
+      "category": "values",
+      "dimension": "values",
+      "text": "If a team offers both bonuses and time to learn, which arrangement would you prefer?",
+      "translations": {"zh-CN":{"text":"如果团队同时提供奖金和学习时间，你更喜欢哪种安排？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-val-11-1","label":"More compensation now","translations":{"zh-CN":{"label":"现在获得更多报酬"}},"weights":{}},
+        {"id":"bank-val-11-2","label":"More protected time to learn","translations":{"zh-CN":{"label":"有更多受到保障的学习时间"}},"weights":{}},
+        {"id":"bank-val-11-3","label":"A dependable balance between the two","translations":{"zh-CN":{"label":"两者之间有稳定的平衡"}},"weights":{}},
+        {"id":"bank-val-11-4","label":"The option to adjust the balance over time","translations":{"zh-CN":{"label":"可以在不同阶段调整两者的比重"}},"weights":{}},
+        {"id":"bank-val-11-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-val-12",
+      "category": "values",
+      "dimension": "values",
+      "text": "Where would you prefer to see boundaries between work and personal life?",
+      "translations": {"zh-CN":{"text":"你希望工作与个人生活之间是什么样的边界？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-val-12-1","label":"A clear end to most workdays","translations":{"zh-CN":{"label":"大多数工作日都能在明确的时间结束"}},"weights":{}},
+        {"id":"bank-val-12-2","label":"Flexibility across the day with agreed availability","translations":{"zh-CN":{"label":"白天可灵活安排，同时约定可联络时段"}},"weights":{}},
+        {"id":"bank-val-12-3","label":"Periods of intense work followed by protected downtime","translations":{"zh-CN":{"label":"一段高强度工作之后有受保障的休息时间"}},"weights":{}},
+        {"id":"bank-val-12-4","label":"Different boundaries at different stages of life","translations":{"zh-CN":{"label":"人生不同阶段可以设定不同边界"}},"weights":{}},
+        {"id":"bank-val-12-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-val-13",
+      "category": "values",
+      "dimension": "values",
+      "text": "When an organization makes a social or environmental promise, what matters most to you?",
+      "translations": {"zh-CN":{"text":"当组织作出社会或环境承诺时，你最看重什么？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-val-13-1","label":"It publishes specific actions and their results","translations":{"zh-CN":{"label":"公布具体行动及其结果"}},"weights":{}},
+        {"id":"bank-val-13-2","label":"It involves communities affected by the changes","translations":{"zh-CN":{"label":"邀请受到变化影响的社区参与"}},"weights":{}},
+        {"id":"bank-val-13-3","label":"It assigns staff time and resources to the work","translations":{"zh-CN":{"label":"为这项工作投入人员时间和资源"}},"weights":{}},
+        {"id":"bank-val-13-4","label":"It says what it cannot yet do and why","translations":{"zh-CN":{"label":"说明目前还做不到什么，以及原因"}},"weights":{}},
+        {"id":"bank-val-13-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-val-14",
+      "category": "values",
+      "dimension": "values",
+      "text": "If you could ask a future manager one question about fairness, which would it be?",
+      "translations": {"zh-CN":{"text":"如果能问未来的主管一个关于公平的问题，你会问什么？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-val-14-1","label":"How do people get access to training and opportunities?","translations":{"zh-CN":{"label":"员工如何获得培训和机会？"}},"weights":{}},
+        {"id":"bank-val-14-2","label":"How is pay or progression decided?","translations":{"zh-CN":{"label":"薪酬和晋升是怎么决定的？"}},"weights":{}},
+        {"id":"bank-val-14-3","label":"What happens when someone raises a concern?","translations":{"zh-CN":{"label":"有人提出疑虑时会怎样处理？"}},"weights":{}},
+        {"id":"bank-val-14-4","label":"How are recurring difficult tasks shared?","translations":{"zh-CN":{"label":"经常出现的棘手任务是如何分担的？"}},"weights":{}},
+        {"id":"bank-val-14-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-val-15",
+      "category": "values",
+      "dimension": "values",
+      "text": "Which form of contribution would you most want a role to make room for?",
+      "translations": {"zh-CN":{"text":"你最希望一个岗位能让你作出哪种贡献？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-val-15-1","label":"Build something others can use for a long time","translations":{"zh-CN":{"label":"做出别人能长期使用的成果"}},"weights":{}},
+        {"id":"bank-val-15-2","label":"Offer direct support when someone needs it","translations":{"zh-CN":{"label":"在别人需要时提供直接支持"}},"weights":{}},
+        {"id":"bank-val-15-3","label":"Preserve knowledge that might otherwise be lost","translations":{"zh-CN":{"label":"保留原本可能失传的知识"}},"weights":{}},
+        {"id":"bank-val-15-4","label":"Improve the conditions under which other people work","translations":{"zh-CN":{"label":"改善他人的工作条件"}},"weights":{}},
+        {"id":"bank-val-15-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-wrk-01",
+      "category": "preferences",
+      "dimension": "work_preferences",
+      "text": "What sort of time horizon would you prefer for your main assignments?",
+      "translations": {"zh-CN":{"text":"你更喜欢主要任务在什么时间范围内完成？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-wrk-01-1","label":"Same-day tasks with clear feedback","translations":{"zh-CN":{"label":"当天完成，并得到明确反馈"}},"weights":{}},
+        {"id":"bank-wrk-01-2","label":"Projects that take a few weeks and have milestones","translations":{"zh-CN":{"label":"有里程碑、持续数周的项目"}},"weights":{}},
+        {"id":"bank-wrk-01-3","label":"Long assignments that develop over several months","translations":{"zh-CN":{"label":"持续数月、逐步推进的任务"}},"weights":{}},
+        {"id":"bank-wrk-01-4","label":"A mix of horizons during the same period","translations":{"zh-CN":{"label":"在同一时期内兼有不同周期的任务"}},"weights":{}},
+        {"id":"bank-wrk-01-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-wrk-02",
+      "category": "preferences",
+      "dimension": "work_preferences",
+      "text": "In a role with regular communication, which channel would you most often choose?",
+      "translations": {"zh-CN":{"text":"如果岗位需要经常沟通，你最常愿意使用哪种渠道？"}},
+      "focus": ["writing","people","presenting","visualization"],
+      "options": [
+        {"id":"bank-wrk-02-1","label":"Written messages others can revisit","translations":{"zh-CN":{"label":"别人可以反复查阅的书面信息"}},"weights":{"writing":1}},
+        {"id":"bank-wrk-02-2","label":"Short conversations when questions arise","translations":{"zh-CN":{"label":"遇到问题时进行简短对话"}},"weights":{"people":1}},
+        {"id":"bank-wrk-02-3","label":"Scheduled group discussions","translations":{"zh-CN":{"label":"按安排进行的小组讨论"}},"weights":{"presenting":1}},
+        {"id":"bank-wrk-02-4","label":"Shared visual references or demonstrations","translations":{"zh-CN":{"label":"共享图示或现场演示"}},"weights":{"visualization":1}},
+        {"id":"bank-wrk-02-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-wrk-03",
+      "category": "preferences",
+      "dimension": "work_preferences",
+      "text": "How would you prefer to receive feedback on work in progress?",
+      "translations": {"zh-CN":{"text":"你希望以哪种方式收到对进行中工作的反馈？"}},
+      "focus": ["quality","people","experimentation","autonomy"],
+      "options": [
+        {"id":"bank-wrk-03-1","label":"An annotated example with specific criteria","translations":{"zh-CN":{"label":"附有具体标准的标注示例"}},"weights":{"quality":1}},
+        {"id":"bank-wrk-03-2","label":"A conversation with time for questions","translations":{"zh-CN":{"label":"有时间提问的一场对话"}},"weights":{"people":1}},
+        {"id":"bank-wrk-03-3","label":"An early review before the approach is settled","translations":{"zh-CN":{"label":"在方案确定前进行一次早期评审"}},"weights":{"experimentation":1}},
+        {"id":"bank-wrk-03-4","label":"A review at an agreed milestone after I have tried my approach","translations":{"zh-CN":{"label":"我试过自己的方法后，再按约定的里程碑进行评审"}},"weights":{"autonomy":1}},
+        {"id":"bank-wrk-03-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-wrk-04",
+      "category": "preferences",
+      "dimension": "work_preferences",
+      "text": "Which setting would you choose most often for the work itself?",
+      "translations": {"zh-CN":{"text":"你最常愿意在什么样的环境开展工作？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-wrk-04-1","label":"A steady indoor workspace with a consistent setup","translations":{"zh-CN":{"label":"布置固定、条件稳定的室内工作空间"}},"weights":{}},
+        {"id":"bank-wrk-04-2","label":"Several sites with different conditions","translations":{"zh-CN":{"label":"在条件各异的多个地点开展工作"}},"weights":{}},
+        {"id":"bank-wrk-04-3","label":"A quiet place I can adapt to my needs","translations":{"zh-CN":{"label":"能按需求调整的安静场所"}},"weights":{}},
+        {"id":"bank-wrk-04-4","label":"A shared place where assistance is nearby","translations":{"zh-CN":{"label":"附近随时有同事可以协助的共享空间"}},"weights":{}},
+        {"id":"bank-wrk-04-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-wrk-05",
+      "category": "preferences",
+      "dimension": "work_preferences",
+      "text": "How would you prefer interruptions to be handled during work?",
+      "translations": {"zh-CN":{"text":"工作被打断时，你希望怎样处理？"}},
+      "focus": ["structure","autonomy","people"],
+      "options": [
+        {"id":"bank-wrk-05-1","label":"Set a clear system for which requests are urgent","translations":{"zh-CN":{"label":"有清晰机制区分哪些请求紧急"}},"weights":{"structure":1}},
+        {"id":"bank-wrk-05-2","label":"Protect blocks of uninterrupted work","translations":{"zh-CN":{"label":"保留不受打扰的工作时段"}},"weights":{"autonomy":1}},
+        {"id":"bank-wrk-05-3","label":"Keep some availability for live questions","translations":{"zh-CN":{"label":"留出时间即时回应提问"}},"weights":{"people":1}},
+        {"id":"bank-wrk-05-4","label":"Use a rotation so the same person is not always interrupted","translations":{"zh-CN":{"label":"轮流负责接收临时请求，避免总是打断同一个人"}},"weights":{}},
+        {"id":"bank-wrk-05-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-wrk-06",
+      "category": "preferences",
+      "dimension": "work_preferences",
+      "text": "Which handover between teammates would make you most comfortable taking over?",
+      "translations": {"zh-CN":{"text":"哪种团队交接方式最能让你安心接手？"}},
+      "focus": ["documentation","communication","hands-on","autonomy"],
+      "options": [
+        {"id":"bank-wrk-06-1","label":"A well-organized written record","translations":{"zh-CN":{"label":"条理清楚的书面记录"}},"weights":{"documentation":1}},
+        {"id":"bank-wrk-06-2","label":"A brief live walkthrough with time for questions","translations":{"zh-CN":{"label":"简短的现场说明，并留出提问时间"}},"weights":{"communication":1}},
+        {"id":"bank-wrk-06-3","label":"A chance to do the first step together","translations":{"zh-CN":{"label":"有机会一起完成第一步"}},"weights":{"hands-on":1}},
+        {"id":"bank-wrk-06-4","label":"Access to examples with room to explore on my own","translations":{"zh-CN":{"label":"能查阅示例，也有空间自行探索"}},"weights":{"autonomy":1}},
+        {"id":"bank-wrk-06-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-wrk-07",
+      "category": "preferences",
+      "dimension": "work_preferences",
+      "text": "How would you prefer work to be assigned at the start of a project?",
+      "translations": {"zh-CN":{"text":"项目开始时，你希望怎样分配工作？"}},
+      "focus": ["structure","autonomy","people","experimentation"],
+      "options": [
+        {"id":"bank-wrk-07-1","label":"A clear set of responsibilities agreed up front","translations":{"zh-CN":{"label":"事先商定各项明确职责"}},"weights":{"structure":1}},
+        {"id":"bank-wrk-07-2","label":"An outcome to own with freedom to pick the approach","translations":{"zh-CN":{"label":"负责一个成果，并能自由选择方法"}},"weights":{"autonomy":1}},
+        {"id":"bank-wrk-07-3","label":"Tasks allocated together after discussing everyone's needs","translations":{"zh-CN":{"label":"讨论各自需求后共同分配任务"}},"weights":{"people":1}},
+        {"id":"bank-wrk-07-4","label":"A short discovery phase before detailed responsibilities are set","translations":{"zh-CN":{"label":"先短时间探索，再明确细分职责"}},"weights":{"experimentation":1}},
+        {"id":"bank-wrk-07-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-wrk-08",
+      "category": "preferences",
+      "dimension": "work_preferences",
+      "text": "How much contact would you prefer with the people who use the result of your work?",
+      "translations": {"zh-CN":{"text":"你希望与使用工作成果的人保持多频繁的接触？"}},
+      "focus": ["people","research","documentation"],
+      "options": [
+        {"id":"bank-wrk-08-1","label":"Frequent contact as part of the work","translations":{"zh-CN":{"label":"把频繁接触作为工作的一部分"}},"weights":{"people":1}},
+        {"id":"bank-wrk-08-2","label":"Planned contact at key points","translations":{"zh-CN":{"label":"在关键节点安排接触"}},"weights":{"research":1}},
+        {"id":"bank-wrk-08-3","label":"Occasional feedback through notes or reports","translations":{"zh-CN":{"label":"偶尔通过笔记或报告了解反馈"}},"weights":{"documentation":1}},
+        {"id":"bank-wrk-08-4","label":"It varies with the kind of task","translations":{"zh-CN":{"label":"这取决于任务的性质"}},"weights":{}},
+        {"id":"bank-wrk-08-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-wrk-09",
+      "category": "preferences",
+      "dimension": "work_preferences",
+      "text": "What would you prefer when you need to learn a difficult new process at work?",
+      "translations": {"zh-CN":{"text":"在工作中需要学习一套较难的新流程时，你更喜欢怎样学习？"}},
+      "focus": ["people","structure","experimentation","education"],
+      "options": [
+        {"id":"bank-wrk-09-1","label":"Observe a colleague and ask questions","translations":{"zh-CN":{"label":"观察同事操作并提问"}},"weights":{"people":1}},
+        {"id":"bank-wrk-09-2","label":"Use a written sequence and practice each step","translations":{"zh-CN":{"label":"按照书面步骤逐项练习"}},"weights":{"structure":1}},
+        {"id":"bank-wrk-09-3","label":"Try it first in a low-stakes practice setting","translations":{"zh-CN":{"label":"先在风险较低的练习环境中尝试"}},"weights":{"experimentation":1}},
+        {"id":"bank-wrk-09-4","label":"Attend training with examples and feedback","translations":{"zh-CN":{"label":"参加有示例和反馈的培训"}},"weights":{"education":1}},
+        {"id":"bank-wrk-09-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-wrk-10",
+      "category": "preferences",
+      "dimension": "work_preferences",
+      "text": "In an ordinary week, how would you prefer your tasks to vary?",
+      "translations": {"zh-CN":{"text":"在寻常的一周里，你希望任务有哪些变化？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-wrk-10-1","label":"Repeat a few core tasks and improve how I do them","translations":{"zh-CN":{"label":"重复几项核心任务并改进做法"}},"weights":{}},
+        {"id":"bank-wrk-10-2","label":"Move between different tasks as new needs appear","translations":{"zh-CN":{"label":"随着新需求出现切换不同任务"}},"weights":{}},
+        {"id":"bank-wrk-10-3","label":"Choose when to alternate between familiar and new work","translations":{"zh-CN":{"label":"自己决定何时在熟悉与新工作之间切换"}},"weights":{}},
+        {"id":"bank-wrk-10-4","label":"Have stable duties and a separate block for new assignments","translations":{"zh-CN":{"label":"有稳定职责，也有单独时段处理新任务"}},"weights":{}},
+        {"id":"bank-wrk-10-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-wrk-11",
+      "category": "preferences",
+      "dimension": "work_preferences",
+      "text": "Which way of coordinating across time zones would suit you best?",
+      "translations": {"zh-CN":{"text":"哪种跨时区协作方式最适合你？"}},
+      "focus": ["writing","people","operations"],
+      "options": [
+        {"id":"bank-wrk-11-1","label":"Mostly asynchronous updates with documented decisions","translations":{"zh-CN":{"label":"主要异步更新，并记录决策"}},"weights":{"writing":1}},
+        {"id":"bank-wrk-11-2","label":"A short shared window for live conversations","translations":{"zh-CN":{"label":"安排短暂的共同在线时段交流"}},"weights":{"people":1}},
+        {"id":"bank-wrk-11-3","label":"A defined relay with clear handover points","translations":{"zh-CN":{"label":"设定交接节点明确的接力流程"}},"weights":{"operations":1}},
+        {"id":"bank-wrk-11-4","label":"A flexible arrangement based on where each task stands","translations":{"zh-CN":{"label":"按各项任务的进度灵活安排"}},"weights":{}},
+        {"id":"bank-wrk-11-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-wrk-12",
+      "category": "preferences",
+      "dimension": "work_preferences",
+      "text": "How much travel would you prefer a role to involve if other conditions were similar?",
+      "translations": {"zh-CN":{"text":"其他条件相近时，你希望岗位需要多少出差？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-wrk-12-1","label":"Little or none","translations":{"zh-CN":{"label":"很少或不需要出差"}},"weights":{}},
+        {"id":"bank-wrk-12-2","label":"Occasional trips with advance notice","translations":{"zh-CN":{"label":"提前通知，偶尔出差"}},"weights":{}},
+        {"id":"bank-wrk-12-3","label":"Regular short trips between locations","translations":{"zh-CN":{"label":"在不同地点之间定期短途出差"}},"weights":{}},
+        {"id":"bank-wrk-12-4","label":"Longer trips concentrated in certain periods","translations":{"zh-CN":{"label":"较长的出差集中在某些时段"}},"weights":{}},
+        {"id":"bank-wrk-12-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-wrk-13",
+      "category": "preferences",
+      "dimension": "work_preferences",
+      "text": "Which kind of pace is most appealing for your core work?",
+      "translations": {"zh-CN":{"text":"核心工作的哪种节奏最吸引你？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-wrk-13-1","label":"An even pace with time to plan","translations":{"zh-CN":{"label":"节奏均匀，有时间规划"}},"weights":{}},
+        {"id":"bank-wrk-13-2","label":"Short peaks around familiar deadlines","translations":{"zh-CN":{"label":"在可预期的截止时间附近有短暂高峰"}},"weights":{}},
+        {"id":"bank-wrk-13-3","label":"A variable pace as needs change","translations":{"zh-CN":{"label":"节奏随需求变化"}},"weights":{}},
+        {"id":"bank-wrk-13-4","label":"A pace I can manage within agreed delivery dates","translations":{"zh-CN":{"label":"在约定交付日期内自行调节节奏"}},"weights":{}},
+        {"id":"bank-wrk-13-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-wrk-14",
+      "category": "preferences",
+      "dimension": "work_preferences",
+      "text": "If your main tasks involve collaboration, which team arrangement would you prefer?",
+      "translations": {"zh-CN":{"text":"如果主要任务需要协作，你更喜欢哪种团队安排？"}},
+      "focus": ["people","research","structure","autonomy"],
+      "options": [
+        {"id":"bank-wrk-14-1","label":"A small team that works together regularly","translations":{"zh-CN":{"label":"经常一起工作的小团队"}},"weights":{"people":1}},
+        {"id":"bank-wrk-14-2","label":"Different specialists joining at different stages","translations":{"zh-CN":{"label":"不同阶段由不同专家参与"}},"weights":{"research":1}},
+        {"id":"bank-wrk-14-3","label":"Well-defined interfaces across several teams","translations":{"zh-CN":{"label":"多个团队之间有明确的对接方式"}},"weights":{"structure":1}},
+        {"id":"bank-wrk-14-4","label":"A main assignment I own with support when needed","translations":{"zh-CN":{"label":"独立负责一项主要任务，需要时获得支持"}},"weights":{"autonomy":1}},
+        {"id":"bank-wrk-14-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-wrk-15",
+      "category": "preferences",
+      "dimension": "work_preferences",
+      "text": "How would you like a role to handle decisions that affect your work?",
+      "translations": {"zh-CN":{"text":"对于影响你工作的决定，你希望岗位采用怎样的决策安排？"}},
+      "focus": ["autonomy","people","structure"],
+      "options": [
+        {"id":"bank-wrk-15-1","label":"I can decide within a clearly agreed scope","translations":{"zh-CN":{"label":"我能在明确约定的范围内自行决定"}},"weights":{"autonomy":1}},
+        {"id":"bank-wrk-15-2","label":"I can discuss choices early with those involved","translations":{"zh-CN":{"label":"我能尽早与相关人员讨论选择"}},"weights":{"people":1}},
+        {"id":"bank-wrk-15-3","label":"A known process tells me how input is used","translations":{"zh-CN":{"label":"有明确流程说明意见如何被采用"}},"weights":{"structure":1}},
+        {"id":"bank-wrk-15-4","label":"The level of involvement can vary with the decision","translations":{"zh-CN":{"label":"参与程度可以因决定而异"}},"weights":{}},
+        {"id":"bank-wrk-15-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-gol-01",
+      "category": "goals",
+      "dimension": "career_goals",
+      "text": "Looking ahead one year, which change would make you feel that your career exploration had moved forward?",
+      "translations": {"zh-CN":{"text":"展望一年后，哪种变化会让你觉得职业探索有了进展？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-gol-01-1","label":"I have narrowed down the kinds of work I want to try","translations":{"zh-CN":{"label":"缩小了想尝试的工作范围"}},"weights":{}},
+        {"id":"bank-gol-01-2","label":"I have found a realistic way to enter a field","translations":{"zh-CN":{"label":"找到进入某个领域的可行路径"}},"weights":{}},
+        {"id":"bank-gol-01-3","label":"I know more about the conditions that help me thrive","translations":{"zh-CN":{"label":"更清楚哪些工作条件有利于自己发挥"}},"weights":{}},
+        {"id":"bank-gol-01-4","label":"I have tested assumptions about an option I was considering","translations":{"zh-CN":{"label":"检验了自己对某个职业选项的设想"}},"weights":{}},
+        {"id":"bank-gol-01-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-gol-02",
+      "category": "goals",
+      "dimension": "career_goals",
+      "text": "Which direction would you most like your next role to make possible?",
+      "translations": {"zh-CN":{"text":"你最希望下一份工作为你打开哪个方向？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-gol-02-1","label":"Deepen an existing area of practice","translations":{"zh-CN":{"label":"深化已有的实践方向"}},"weights":{}},
+        {"id":"bank-gol-02-2","label":"Combine two areas I care about","translations":{"zh-CN":{"label":"结合我关心的两个领域"}},"weights":{}},
+        {"id":"bank-gol-02-3","label":"Move into a different domain while keeping transferable experience","translations":{"zh-CN":{"label":"进入不同领域，同时继续利用可迁移的经验"}},"weights":{}},
+        {"id":"bank-gol-02-4","label":"Try different kinds of responsibilities before narrowing down","translations":{"zh-CN":{"label":"先尝试不同职责，再缩小选择范围"}},"weights":{}},
+        {"id":"bank-gol-02-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-gol-03",
+      "category": "goals",
+      "dimension": "career_goals",
+      "text": "What kind of evidence would help you decide whether to pursue a field?",
+      "translations": {"zh-CN":{"text":"哪种信息能帮助你判断是否进入某个领域？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-gol-03-1","label":"A realistic description of several ordinary workdays","translations":{"zh-CN":{"label":"对几天日常工作的真实描述"}},"weights":{}},
+        {"id":"bank-gol-03-2","label":"A clear account of entry routes and learning commitments","translations":{"zh-CN":{"label":"对入行路径和学习投入的清晰说明"}},"weights":{}},
+        {"id":"bank-gol-03-3","label":"Different people's accounts of why they stayed or left","translations":{"zh-CN":{"label":"不同的人为何留下或离开的亲身讲述"}},"weights":{}},
+        {"id":"bank-gol-03-4","label":"A short opportunity to observe or participate","translations":{"zh-CN":{"label":"一次短时间观察或参与的机会"}},"weights":{}},
+        {"id":"bank-gol-03-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-gol-04",
+      "category": "goals",
+      "dimension": "career_goals",
+      "text": "Which next step would feel proportionate if you were considering a costly qualification?",
+      "translations": {"zh-CN":{"text":"如果你在考虑一项费用较高的资格培训，怎样的下一步最合适？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-gol-04-1","label":"Compare what different routes actually qualify me to do","translations":{"zh-CN":{"label":"比较不同路径实际能让我具备哪些从业资格"}},"weights":{}},
+        {"id":"bank-gol-04-2","label":"Try a small introductory learning activity first","translations":{"zh-CN":{"label":"先尝试一项短小的入门学习活动"}},"weights":{}},
+        {"id":"bank-gol-04-3","label":"Talk to people who completed it and people who chose another route","translations":{"zh-CN":{"label":"与完成培训的人和选择其他路径的人交流"}},"weights":{}},
+        {"id":"bank-gol-04-4","label":"Work out how the schedule and cost fit my obligations","translations":{"zh-CN":{"label":"算清时间和费用是否与自己的其他责任相容"}},"weights":{}},
+        {"id":"bank-gol-04-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-gol-05",
+      "category": "goals",
+      "dimension": "career_goals",
+      "text": "What would you most want to learn from a short job-shadowing visit?",
+      "translations": {"zh-CN":{"text":"短时间的岗位跟访中，你最想了解什么？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-gol-05-1","label":"How time is divided across routine and unusual tasks","translations":{"zh-CN":{"label":"日常任务和非例行任务各占多少时间"}},"weights":{}},
+        {"id":"bank-gol-05-2","label":"How experienced workers learn and receive feedback","translations":{"zh-CN":{"label":"有经验的从业者如何学习和获得反馈"}},"weights":{}},
+        {"id":"bank-gol-05-3","label":"How different specialists interact in the same workplace","translations":{"zh-CN":{"label":"不同专业人员如何在同一工作场所协作"}},"weights":{}},
+        {"id":"bank-gol-05-4","label":"What surprises people who are new to the role","translations":{"zh-CN":{"label":"哪些方面常让新入行的人感到意外"}},"weights":{}},
+        {"id":"bank-gol-05-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-gol-06",
+      "category": "goals",
+      "dimension": "career_goals",
+      "text": "If your long-term direction were open, what would you prefer to build first?",
+      "translations": {"zh-CN":{"text":"如果长期方向还未确定，你会优先积累什么？"}},
+      "focus": ["education","hands-on","people","autonomy"],
+      "options": [
+        {"id":"bank-gol-06-1","label":"A foundation that opens several learning routes","translations":{"zh-CN":{"label":"打下能通往多种学习路径的基础"}},"weights":{"education":1}},
+        {"id":"bank-gol-06-2","label":"Practical experience that transfers across settings","translations":{"zh-CN":{"label":"积累可在不同场景使用的实践经验"}},"weights":{"hands-on":1}},
+        {"id":"bank-gol-06-3","label":"Relationships with people in different fields","translations":{"zh-CN":{"label":"认识不同领域的人并建立联系"}},"weights":{"people":1}},
+        {"id":"bank-gol-06-4","label":"Enough flexibility to try options without a large commitment","translations":{"zh-CN":{"label":"保留足够弹性，能低成本尝试不同选项"}},"weights":{"autonomy":1}},
+        {"id":"bank-gol-06-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-gol-07",
+      "category": "goals",
+      "dimension": "career_goals",
+      "text": "Which kind of growth would you actively seek after getting settled in a role?",
+      "translations": {"zh-CN":{"text":"在岗位上站稳脚跟后，你会主动追求哪种成长？"}},
+      "focus": ["research","people","organization","creativity"],
+      "options": [
+        {"id":"bank-gol-07-1","label":"Deeper expertise in a particular subject or problem","translations":{"zh-CN":{"label":"更深入地掌握某个主题或问题"}},"weights":{"research":1}},
+        {"id":"bank-gol-07-2","label":"More opportunities to mentor or support colleagues","translations":{"zh-CN":{"label":"更多指导或支持同事的机会"}},"weights":{"people":1}},
+        {"id":"bank-gol-07-3","label":"Responsibility for coordinating larger pieces of work","translations":{"zh-CN":{"label":"负责协调范围更大的工作"}},"weights":{"organization":1}},
+        {"id":"bank-gol-07-4","label":"Room to try methods or projects outside the current routine","translations":{"zh-CN":{"label":"有空间尝试超出现有常规的方法或项目"}},"weights":{"creativity":1}},
+        {"id":"bank-gol-07-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-gol-08",
+      "category": "goals",
+      "dimension": "career_goals",
+      "text": "How would you prefer your first step into a different industry to be structured?",
+      "translations": {"zh-CN":{"text":"进入不同行业时，你希望第一步怎样安排？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-gol-08-1","label":"An entry role with a clear development path","translations":{"zh-CN":{"label":"选择发展路径明确的入门岗位"}},"weights":{}},
+        {"id":"bank-gol-08-2","label":"A short project to see how the work fits","translations":{"zh-CN":{"label":"通过短项目了解工作是否适合自己"}},"weights":{}},
+        {"id":"bank-gol-08-3","label":"A bridge role that uses familiar skills in a new setting","translations":{"zh-CN":{"label":"在新环境中运用熟悉技能的过渡岗位"}},"weights":{}},
+        {"id":"bank-gol-08-4","label":"Part-time study while keeping my current commitments","translations":{"zh-CN":{"label":"维持现有安排，同时参加非全日制学习"}},"weights":{}},
+        {"id":"bank-gol-08-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-gol-09",
+      "category": "goals",
+      "dimension": "career_goals",
+      "text": "If you combine interests from two fields, what would you most like the combination to achieve?",
+      "translations": {"zh-CN":{"text":"如果结合来自两个领域的兴趣，你最希望实现什么？"}},
+      "focus": ["communication","prototyping","research","operations"],
+      "options": [
+        {"id":"bank-gol-09-1","label":"Make knowledge from one field useful to people in another","translations":{"zh-CN":{"label":"让一个领域的知识对另一个领域的人有用"}},"weights":{"communication":1}},
+        {"id":"bank-gol-09-2","label":"Create a tool or service neither field would design alone","translations":{"zh-CN":{"label":"制作单一领域无法独立设计的工具或服务"}},"weights":{"prototyping":1}},
+        {"id":"bank-gol-09-3","label":"Ask a question that requires both ways of thinking","translations":{"zh-CN":{"label":"提出一个需要两种思维方式共同回答的问题"}},"weights":{"research":1}},
+        {"id":"bank-gol-09-4","label":"Improve coordination between teams that rarely work together","translations":{"zh-CN":{"label":"改善很少合作的团队之间的协调"}},"weights":{"operations":1}},
+        {"id":"bank-gol-09-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-gol-10",
+      "category": "goals",
+      "dimension": "career_goals",
+      "text": "What would make a mentor most helpful at this stage of your exploration?",
+      "translations": {"zh-CN":{"text":"在当前职业探索阶段，怎样的导师最能帮到你？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-gol-10-1","label":"They can explain what entry-level work really involves","translations":{"zh-CN":{"label":"能解释入门岗位的实际工作"}},"weights":{}},
+        {"id":"bank-gol-10-2","label":"They can suggest small ways to try out my options","translations":{"zh-CN":{"label":"能建议低成本尝试选项的方法"}},"weights":{}},
+        {"id":"bank-gol-10-3","label":"They can ask questions that help me clarify my priorities","translations":{"zh-CN":{"label":"能通过提问帮助我明确自己的优先事项"}},"weights":{}},
+        {"id":"bank-gol-10-4","label":"They know several paths and can compare them from experience","translations":{"zh-CN":{"label":"熟悉多条路径，能根据经验进行比较"}},"weights":{}},
+        {"id":"bank-gol-10-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-gol-11",
+      "category": "goals",
+      "dimension": "career_goals",
+      "text": "If a promising field is unfamiliar to you, how would you prefer to learn more?",
+      "translations": {"zh-CN":{"text":"如果一个有潜力的领域对你来说很陌生，你希望怎样进一步了解？"}},
+      "focus": ["research","people","education","hands-on"],
+      "options": [
+        {"id":"bank-gol-11-1","label":"Read recent cases and see how problems are framed","translations":{"zh-CN":{"label":"阅读近期案例，了解从业者如何界定问题"}},"weights":{"research":1}},
+        {"id":"bank-gol-11-2","label":"Have brief conversations with people in different roles","translations":{"zh-CN":{"label":"与担任不同角色的人简短交流"}},"weights":{"people":1}},
+        {"id":"bank-gol-11-3","label":"Take an introductory course or workshop","translations":{"zh-CN":{"label":"参加入门课程或工作坊"}},"weights":{"education":1}},
+        {"id":"bank-gol-11-4","label":"Try a small activity that resembles part of the work","translations":{"zh-CN":{"label":"尝试一个类似实际工作环节的小活动"}},"weights":{"hands-on":1}},
+        {"id":"bank-gol-11-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-gol-12",
+      "category": "goals",
+      "dimension": "career_goals",
+      "text": "Which sign would tell you it is time to reconsider a career plan?",
+      "translations": {"zh-CN":{"text":"什么迹象会让你觉得该重新审视职业计划？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-gol-12-1","label":"New information changes the cost or timing of entry","translations":{"zh-CN":{"label":"新信息改变了入行成本或所需时间"}},"weights":{}},
+        {"id":"bank-gol-12-2","label":"The work I observe differs from what drew me to it","translations":{"zh-CN":{"label":"实际观察到的工作与最初吸引我的内容不同"}},"weights":{}},
+        {"id":"bank-gol-12-3","label":"My priorities or obligations have shifted","translations":{"zh-CN":{"label":"我的优先事项或责任发生变化"}},"weights":{}},
+        {"id":"bank-gol-12-4","label":"Another route leads to the same goal with a better fit","translations":{"zh-CN":{"label":"另一条路径也能实现同一目标，而且更适合我"}},"weights":{}},
+        {"id":"bank-gol-12-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-gol-13",
+      "category": "goals",
+      "dimension": "career_goals",
+      "text": "Which time scale would you prefer for testing a new direction before making a major decision?",
+      "translations": {"zh-CN":{"text":"作出重大决定之前，你希望用多长时间了解一个新方向？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-gol-13-1","label":"A few short activities over days or weeks","translations":{"zh-CN":{"label":"几天到几周内安排几次短活动"}},"weights":{}},
+        {"id":"bank-gol-13-2","label":"A bounded project over several months","translations":{"zh-CN":{"label":"用几个月做一个范围明确的项目"}},"weights":{}},
+        {"id":"bank-gol-13-3","label":"Repeated exposure across more than one setting","translations":{"zh-CN":{"label":"在不止一种场景中进行多次体验"}},"weights":{}},
+        {"id":"bank-gol-13-4","label":"It depends on what the decision would cost or change","translations":{"zh-CN":{"label":"这取决于决定的成本或会带来哪些变化"}},"weights":{}},
+        {"id":"bank-gol-13-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-gol-14",
+      "category": "goals",
+      "dimension": "career_goals",
+      "text": "Which kind of career flexibility would you most like to preserve?",
+      "translations": {"zh-CN":{"text":"你最希望保留哪种职业灵活性？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-gol-14-1","label":"The ability to move between industries","translations":{"zh-CN":{"label":"在不同行业之间转换的能力"}},"weights":{}},
+        {"id":"bank-gol-14-2","label":"The ability to vary hours or location when needed","translations":{"zh-CN":{"label":"必要时调整工时或工作地点的能力"}},"weights":{}},
+        {"id":"bank-gol-14-3","label":"The ability to return to study at a later stage","translations":{"zh-CN":{"label":"在后续阶段重返学习的能力"}},"weights":{}},
+        {"id":"bank-gol-14-4","label":"The ability to alternate between specialist and coordinating work","translations":{"zh-CN":{"label":"在专业工作和协调工作之间转换的能力"}},"weights":{}},
+        {"id":"bank-gol-14-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    },
+    {
+      "id": "bank-gol-15",
+      "category": "goals",
+      "dimension": "career_goals",
+      "text": "When you finish a career assessment, what would be most useful to receive?",
+      "translations": {"zh-CN":{"text":"完成职业测评后，什么样的结果对你最有用？"}},
+      "focus": [],
+      "options": [
+        {"id":"bank-gol-15-1","label":"A shortlist of different options with reasons to explore each","translations":{"zh-CN":{"label":"一份包含不同选项及各自探索理由的简短清单"}},"weights":{}},
+        {"id":"bank-gol-15-2","label":"A comparison of education, work conditions, and next steps","translations":{"zh-CN":{"label":"对教育路径、工作条件和后续步骤的比较"}},"weights":{}},
+        {"id":"bank-gol-15-3","label":"A way to see which preferences may matter across many roles","translations":{"zh-CN":{"label":"了解哪些偏好可能在许多岗位中都很重要"}},"weights":{}},
+        {"id":"bank-gol-15-4","label":"A few realistic activities I can try before deciding","translations":{"zh-CN":{"label":"几个作决定前可以尝试的实际活动"}},"weights":{}},
+        {"id":"bank-gol-15-custom","label":"Other / describe in your own words","translations":{"zh-CN":{"label":"其他／用自己的话描述"}},"weights":{},"fieldWeights":{},"allowsNote":true}
+      ]
+    }
+  ]
+}
