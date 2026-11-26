@@ -58,7 +58,7 @@ let nextSessionId = 42;
 let guestInsertError;
 const database = {
   async query(query, values = []) {
-    if (query.startsWith('SELECT id, is_guest FROM users')) return { rows: [{ id: values[0], is_guest: true }] };
+    if (query.startsWith('SELECT id, is_guest, session_version FROM users')) return { rows: [{ id: values[0], is_guest: true }] };
     if (query.startsWith('SELECT id FROM users')) return { rows: values[0] === 7 ? [{ id: 7 }] : [] };
     if (query.startsWith('INSERT INTO ai_usage_daily')) return { rows: [{ request_count: 1, request_limit: 1 }] };
     if (query.includes('FROM users WHERE id = $1')) return { rows: [{ id: values[0], is_guest: true, interests: [], skills: [] }] };

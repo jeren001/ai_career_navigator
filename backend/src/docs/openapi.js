@@ -16,6 +16,27 @@ const body = (name, examples, required = true) => ({
   content: { 'application/json': { schema: ref(name), examples } },
 });
 const example = (summary, value) => ({ summary, value });
+const accountErrors = {
+  400: 'Invalid input or expired, used, or incorrect code.',
+  401: 'Authentication or the current password is invalid.',
+  409: 'The requested email or account state conflicts with an existing record.',
+  429: 'Too many requests. Retry after the rate limit resets.',
+  503: 'The account email provider or authentication is unavailable.',
+};
+const accountOperation = (operationId, summary, schema, sample, { publicAccess = false, accepted = false } = {}) => ({
+  tags: ['Authentication'], operationId, summary,
+  security: publicAccess ? [] : requireBearer,
+  ...(schema && { requestBody: body(schema, { account: example('Account request', sample) }) }),
+  responses: {
+    ...(accepted ? { 202: response('Request accepted.', ref('EmailCodeAccepted')) }
+      : { 204: { description: 'Request completed.' } }),
+    ...errors(accountErrors),
+  },
+});
+const photoResponse = {
+  description: 'Sanitized JPEG.',
+  content: { 'image/jpeg': { schema: { type: 'string', format: 'binary' } } },
+};
 
 const demoId = '3c2243f4-289a-4fa2-8299-23dd7d06d076';
 const demoCredentials = { email: 'career.demo@example.test', password: 'example-password-123' };
@@ -209,7 +230,7 @@ export const openapi = {
   },
   servers: [{ url: '/', description: 'Current backend' }],
   tags: [
-    { name: 'Health' }, { name: 'Authentication' }, { name: 'Profile' },
+    { name: 'Health' }, { name: 'Authentication' }, { name: 'Profile' }, { name: 'Settings' },
     { name: 'Careers' }, { name: 'Career Match' }, { name: 'My Roadmap' }, { name: 'My Skills' }, { name: 'Practical Challenges' }, { name: 'Learning Hub' },
     { name: 'Interview Simulator' }, { name: 'My Resume' }, { name: 'Assessment' }, { name: 'Quiz aliases' },
   ],
@@ -231,11 +252,85 @@ export const openapi = {
       tags: ['Authentication'], operationId: 'register', summary: 'Register or promote a guest',
       description: 'Authorize with your guest token to retain that guest’s assessments when registering. Replace the guest token with the account token from the response.',
       security: optionalBearer,
-      requestBody: body('Registration', { account: example('Register with email', { ...demoCredentials, display_name: 'Career Demo' }) }),
+      requestBody: body('Registration', { account: example('Register with email', { ...demoCredentials, display_name: 'Career Demo', username: 'career.demo', preferred_language: 'en' }) }),
       responses: {
         201: response('Account registered.', ref('AuthResponse')),
-        ...errors({ 400: 'Invalid registration details.', 401: 'Invalid bearer token.', 409: 'Account conflict or guest no longer available.', 503: 'Authentication signing is unavailable.' }),
+        ...errors({ 400: 'Invalid registration details.', 401: 'Invalid bearer token.', 409: 'Email or username conflict, or guest no longer available.', 429: 'Registration rate limit reached.', 503: 'Authentication signing is unavailable.' }),
       },
+    } },
+    '/api/auth/email-verification/request': { post: accountOperation('requestEmailVerification',
+      'Send a verification code to your current email', null, null, { accepted: true }) },
+    '/api/auth/email-verification/confirm': { post: accountOperation('verifyEmail',
+      'Verify your current email with an eight-digit code', 'EmailCode', { code: '01234567' }) },
+    '/api/auth/email-change/request': { post: accountOperation('requestEmailChange',
+      'Check your current password and send a code to the new email', 'EmailChangeRequest',
+      { email: 'new@example.test', current_password: 'example-password-123' }, { accepted: true }) },
+    '/api/auth/email-change/confirm': { post: accountOperation('confirmEmailChange',
+      'Confirm the new email and invalidate existing sessions', 'EmailCode', { code: '01234567' }) },
+    '/api/auth/password-reset/request': { post: accountOperation('requestPasswordReset',
+      'Request an account recovery code', 'PasswordResetRequest', { email: 'career.demo@example.test', language: 'zh-CN' },
+      { accepted: true, publicAccess: true }) },
+    '/api/auth/password-reset/confirm': { post: accountOperation('confirmPasswordReset',
+      'Reset a password and invalidate existing sessions', 'PasswordResetConfirm',
+      { email: 'career.demo@example.test', code: '01234567', new_password: 'another-example-password' }, { publicAccess: true }) },
+    '/api/auth/password/change': { post: accountOperation('changePassword',
+      'Change your password and invalidate existing sessions', 'PasswordChange',
+      { current_password: 'example-password-123', new_password: 'another-example-password' }) },
+    '/api/auth/account': { delete: accountOperation('deleteAccount',
+      'Delete your account and linked data', 'AccountDelete',
+      { current_password: 'example-password-123', confirmation: 'DELETE' }) },
+    '/api/settings': {
+      get: {
+        tags: ['Settings'], operationId: 'getSettings', summary: 'Read account preferences', security: requireBearer,
+        responses: { 200: response('Language, privacy and notification preferences.', ref('SettingsResponse')), ...errors({ 401: 'Account token required.' }) },
+      },
+      patch: {
+        tags: ['Settings'], operationId: 'updateSettings', summary: 'Update account preferences', security: requireBearer,
+        requestBody: body('SettingsPatch', { preferences: example('Select a language and update visibility and notifications', {
+          preferred_language: 'zh-CN', privacy_settings: { about_me: 'public' }, notification_settings: { roadmap_updates: true },
+        }) }),
+        responses: { 200: response('Saved preferences.', ref('SettingsResponse')), ...errors({ 400: 'Invalid preference fields.', 401: 'Account token required.' }) },
+      },
+    },
+    '/api/notifications': { get: {
+      tags: ['Settings'], operationId: 'listNotifications', summary: 'List your in-app notifications', security: requireBearer,
+      parameters: [catalogQuery('before', 'Pass the previous response’s next_before value.', { type: 'integer', minimum: 1 })],
+      responses: { 200: response('Notifications in the account language.', ref('NotificationList')), ...errors({ 400: 'Invalid cursor.', 401: 'Account token required.' }) },
+    } },
+    '/api/notifications/{id}/read': { patch: {
+      tags: ['Settings'], operationId: 'readNotification', summary: 'Mark a notification as read', security: requireBearer,
+      parameters: [skillId],
+      responses: { 204: { description: 'Marked read.' }, ...errors({ 400: 'Invalid notification ID.', 401: 'Account token required.', 404: 'Owned notification not found.' }) },
+    } },
+    '/api/profile/photo': {
+      get: {
+        tags: ['Profile'], operationId: 'getProfilePhoto', summary: 'Get your profile photo', security: requireBearer,
+        responses: { 200: photoResponse, ...errors({ 401: 'Account token required.', 404: 'Photo not found.' }) },
+      },
+      put: {
+        tags: ['Profile'], operationId: 'putProfilePhoto', summary: 'Upload or replace your profile photo', security: requireBearer,
+        description: 'Send raw image bytes, up to 5 MiB. The server stores a resized JPEG with metadata removed.',
+        requestBody: { required: true, content: Object.fromEntries(['image/jpeg', 'image/png', 'image/webp'].map((type) =>
+          [type, { schema: { type: 'string', format: 'binary' } }])) },
+        responses: { 200: response('Photo saved.', ref('ProfilePhoto')), ...errors({
+          400: 'Empty image.', 401: 'Account token required.', 413: 'Image exceeds 5 MiB.',
+          415: 'Unsupported media type or content encoding.', 422: 'Invalid image or image exceeds processing limits.', 503: 'Photo processing unavailable.',
+        }) },
+      },
+      delete: {
+        tags: ['Profile'], operationId: 'deleteProfilePhoto', summary: 'Delete your profile photo', security: requireBearer,
+        responses: { 204: { description: 'Photo removed.' }, ...errors({ 401: 'Account token required.' }) },
+      },
+    },
+    '/api/profile/public/{username}': { get: {
+      tags: ['Profile'], operationId: 'getPublicProfile', summary: 'Read fields published by the username owner', security: [],
+      parameters: [{ ...pathId(string, 'career.demo'), name: 'username' }],
+      responses: { 200: response('Published profile fields.', ref('PublicProfile')), ...errors({ 400: 'Invalid username.', 404: 'Public profile not found.' }) },
+    } },
+    '/api/profile/public/{username}/photo': { get: {
+      tags: ['Profile'], operationId: 'getPublicProfilePhoto', summary: 'Read a published profile photo', security: [],
+      parameters: [{ ...pathId(string, 'career.demo'), name: 'username' }],
+      responses: { 200: photoResponse, ...errors({ 400: 'Invalid username.', 404: 'Public photo not found.' }) },
     } },
     '/api/auth/login': { post: {
       tags: ['Authentication'], operationId: 'login', summary: 'Sign in to a registered account',
@@ -244,7 +339,7 @@ export const openapi = {
       requestBody: body('Credentials', { account: example('Sign in with email', demoCredentials) }),
       responses: {
         200: response('Signed in.', ref('AuthResponse')),
-        ...errors({ 400: 'Invalid email or password format.', 401: 'Invalid credentials or bearer token.', 503: 'Authentication signing is unavailable.' }),
+        ...errors({ 400: 'Invalid email or password format.', 401: 'Invalid credentials or bearer token.', 429: 'Login rate limit reached.', 503: 'Authentication signing is unavailable.' }),
       },
     } },
     '/api/auth/transfer': { post: {
@@ -278,12 +373,13 @@ export const openapi = {
         tags: ['Profile'], operationId: 'updateProfile', summary: 'Update selected profile fields',
         description: 'A registered account is required. Pass null or an empty string to clear nullable text fields and an empty array to clear interests or skills.',
         security: requireBearer,
-        requestBody: body('ProfilePatch', { profile: example('Set language and interests', {
-          preferred_language: 'zh-CN', interests: ['Data visualization'], career_goals: 'Build a portfolio project.',
+        requestBody: body('ProfilePatch', { profile: example('Update personal details and interests', {
+          username: 'career.demo', first_name: '小明', last_name: '王', city: '上海',
+          preferred_language: 'zh-CN', interests: ['数据可视化'], career_goals: '完成一个作品集项目。',
         }) }),
         responses: {
           200: response('Updated profile.', ref('ProfileResponse')),
-          ...errors({ 400: 'Missing or invalid profile fields.', 401: 'Registered account bearer token required.', 404: 'User not found.', 503: 'Authentication signing is unavailable.' }),
+          ...errors({ 400: 'Missing or invalid profile fields.', 401: 'Registered account bearer token required.', 404: 'User not found.', 409: 'Username is already taken.', 503: 'Authentication signing is unavailable.' }),
         },
       },
     },

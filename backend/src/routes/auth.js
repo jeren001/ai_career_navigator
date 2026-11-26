@@ -9,7 +9,8 @@ import {
   verifyAccessToken,
   verifyPassword,
 } from '../services/auth.js';
-import { normalizeEmail, publicProfile, validatePassword } from '../services/profile.js';
+import { normalizeEmail, normalizeUsername, profileColumns, publicProfile, validatePassword, validateProfileUpdate } from '../services/profile.js';
+import { limitAccountRequest } from '../services/account-security.js';
 
 function requestError(message, status = 400) {
   const error = new Error(message);
@@ -19,7 +20,7 @@ function requestError(message, status = 400) {
 
 function displayName(value) {
   if (value === undefined || value === null || value === '') return null;
-  if (typeof value !== 'string' || value.trim().length > 120) throw requestError('display_name must be a string with at most 120 characters');
+  if (typeof value !== 'string' || value.includes('\0') || value.trim().length > 120) throw requestError('display_name must be a string with at most 120 characters');
   return value.trim() || null;
 }
 
@@ -58,7 +59,11 @@ export default function createAuthRouter(database) {
       const email = normalizeEmail(request.body?.email);
       const password = validatePassword(request.body?.password);
       const name = displayName(request.body?.display_name);
+      const username = normalizeUsername(request.body?.username);
+      const language = request.body?.preferred_language === undefined ? null
+        : validateProfileUpdate({ preferred_language: request.body.preferred_language }).preferred_language;
       assertAuthConfigured();
+      await limitAccountRequest(database, 'register', request.ip, 15, 3600);
       const passwordHash = await hashPassword(password);
       client = await database.connect();
       await client.query('BEGIN');
@@ -67,32 +72,20 @@ export default function createAuthRouter(database) {
       if (request.auth?.isGuest) {
         result = await client.query(
           `UPDATE users
-           SET email = $2, password_hash = $3, display_name = COALESCE($4, display_name), is_guest = FALSE
+           SET email = $2, password_hash = $3, display_name = COALESCE($4, display_name),
+               username = $5, preferred_language = COALESCE($6, preferred_language), is_guest = FALSE
            WHERE id = $1 AND is_guest = TRUE
-           RETURNING id, email, display_name, is_guest, created_at`,
-          [request.auth.userId, email, passwordHash, name],
+           RETURNING ${profileColumns}, session_version`,
+          [request.auth.userId, email, passwordHash, name, username, language],
         );
         if (result.rows.length === 0) throw requestError('Guest account is no longer available', 409);
       } else {
-        const legacyUser = await client.query(
-          `SELECT id FROM users
-           WHERE lower(btrim(email)) = $1 AND is_guest = TRUE AND password_hash IS NULL
-           FOR UPDATE`,
-          [email],
+        result = await client.query(
+          `INSERT INTO users (email, password_hash, display_name, is_guest, username, preferred_language)
+           VALUES ($1, $2, $3, FALSE, $4, COALESCE($5, 'en'))
+           RETURNING ${profileColumns}, session_version`,
+          [email, passwordHash, name, username, language],
         );
-        result = legacyUser.rows.length
-          ? await client.query(
-            `UPDATE users SET password_hash = $2, display_name = COALESCE($3, display_name), is_guest = FALSE
-             WHERE id = $1
-             RETURNING id, email, display_name, is_guest, created_at`,
-            [legacyUser.rows[0].id, passwordHash, name],
-          )
-          : await client.query(
-            `INSERT INTO users (email, password_hash, display_name, is_guest)
-             VALUES ($1, $2, $3, FALSE)
-             RETURNING id, email, display_name, is_guest, created_at`,
-            [email, passwordHash, name],
-          );
       }
 
       await client.query('COMMIT');
@@ -102,7 +95,8 @@ export default function createAuthRouter(database) {
       if (client) await client.query('ROLLBACK').catch(() => {});
       if (error.code === '23505') {
         error.status = 409;
-        error.message = 'An account with this email already exists';
+        error.message = error.constraint === 'users_username_unique_idx'
+          ? 'Username is already taken' : 'An account with this email already exists';
       }
       return next(error);
     } finally {
@@ -115,8 +109,10 @@ export default function createAuthRouter(database) {
       const email = normalizeEmail(request.body?.email);
       const password = validatePassword(request.body?.password);
       assertAuthConfigured();
+      await limitAccountRequest(database, 'login-ip', request.ip, 30, 900);
+      await limitAccountRequest(database, 'login-email', email, 15, 900);
       const result = await database.query(
-        `SELECT id, email, display_name, is_guest, password_hash, created_at
+        `SELECT ${profileColumns}, password_hash, session_version
          FROM users WHERE lower(btrim(email)) = $1 AND is_guest = FALSE`,
         [email],
       );
@@ -157,8 +153,7 @@ export default function createAuthRouter(database) {
   router.get('/me', requireAnyIdentity, async (request, response, next) => {
     try {
       const result = await database.query(
-        `SELECT id, email, display_name, country, preferred_language, age_group, education,
-                work_experience, interests, skills, career_goals, is_guest, created_at
+        `SELECT ${profileColumns}
          FROM users WHERE id = $1`,
         [request.auth.userId],
       );

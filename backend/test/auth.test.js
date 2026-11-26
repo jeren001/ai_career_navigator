@@ -28,7 +28,8 @@ function publicUser(user) {
 
 const database = {
   async query(query, values = []) {
-    if (query.startsWith('SELECT id, is_guest FROM users')) {
+    if (query.startsWith('INSERT INTO account_request_limits')) return { rowCount: 1 };
+    if (query.startsWith('SELECT id, is_guest, session_version FROM users')) {
       const user = users.find(({ id }) => id === values[0]);
       return { rows: user ? [{ id: user.id, is_guest: user.is_guest }] : [] };
     }
@@ -70,6 +71,9 @@ const database = {
           return { rows: user ? [{ id: user.id }] : [] };
         }
         if (query.startsWith('INSERT INTO users')) {
+          if (users.some(({ email }) => email === values[0])) {
+            throw Object.assign(new Error('duplicate email'), { code: '23505', constraint: 'users_email_unique_idx' });
+          }
           const user = { id: nextUserId++, email: values[0], password_hash: values[1], display_name: values[2], is_guest: false };
           users.push(user);
           return { rows: [user] };
@@ -195,7 +199,7 @@ test('registered users can transfer completed guest assessments', async () => {
   assert.equal(assessments.at(-1).user_id, account.user.id);
 });
 
-test('registration activates a legacy email row without dropping its assessment history', async () => {
+test('registration cannot claim a passwordless legacy email row without mailbox verification', async () => {
   const legacy = { id: nextUserId++, email: 'legacy@example.com', display_name: 'Legacy', is_guest: true };
   users.push(legacy);
   assessments.push({ user_id: legacy.id, id: 30 });
@@ -207,8 +211,8 @@ test('registration activates a legacy email row without dropping its assessment 
   });
   const result = await response.json();
 
-  assert.equal(response.status, 201);
-  assert.equal(result.user.id, legacy.id);
-  assert.equal(result.user.is_guest, false);
+  assert.equal(response.status, 409);
+  assert.equal(result.access_token, undefined);
+  assert.equal(legacy.is_guest, true);
   assert.equal(assessments.at(-1).user_id, legacy.id);
 });
