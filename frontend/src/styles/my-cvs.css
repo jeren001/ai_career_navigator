@@ -1,0 +1,242 @@
+.my-cvs-page,
+.my-cvs-header {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.my-cvs-heading,
+.cv-card-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.my-cvs-heading h1,
+.my-cvs-heading p,
+.my-cvs-results,
+.cv-card-meta p {
+  margin: 0;
+}
+
+.my-cvs-heading p,
+.my-cvs-results {
+  color: #385781;
+  font-size: 14px;
+}
+
+.my-cvs-statistics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.my-cvs-statistics > div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: clamp(8px, 2vw, 16px);
+  color: #071b60;
+  background: #f0f8ff;
+  border: 1px solid #dce7f4;
+  border-radius: 12px;
+}
+
+.my-cvs-statistics dt {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.my-cvs-statistics dd {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.my-cvs-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: 12px;
+}
+
+.my-cvs-search {
+  position: relative;
+  min-width: 0;
+}
+
+.my-cvs-search svg {
+  position: absolute;
+  inset-inline-start: 10px;
+  top: 50%;
+  color: #2987f5;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.my-cvs-search input {
+  padding-inline-start: 34px;
+}
+
+.my-cvs-controls [aria-pressed="true"] {
+  background: #d9f1ff;
+  border-color: #2987f5;
+}
+
+.my-cvs-list {
+  display: grid;
+  gap: 12px;
+}
+
+.my-cvs-list .cv-card {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr) minmax(100px, auto) auto;
+  align-items: center;
+}
+
+.my-cvs-list .cv-card-preview {
+  height: 92px;
+}
+
+.my-cvs-list .cv-card-actions {
+  border: 0;
+  padding-top: 0;
+}
+
+.cv-card-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  color: #071b60;
+  background: #d9f1ff;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cv-card-status[data-draft="true"] {
+  background: #fff0b1;
+}
+
+.cv-card-title {
+  overflow-wrap: anywhere;
+}
+
+.cv-card-menu {
+  position: relative;
+}
+
+.cv-card-menu summary {
+  list-style: none;
+}
+
+.cv-card-menu summary:focus-visible {
+  outline: 2px solid #2987f5;
+  outline-offset: 2px;
+}
+
+.cv-card-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.cv-card-menu-content {
+  position: absolute;
+  z-index: 3;
+  inset-inline-end: 0;
+  top: calc(100% + 4px);
+  display: grid;
+  width: min(205px, 72vw);
+  padding: 4px;
+  color: #071b60;
+  background: #fff;
+  border: 1px solid #dce7f4;
+  border-radius: 10px;
+  box-shadow: 0 5px 18px rgb(7 27 96 / 15%);
+}
+
+.cv-card-menu-content button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  text-align: start;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.cv-card-menu-content button:hover,
+.cv-card-menu-content button:focus-visible {
+  background: #d9f1ff;
+}
+
+.cv-thumbnail-sheet {
+  position: relative;
+  overflow: hidden;
+}
+
+.cv-thumbnail-document {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
+
+.cv-card-thumbnail .cv-document-photo {
+  width: min(72px, 40%);
+  height: auto;
+  object-fit: cover;
+}
+
+.cv-viewer-dialog {
+  width: min(1000px, calc(100% - 24px));
+}
+
+.cv-viewer-dialog .my-cvs-heading {
+  margin-bottom: 12px;
+}
+
+.cv-pdf-dialog button[data-destructive="true"] {
+  color: #8f1c1c;
+  background: #ffebeb;
+}
+
+@media (max-width: 1100px) {
+  .my-cvs-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .my-cvs-list .cv-card {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
+
+  .my-cvs-list .cv-card-preview {
+    grid-row: span 2;
+    height: 88px;
+  }
+
+  .my-cvs-list .cv-card-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 420px) {
+  .my-cvs-controls > :first-child,
+  .my-cvs-controls > :last-child {
+    grid-column: 1 / -1;
+  }
+
+  .cv-card-actions {
+    flex-wrap: wrap;
+  }
+
+  .cv-viewer-dialog {
+    padding: 12px;
+  }
+}

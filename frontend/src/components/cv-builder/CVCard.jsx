@@ -1,136 +1,41 @@
-// ==========================================
-// PROJECT: AI CAREER
-// COMPONENT: CV Card
-// PURPOSE: Display an individual saved CV
-// ==========================================
+import { Download, FileType, Pencil } from 'lucide-react'
+import CVThumbnail from './my-cvs/CVThumbnail'
+import CVActionsMenu from './my-cvs/CVActionsMenu'
 
-// Import icons
-import {
-  FileText,
-  Pencil,
-  Download,
-  MoreVertical
-} from 'lucide-react'
-
-
-function CVCard({
-  cv,
-  onEdit,
-  onDownload,
-  onOpenMenu
-}) {
-
-  // ==========================================
-  // 01. FORMAT LAST UPDATED DATE
-  // ==========================================
-
-  const formattedDate = cv.updatedAt
-    ? new Date(cv.updatedAt).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
-      })
-    : 'Not available'
-
-
-  // ==========================================
-  // 02. CARD LAYOUT
-  // ==========================================
+export default function CVCard({ cv, onEdit, onDownload, onAction }) {
+  const date = new Date(cv.updatedAt ?? cv.createdAt)
+  const formattedDate = Number.isNaN(date.getTime()) ? 'Not available' : date.toLocaleDateString(undefined, {
+    month: 'short', day: 'numeric', year: 'numeric'
+  })
+  const draft = cv.status === 'draft'
 
   return (
     <article className="cv-card">
-
-      {/* CV PREVIEW */}
-
-      <div className="cv-card-preview">
-
-        {cv.previewUrl ? (
-
-          <img
-            src={cv.previewUrl}
-            alt={`${cv.title} preview`}
-            loading="lazy"
-          />
-
-        ) : (
-
-          <FileText
-            size={64}
-            strokeWidth={1.2}
-            aria-hidden="true"
-          />
-
-        )}
-
-      </div>
-
-
-      {/* CV INFORMATION */}
-
+      <CVThumbnail cv={cv} />
       <div className="cv-card-information">
-
         <div className="cv-card-details">
-
-          <h3 className="cv-card-title">
-            {cv.title}
-          </h3>
-
-          <p className="cv-card-template">
-            {cv.template}{cv.status === 'draft' && ' · Draft'}
-          </p>
-
+          <h3 className="cv-card-title" dir="auto">{cv.title || 'Untitled CV'}</h3>
+          <p className="cv-card-template">{cv.template || 'Template unavailable'}</p>
         </div>
-
-
-        {/* MORE OPTIONS */}
-
-        <button
-          type="button"
-          className="cv-card-menu-button"
-          onClick={() => onOpenMenu(cv.id)}
-          aria-label={`More options for ${cv.title}`}
-          title="More options"
-        >
-          <MoreVertical size={20} />
-        </button>
-
+        <CVActionsMenu cv={cv} onAction={onAction} />
       </div>
-
-
-      {/* LAST UPDATED DATE */}
-
-      <p className="cv-card-date">
-        Edited {formattedDate}
-      </p>
-
-
-      {/* CARD ACTIONS */}
-
+      <div className="cv-card-meta">
+        <span className="cv-card-status" data-draft={draft}>{draft ? 'Draft' : 'Completed'}</span>
+        <p className="cv-card-date">Edited {formattedDate}</p>
+      </div>
       <div className="cv-card-actions">
-
-        <button
-          type="button"
-          className="cv-card-edit-button"
-          onClick={() => onEdit(cv.id)}
-        >
-          <Pencil size={17} />
-          <span>{cv.status === 'draft' ? 'Resume draft' : 'Edit'}</span>
+        <button type="button" className="cv-card-edit-button" onClick={() => onEdit(cv.id)}>
+          <Pencil size={17} aria-hidden="true" /> {draft ? 'Resume draft' : 'Edit'}
         </button>
-
-        <button
-          type="button"
-          className="cv-card-download-button"
-          onClick={() => onDownload(cv.id)}
-          aria-label={`Download ${cv.title} as PDF`}
-          title="Download PDF"
-        >
-          <Download size={20} />
+        <button type="button" className="cv-card-download-button" onClick={() => onDownload(cv.id, 'pdf')}
+          aria-label={`Download ${cv.title} as PDF`} title="Download PDF">
+          <Download size={20} aria-hidden="true" />
         </button>
-
+        <button type="button" className="cv-card-download-button" onClick={() => onDownload(cv.id, 'docx')}
+          aria-label={`Download ${cv.title} as DOCX`} title="Download DOCX">
+          <FileType size={20} aria-hidden="true" />
+        </button>
       </div>
-
     </article>
   )
 }
-
-export default CVCard

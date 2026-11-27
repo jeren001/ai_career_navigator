@@ -202,7 +202,7 @@
 }
 
 .cv-step-item.completed .cv-step-label {
-  color: #2987f5;
+  color: #1c65af;
 }
 
 .cv-step-connector {
@@ -931,6 +931,9 @@
 
 .create-cv-page button:focus-visible,
 .create-cv-page a:focus-visible,
+.create-cv-page input:focus-visible,
+.create-cv-page select:focus-visible,
+.create-cv-page textarea:focus-visible,
 .cv-checkbox-label input:focus-visible {
   outline: 3px solid #2987f5;
   outline-offset: 3px;

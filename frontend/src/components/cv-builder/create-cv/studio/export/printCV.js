@@ -1,14 +1,8 @@
 import documentStyles from '../preview/cv-document.css?inline'
 
-export function pdfFilename(value) {
-  const name = value.trim().replace(/\.pdf$/i, '')
-    .replace(/[<>:"/\\|?*\u0000-\u001f\u007f]/g, '-')
-    .replace(/^[. ]+|[. ]+$/g, '')
-  const safeName = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(name)
-    ? `_${name}`
-    : name
-  return safeName ? `${safeName}.pdf` : ''
-}
+import { exportFilename } from './exportFilename'
+
+export const pdfFilename = value => exportFilename(value, 'pdf')
 
 function printStyles(width, height) {
   return `

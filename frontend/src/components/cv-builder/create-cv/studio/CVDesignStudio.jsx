@@ -28,12 +28,13 @@ const panels = {
   }
 }
 
-export default function CVDesignStudio({ cvData, exportTitle, onChange, onDesignChange, onDataChange, validateStep, onSectionEditingChange, sectionEditing }) {
+export default function CVDesignStudio({ cvData, exportTitle, onChange, onDesignChange, onDataChange, validateStep, onSectionEditingChange, sectionEditing, onPhotoPendingChange, photoPending }) {
   const [activePanel, setActivePanel] = useState('templates')
 
   function changePanel(panelId) {
     if (panelId === activePanel) return
     if (sectionEditing && !window.confirm('Discard the unconfirmed section edit?')) return
+    if (photoPending && !window.confirm('Leave before the photo finishes loading?')) return
     setActivePanel(panelId)
   }
 
@@ -67,7 +68,7 @@ export default function CVDesignStudio({ cvData, exportTitle, onChange, onDesign
             <TemplateSelection selectedTemplate={cvData.template} onChange={onChange} />
           )}
           {activePanel === 'design' && (
-            <DesignPanel template={template} overrides={cvData.design} onChange={onDesignChange} />
+            <DesignPanel template={template} overrides={cvData.design} onChange={onDesignChange} onPhotoPendingChange={onPhotoPendingChange} />
           )}
           {activePanel === 'sections' && (
             <SectionsPanel cvData={cvData} template={template} onChange={onDataChange} validateStep={validateStep} onEditingChange={onSectionEditingChange} />

@@ -1,19 +1,9 @@
-import { getCountryCallingCode, isSupportedCountry } from 'react-phone-number-input'
-import { formatDocumentAddress, formatDocumentPhone } from '../international/localizationUtils'
+import { getDocumentContacts } from './documentContent'
 import { CVText } from './CVSection'
 
 export default function CVPersonalInformation({ information, photo, title, localization }) {
-  const { fullName, jobTitle, careerLevel, email, phone, phoneCountry, location } = information
-
-  // The phone input can contain just a dial prefix before the user enters a number.
-  const prefix = phoneCountry && isSupportedCountry(phoneCountry)
-    ? `+${getCountryCallingCode(phoneCountry)}`
-    : ''
-  const contacts = {
-    email,
-    phone: phone === prefix ? '' : formatDocumentPhone(phone, localization.phoneFormat),
-    location: formatDocumentAddress(location, localization.addressFormat)
-  }
+  const { fullName, jobTitle, careerLevel } = information
+  const contacts = getDocumentContacts(information, localization)
 
   return (
     <header className="cv-document-header">

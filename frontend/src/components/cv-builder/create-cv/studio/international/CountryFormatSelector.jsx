@@ -1,10 +1,9 @@
-import { internationalFormatCatalog, internationalRegions } from '../templates/internationalFormatCatalog'
+import { getInternationalTargetId, internationalFormatCatalog, internationalRegions } from '../templates/internationalFormatCatalog'
 
 const countryNames = new Intl.DisplayNames(['en'], { type: 'region' })
-export const targetId = ({ internationalFormat }) => internationalFormat.countryCode ?? internationalFormat.formatCode
 
 export default function CountryFormatSelector({ value, onChange }) {
-  const supported = internationalFormatCatalog.some(template => targetId(template) === value)
+  const supported = internationalFormatCatalog.some(template => getInternationalTargetId(template) === value)
   return (
     <label className="cv-gallery-field">
       <span>Target country or region</span>
@@ -14,7 +13,7 @@ export default function CountryFormatSelector({ value, onChange }) {
         {internationalRegions.map(region => (
           <optgroup label={region} key={region}>
             {internationalFormatCatalog.filter(template => template.internationalFormat.region === region).map(template => {
-              const id = targetId(template)
+              const id = getInternationalTargetId(template)
               return <option key={id} value={id}>{id === 'europass' ? 'Europass (regional format)' : countryNames.of(id)}</option>
             })}
           </optgroup>

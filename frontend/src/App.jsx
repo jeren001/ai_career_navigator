@@ -16,23 +16,28 @@ import Dashboard from './pages/Dashboard'
 import About from './pages/About'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
-import MyProfile from './pages/MyProfile'
 import Settings from './pages/Settings'
 
 import AIAssistant from './pages/AIAssistant'
 
-import CVBuilder from './pages/CVBuilder'
-
 const router = createBrowserRouter([
   { path: '/', element: <Home /> },
   { path: '/dashboard', element: <Dashboard /> },
-  { path: '/profile', element: <MyProfile /> },
+  {
+    path: '/profile',
+    lazy: async () => ({ Component: (await import('./pages/MyProfile')).default }),
+    hydrateFallbackElement: <p role="status">Loading profile…</p>
+  },
   { path: '/about', element: <About /> },
   { path: '/signin', element: <SignIn /> },
   { path: '/signup', element: <SignUp /> },
   { path: '/settings', element: <Settings /> },
   { path: '/ai-assistant', element: <AIAssistant /> },
-  { path: '/resume', element: <CVBuilder /> },
+  {
+    path: '/resume',
+    lazy: async () => ({ Component: (await import('./pages/CVBuilder')).default }),
+    hydrateFallbackElement: <p role="status">Loading CV Builder…</p>
+  },
   { path: '*', element: null }
 ])
 

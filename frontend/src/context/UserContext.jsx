@@ -5,7 +5,8 @@
 // ==========================================
 
 // Import React tools
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
+import { clearCVWorkspace, getCVWorkspace, workspaceRevocationPrefix } from '../services/cvWorkspace'
 
 
 // 01. CREATE USER CONTEXT
@@ -41,7 +42,20 @@ const initialProfile = {
 
 export function UserProvider({ children }) {
 
+  const [cvWorkspace, setCVWorkspace] = useState(getCVWorkspace)
   const [profile, setProfile] = useState(initialProfile)
+
+  useEffect(() => {
+    function handleWorkspaceRevocation(event) {
+      if (cvWorkspace && event.key === workspaceRevocationPrefix + cvWorkspace && event.newValue) {
+        setProfile({ ...initialProfile })
+        setCVWorkspace(getCVWorkspace())
+      }
+    }
+
+    window.addEventListener('storage', handleWorkspaceRevocation)
+    return () => window.removeEventListener('storage', handleWorkspaceRevocation)
+  }, [cvWorkspace])
 
 
   // Update multiple profile fields
@@ -71,6 +85,8 @@ export function UserProvider({ children }) {
   // Reset user profile
 
   function resetProfile() {
+    clearCVWorkspace()
+    setCVWorkspace(getCVWorkspace())
 
     setProfile({ ...initialProfile })
 
@@ -84,6 +100,7 @@ export function UserProvider({ children }) {
     <UserContext.Provider
       value={{
         profile,
+        cvWorkspace,
         setProfile,
         updateProfile,
         updateProfilePhoto,

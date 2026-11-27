@@ -132,12 +132,7 @@ function WorkExperience({
 
           <h3>No work experience added</h3>
 
-          <p>
-            <p>
-  Don't have professional experience yet?
-  You can skip this step and continue building your CV.
-</p>
-          </p>
+          <p>Don’t have professional experience yet? You can skip this step.</p>
 
         </div>
 

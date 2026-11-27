@@ -17,7 +17,7 @@ function RecentCVs({
   onViewAll,
   onEdit,
   onDownload,
-  onOpenMenu
+  onAction
 }) {
 
   // ==========================================
@@ -86,7 +86,7 @@ function RecentCVs({
               cv={cv}
               onEdit={onEdit}
               onDownload={onDownload}
-              onOpenMenu={onOpenMenu}
+              onAction={onAction}
             />
 
           ))}

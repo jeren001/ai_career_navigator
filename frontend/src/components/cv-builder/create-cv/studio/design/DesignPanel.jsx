@@ -6,7 +6,7 @@ import PhotoSettings from './PhotoSettings'
 import TypographySettings from './TypographySettings'
 import { resolveDesign } from './designDefaults'
 
-export default function DesignPanel({ template, overrides = {}, onChange }) {
+export default function DesignPanel({ template, overrides = {}, onChange, onPhotoPendingChange }) {
   const [resetCount, setResetCount] = useState(0)
   const design = resolveDesign(template, overrides)
 
@@ -25,7 +25,7 @@ export default function DesignPanel({ template, overrides = {}, onChange }) {
       <TypographySettings design={design} onChange={update} />
       <PageSettings design={design} onChange={update} />
       <LayoutSettings template={template} columns={design.columns} requestedColumns={overrides.columns} onChange={columns => update({ columns })} />
-      <PhotoSettings key={resetCount + '-photo'} photo={overrides.photo} showPhoto={overrides.showPhoto} onChange={update} />
+      <PhotoSettings key={resetCount + '-photo'} photo={overrides.photo} showPhoto={overrides.showPhoto} onChange={update} onPendingChange={onPhotoPendingChange} />
       <button type="button" className="cv-design-action" onClick={resetDesign}>Reset Design</button>
     </div>
   )

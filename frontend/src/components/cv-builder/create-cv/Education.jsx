@@ -122,7 +122,7 @@ function Education({
           <h2>Education</h2>
 
           <p>
-            Add your academic background and qualificaAdd your academic background and qualifications (optional).tions.
+            Add your academic background and qualifications (optional).
           </p>
 
         </div>
@@ -144,10 +144,7 @@ function Education({
 
           <h3>No education added</h3>
 
-          <p>
-  You can add your educational background
-  or skip this step.
-</p>
+          <p>You can add your educational background or skip this step.</p>
 
         </div>
 

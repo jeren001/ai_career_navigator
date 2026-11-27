@@ -32,7 +32,7 @@ function DashboardHeader({ onMenuClick }) {
 
   // 01. GLOBAL USER DATA
 
-  const { profile, resetProfile } = useUser()
+  const { profile } = useUser()
 
 
   // 02. DEFAULT DISPLAY LANGUAGE
@@ -106,12 +106,10 @@ function DashboardHeader({ onMenuClick }) {
 
     // TODO: Connect to backend authentication
 
-    resetProfile()
-
     setProfileOpen(false)
     setNotificationsOpen(false)
 
-    navigate('/signin', { replace: true })
+    navigate('/signin', { replace: true, state: { signOut: true } })
 
   }
 

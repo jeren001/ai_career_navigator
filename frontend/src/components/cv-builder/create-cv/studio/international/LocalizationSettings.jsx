@@ -1,6 +1,6 @@
 import { pageDimensions } from '../design/designDefaults'
 
-export const localizationChoices = {
+const localizationChoices = {
   dateFormat: {
     label: 'Date format',
     options: { locale: 'CV language', iso: 'ISO (YYYY-MM)', 'month-first': 'Month / year', 'year-first': 'Year / month' }

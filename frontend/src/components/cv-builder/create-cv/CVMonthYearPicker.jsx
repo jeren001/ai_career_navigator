@@ -10,6 +10,8 @@
 // 01. MONTH CONFIGURATION
 // ==========================================
 
+const defaultMaxYear = new Date().getFullYear()
+
 const months = [
   { value: '01', label: 'January' },
   { value: '02', label: 'February' },
@@ -38,7 +40,7 @@ function CVMonthYearPicker({
   required = false,
   disabled = false,
   minYear = 1950,
-  maxYear = new Date().getFullYear()
+  maxYear = defaultMaxYear
 }) {
 
   // Extract year and month from the stored value

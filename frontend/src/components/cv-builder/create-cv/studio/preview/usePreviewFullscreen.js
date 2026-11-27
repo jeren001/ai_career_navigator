@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export default function usePreviewFullscreen(workspace) {
   const [expanded, setExpanded] = useState(false)
   const [fallback, setFallback] = useState(false)
 
-  function restoreFocus() {
+  const restoreFocus = useCallback(() => {
     requestAnimationFrame(() => workspace.current?.querySelector('[data-preview-fullscreen]')?.focus())
-  }
+  }, [workspace])
 
   async function toggle() {
     const element = workspace.current
@@ -37,7 +37,7 @@ export default function usePreviewFullscreen(workspace) {
     }
     document.addEventListener('fullscreenchange', handleFullscreenChange)
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange)
-  }, [workspace])
+  }, [workspace, restoreFocus])
 
   useEffect(() => {
     if (!fallback) return
@@ -68,7 +68,7 @@ export default function usePreviewFullscreen(workspace) {
       document.body.style.overflow = previousOverflow
       document.removeEventListener('keydown', handleKey)
     }
-  }, [fallback, workspace])
+  }, [fallback, workspace, restoreFocus])
 
   return { expanded, fallback, toggle }
 }

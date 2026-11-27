@@ -29,33 +29,132 @@
    02. PAGE HEADER
 ========================================== */
 
-.cv-builder-header {
+.cv-builder-workspace {
   display: flex;
-  align-items: flex-start;
-  gap: 18px;
+  flex-direction: column;
+  gap: inherit;
+  min-width: 0;
+  flex: 1;
 }
 
-.cv-builder-header-icon {
+.cv-builder-header {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 12px;
+}
 
+.cv-builder-menu-button,
+.cv-builder-home-link {
+  display: grid;
+  place-items: center;
   flex-shrink: 0;
-  padding-top: 4px;
-
+  width: 44px;
+  height: 44px;
   color: #071b60;
+  border-radius: 10px;
+}
+
+.cv-builder-menu-button {
+  cursor: pointer;
+}
+
+.cv-builder-menu-button:hover,
+.cv-builder-home-link:hover {
+  background: #eaf5ff;
+}
+
+.cv-builder-home-link img {
+  width: 100%;
+  height: 100%;
+  padding: 3px;
+  object-fit: contain;
+}
+
+.cv-builder-home-link:focus-visible,
+.cv-builder-drawer .sidebar-brand:focus-visible {
+  outline: 2px solid #2987f5;
+  outline-offset: 3px;
+}
+
+.cv-builder-drawer {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: min(280px, 85vw);
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: #fff;
+  box-shadow: 8px 0 30px rgb(7 27 96 / 10%);
+}
+
+.cv-builder-drawer::backdrop {
+  background: rgb(7 27 96 / 30%);
+  backdrop-filter: blur(3px);
+}
+
+body:has(.cv-builder-drawer[open]) {
+  overflow: hidden;
+}
+
+.cv-builder-drawer .dashboard-sidebar {
+  position: static;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  transform: none;
+  visibility: visible;
+  overscroll-behavior: contain;
+}
+
+.cv-builder-drawer .sidebar-header {
+  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.cv-builder-drawer .sidebar-brand span {
+  font-size: 19px;
+}
+
+.cv-builder-drawer .sidebar-brand img {
+  width: 44px;
+}
+
+.cv-builder-drawer .sidebar-close-button {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  min-width: 36px;
+  min-height: 36px;
+  color: #071b60;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cv-builder-drawer[open] {
+    animation: cv-builder-drawer-enter 0.25s ease;
+  }
+}
+
+@keyframes cv-builder-drawer-enter {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
 }
 
 .cv-builder-header-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
+  min-width: 0;
 }
 
 .cv-builder-title {
   margin: 0;
 
-  font-size: 32px;
+  font-size: 27px;
   font-weight: 750;
   line-height: 1.3;
 
@@ -65,7 +164,7 @@
 .cv-builder-description {
   margin: 0;
 
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   line-height: 1.6;
 
@@ -463,7 +562,7 @@
 }
 
 .cv-card-edit-button {
-  color: #2987f5;
+  color: #1c65af;
 }
 
 .cv-card-menu-button:hover,
@@ -582,16 +681,11 @@
   }
 
   .cv-builder-header {
-    gap: 12px;
-  }
-
-  .cv-builder-header-icon svg {
-    width: 28px;
-    height: 28px;
+    gap: 8px;
   }
 
   .cv-builder-title {
-    font-size: 26px;
+    font-size: 22px;
   }
 
   .cv-builder-description {

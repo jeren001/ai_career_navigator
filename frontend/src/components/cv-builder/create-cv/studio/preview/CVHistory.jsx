@@ -1,29 +1,15 @@
-import { formatDocumentAddress, formatDocumentDate } from '../international/localizationUtils'
+import { formatDocumentAddress } from '../international/localizationUtils'
+import { getHistoryRange, orderHistory } from './documentContent'
 import { CVText } from './CVSection'
 
-function formatRange({ startDate, endDate }, active, studying, localization) {
-  const start = formatDocumentDate(startDate, localization)
-  const end = formatDocumentDate(endDate, localization)
-  if (active) {
-    const current = [start, localization.label('present')].filter(Boolean).join(' – ')
-    return studying && end ? `${current} (${localization.label('expected')} ${end})` : current
-  }
-  return [start, end].filter(Boolean).join(' – ')
-}
-
 export default function CVHistory({ entries, studying = false, order, localization }) {
-  const ordered = order
-    ? [...entries].sort((first, second) => {
-        const dateOrder = (first.startDate || '').localeCompare(second.startDate || '')
-        return order === 'newest-first' ? -dateOrder : dateOrder
-      })
-    : entries
+  const ordered = orderHistory(entries, order)
 
   return (
     <ul className="cv-document-history">
       {ordered.map(entry => (
         <li key={entry.id} className="cv-document-entry">
-          <CVText>{formatRange(entry, studying ? entry.currentlyStudying : entry.currentlyWorking, studying, localization)}</CVText>
+          <CVText>{getHistoryRange(entry, studying ? entry.currentlyStudying : entry.currentlyWorking, studying, localization)}</CVText>
           <div className="cv-document-entry-body">
             <strong dir="auto">{studying ? entry.degree : entry.jobTitle}</strong>
             <CVText>{studying ? entry.institution : entry.company}</CVText>

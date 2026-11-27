@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { pageDimensions, resolveDesign } from '../design/designDefaults'
 import { Download } from 'lucide-react'
+import DOCXExportDialog from '../export/DOCXExportDialog'
 import PDFExportDialog from '../export/PDFExportDialog'
 import CVPaginationSource from './CVPaginationSource'
 import PreviewPagination from './PreviewPagination'
@@ -20,7 +21,7 @@ export default function CVPreview({ cvData, template, titleId, exportTitle }) {
   const sheets = useRef(null)
   const currentPage = useRef(1)
   const [active, setActive] = useState(1)
-  const [exportOpen, setExportOpen] = useState(false)
+  const [exportFormat, setExportFormat] = useState(null)
   const [mode, setMode] = useState('width')
   const [zoom, setZoom] = useState(100)
   const [space, setSpace] = useState({ width: 0, height: 0 })
@@ -135,12 +136,19 @@ export default function CVPreview({ cvData, template, titleId, exportTitle }) {
       {numberOfPages > 0 && <PreviewPagination current={activePage} total={numberOfPages} onNavigate={navigate} />}
 
       <div className="cv-preview-controls">
-        <button type="button" onClick={() => setExportOpen(true)}>
+        <button type="button" onClick={() => setExportFormat('pdf')}>
           <Download size={17} aria-hidden="true" /> Download PDF
         </button>
+        <button type="button" onClick={() => setExportFormat('docx')}>
+          <Download size={17} aria-hidden="true" /> Download DOCX
+        </button>
       </div>
-      {exportOpen && (
-        <PDFExportDialog title={exportTitle} result={result} width={width} height={height} onClose={() => setExportOpen(false)} />
+      {exportFormat === 'pdf' && (
+        <PDFExportDialog title={exportTitle} result={result} width={width} height={height} onClose={() => setExportFormat(null)} />
+      )}
+
+      {exportFormat === 'docx' && (
+        <DOCXExportDialog title={exportTitle} cvData={cvData} onClose={() => setExportFormat(null)} />
       )}
 
       <CVPaginationSource cvData={cvData} layout={template.layout} design={design} width={width} source={source} staging={staging} />

@@ -1,20 +1,12 @@
 import { useMemo } from 'react'
-import { pageDimensions, resolveDesign } from '../design/designDefaults'
+import { pageDimensions } from '../design/designDefaults'
 import CVPaginationSource from '../preview/CVPaginationSource'
 import useCVPagination from '../preview/useCVPagination'
-import { DEFAULT_TEMPLATE_ID, getTemplateById } from '../templates/templateCatalog'
+import { getSavedDocument } from '../preview/savedDocument'
 import PDFExportDialog from './PDFExportDialog'
 
 export default function SavedCVExport({ record, onClose }) {
-  const { cvData, template, design } = useMemo(() => {
-    const data = record.data
-    const selected = getTemplateById(data?.template ?? record.templateId) ?? getTemplateById(DEFAULT_TEMPLATE_ID)
-    return {
-      cvData: { ...data, basicInformation: data?.basicInformation ?? {} },
-      template: selected,
-      design: resolveDesign(selected, data?.design)
-    }
-  }, [record])
+  const { cvData, template, design } = useMemo(() => getSavedDocument(record), [record])
   const [width, height] = pageDimensions[design.pageSize] ?? pageDimensions.A4
   const { source, staging, result } = useCVPagination(cvData, template.layout, design, height)
 

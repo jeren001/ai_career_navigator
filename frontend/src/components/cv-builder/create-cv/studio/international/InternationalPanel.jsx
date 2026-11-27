@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { resolveDesign } from '../design/designDefaults'
-import { internationalFormatCatalog } from '../templates/internationalFormatCatalog'
+import { getInternationalTargetId, internationalFormatCatalog } from '../templates/internationalFormatCatalog'
 import AITranslationPanel from './AITranslationPanel'
-import CountryFormatSelector, { targetId } from './CountryFormatSelector'
+import CountryFormatSelector from './CountryFormatSelector'
 import CountryGuidelines from './CountryGuidelines'
 import CVLanguageSelector from './CVLanguageSelector'
 import LocalizationSettings from './LocalizationSettings'
@@ -22,7 +22,7 @@ function initialDraft(cvData) {
 export default function InternationalPanel({ cvData, template, onChange }) {
   const [draft, setDraft] = useState(() => initialDraft(cvData))
   const [status, setStatus] = useState('')
-  const targetTemplate = internationalFormatCatalog.find(item => targetId(item) === draft.target)
+  const targetTemplate = internationalFormatCatalog.find(item => getInternationalTargetId(item) === draft.target)
   const { pageSize: currentPageSize } = resolveDesign(template, cvData.design)
   const direction = getLocalization(draft).direction
 

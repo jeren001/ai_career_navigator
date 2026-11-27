@@ -5,6 +5,7 @@ import CVSection, { CVText } from './CVSection'
 import { customFields, entryHasContent, standardSections } from '../sections/sectionCatalog'
 import { getSectionGroups } from '../sections/sectionDefaults'
 import { formatDocumentDate, getLocalization } from '../international/localizationUtils'
+import { getDocumentSectionTitle } from './documentContent'
 import './cv-document.css'
 
 function hasText(entries, fields) {
@@ -71,15 +72,15 @@ export default function CVDocument({ cvData, layout, design }) {
   const custom = new Map(cvData.sections?.custom?.map(section => [section.id, section.entries]))
 
   function renderGroup(items) {
-    return items.flatMap(({ id, title, hidden }) => {
+    return items.flatMap(item => {
+      const { id, hidden } = item
       if (hidden) return []
       const fields = standardSections[id]?.fields
       const content = fields
         ? renderEntries(cvData.sections?.content?.[id] ?? [], fields, localization)
         : custom.has(id) ? renderEntries(custom.get(id), customFields, localization) : sections[id]
-      const shouldLocalize = localization.headings && localization.locale !== 'en' &&
-        !custom.has(id) && !cvData.sections?.settings?.[id]?.title
-      return content ? [<CVSection key={id} title={shouldLocalize ? localization.heading(id) : title}>{content}</CVSection>] : []
+      const title = getDocumentSectionTitle(item, cvData.sections?.settings, localization)
+      return content ? [<CVSection key={id} title={title}>{content}</CVSection>] : []
     })
   }
 

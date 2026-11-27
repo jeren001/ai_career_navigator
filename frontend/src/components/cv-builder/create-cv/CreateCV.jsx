@@ -132,12 +132,23 @@ function CreateCV({
    const [saving, setSaving] = useState(null)
    const [title, setTitle] = useState(record?.title ?? '')
    const [sectionEditing, setSectionEditing] = useState(false)
+   const [photoPending, setPhotoPending] = useState(false)
    const identity = useRef(record ? { id: record.id, createdAt: record.createdAt } : null)
    const saveLock = useRef(false)
    const initialSnapshot = useRef(null)
-   const snapshot = useMemo(() => JSON.stringify([cvData, title]), [cvData, title])
-   if (initialSnapshot.current === null) initialSnapshot.current = snapshot
-   const canExit = useCVExitProtection(snapshot !== initialSnapshot.current || sectionEditing, Boolean(saving))
+   const photoSource = cvData.design?.photo?.src
+   // Compare the immutable photo payload separately to avoid repeatedly
+   // serializing a potentially multi-megabyte base64 string on field edits.
+   const snapshot = useMemo(() => {
+     const design = cvData.design?.photo
+       ? { ...cvData.design, photo: { ...cvData.design.photo, src: undefined } }
+       : cvData.design
+     return JSON.stringify([{ ...cvData, design }, title])
+   }, [cvData, title])
+   if (initialSnapshot.current === null) initialSnapshot.current = { snapshot, photoSource }
+   const dirty = snapshot !== initialSnapshot.current.snapshot || photoSource !== initialSnapshot.current.photoSource
+   const pendingStudioChange = sectionEditing || photoPending
+   const canExit = useCVExitProtection(dirty || pendingStudioChange, Boolean(saving))
    const isUpdate = Boolean(record && record.status !== 'draft')
    const suggestedTitle = cvData.basicInformation.jobTitle.trim()
      ? `${cvData.basicInformation.jobTitle.trim()} CV`
@@ -705,6 +716,7 @@ function validateEducation(draft = cvData) {
    function handleBack() {
 
      if (sectionEditing && !window.confirm('Discard the unconfirmed section edit?')) return
+     if (photoPending && !window.confirm('Leave before the photo finishes loading?')) return
      setSectionEditing(false)
 
      if (currentStep === 1) {
@@ -746,7 +758,7 @@ function validateEducation(draft = cvData) {
    }
 
    async function saveCV(status) {
-     if (saveLock.current || sectionEditing) return
+     if (saveLock.current || pendingStudioChange) return
      setCreationError('')
 
      if (status === 'completed') {
@@ -889,6 +901,10 @@ function validateEducation(draft = cvData) {
 
              sectionEditing={sectionEditing}
 
+             photoPending={photoPending}
+
+             onPhotoPendingChange={setPhotoPending}
+
            />
 
          )
@@ -972,6 +988,7 @@ function validateEducation(draft = cvData) {
                disabled={Boolean(saving)} />
            </label>
            {sectionEditing && <p role="status">Save or cancel the section edit before saving your CV.</p>}
+           {photoPending && <p role="status">Wait for the photo to finish loading before saving your CV.</p>}
          </div>
 
          <CVFormNavigation
@@ -982,7 +999,7 @@ function validateEducation(draft = cvData) {
            onCreate={() => saveCV('completed')}
            createLabel={isUpdate ? 'Save Changes' : 'Create CV'}
            saving={saving}
-           blocked={sectionEditing}
+           blocked={pendingStudioChange}
            canSkip={canSkipCurrentStep}
          />
 

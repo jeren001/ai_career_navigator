@@ -6,8 +6,9 @@
 // ==========================================
 
 // Import React and navigation tools
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useUser } from '../context/UserContext'
 
 // Import social authentication icons
 import { FcGoogle } from 'react-icons/fc'
@@ -31,6 +32,20 @@ import mascotImage from '../assets/mascot.png'
 import '../styles/signin.css'
 
 function SignIn() {
+
+  const { state } = useLocation()
+  const navigate = useNavigate()
+  const { resetProfile } = useUser()
+  const handledSignOut = useRef(false)
+
+  useEffect(() => {
+    if (state?.signOut && !handledSignOut.current) {
+      handledSignOut.current = true
+      // The route blocker has already permitted leaving the editor.
+      resetProfile()
+      navigate('/signin', { replace: true })
+    }
+  }, [state, resetProfile, navigate])
 
   // Control password visibility
   const [showPassword, setShowPassword] = useState(false)

@@ -1,36 +1,37 @@
 const segmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null
 
+function characterBounds(value, index) {
+  const betweenPair = /[\uDC00-\uDFFF]/.test(value[index]) && /[\uD800-\uDBFF]/.test(value[index - 1])
+  const start = betweenPair ? index - 1 : index
+  return [start, start + (value.codePointAt(start) > 0xffff ? 2 : 1)]
+}
+
 function splitText(node, fits) {
   const value = node.data
-  let offsets
-  if (segmenter) {
-    offsets = Array.from(segmenter.segment(value), ({ index }) => index)
-  } else {
-    let offset = 0
-    offsets = Array.from(value, character => {
-      const start = offset
-      offset += character.length
-      return start
-    })
+  const segments = segmenter?.segment(value)
+  function bounds(index) {
+    const segment = segments?.containing(index)
+    return segment ? [segment.index, segment.index + segment.segment.length] : characterBounds(value, index)
   }
-  offsets.push(value.length)
 
   let low = 0
-  let high = offsets.length - 1
+  let high = value.length
   const trial = node.cloneNode()
+  // Probe rendered prefixes by grapheme boundary without enumerating the whole
+  // remaining paragraph on each continuation page.
   while (low < high) {
     const middle = Math.ceil((low + high) / 2)
-    trial.data = value.slice(0, offsets[middle])
-    if (fits(trial)) low = middle
-    else high = middle - 1
+    const [start, end] = bounds(middle - 1)
+    trial.data = value.slice(0, end)
+    if (fits(trial)) low = end
+    else high = start
   }
 
   if (!low) return null
-  let cut = offsets[low]
-  // Prefer a nearby word boundary. CJK and long unbroken tokens also make progress.
+  let cut = low
   const preceding = value.slice(0, cut)
   const wordBoundary = preceding.search(/\s[^\s]{1,24}$/u)
-  if (wordBoundary > 0 && offsets.includes(wordBoundary + 1)) cut = wordBoundary + 1
+  if (wordBoundary > 0 && bounds(wordBoundary)[1] === wordBoundary + 1) cut = wordBoundary + 1
 
   return [document.createTextNode(value.slice(0, cut)), document.createTextNode(value.slice(cut))]
 }
