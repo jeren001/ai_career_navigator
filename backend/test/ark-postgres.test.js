@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { after, test } from 'node:test';
 import pool from '../src/db/pool.js';
 import { generateAiJson, resetGeminiStateForTests, setGeminiClientForTests } from '../src/services/ai-service.js';
-import { reserveArkSpend } from '../src/services/ark-usage.js';
+import { reserveArkSpend } from '../src/services/ai-usage.js';
 
 after(() => pool.end());
 

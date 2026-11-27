@@ -1,6 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 import { geminiFetch } from './gemini-fetch.js';
-import { arkProvider, openAiCompatibleProvider } from './openai-compatible.js';
+import { OPENROUTER_DEFAULT_MODEL, OPENROUTER_FALLBACK_MODEL } from './ai-usage.js';
+import { arkProvider, openAiCompatibleProvider, openRouterProvider } from './openai-compatible.js';
 
 export const GEMINI_DEFAULT_MODEL = 'gemini-3.1-flash-lite';
 
@@ -90,7 +91,17 @@ export function configuredAiProviders(injectedGemini) {
     ['ollama', ollamaProvider],
     ['openai-compatible', openAiCompatibleProvider],
   ]);
-  const primary = process.env.AI_PRIMARY_PROVIDER?.trim() || (injectedGemini ? 'gemini' : 'ark');
+  const primary = process.env.AI_PRIMARY_PROVIDER?.trim() || (injectedGemini ? 'gemini' : 'openrouter');
   const secondary = process.env.AI_SECONDARY_PROVIDER?.trim();
+  if (primary === 'openrouter' || secondary === 'openrouter') {
+    const models = [
+      process.env.OPENROUTER_MODEL?.trim() || OPENROUTER_DEFAULT_MODEL,
+      process.env.OPENROUTER_FALLBACK_MODEL?.trim() || OPENROUTER_FALLBACK_MODEL,
+    ];
+    const freeProviders = [...new Set(models)].filter((model) => model !== 'none').map(openRouterProvider);
+    const localProvider = [primary, secondary].includes('ollama') ? ollamaProvider() : undefined;
+    const ordered = primary === 'ollama' ? [localProvider, ...freeProviders] : [...freeProviders, localProvider];
+    return ordered.filter(Boolean);
+  }
   return [...new Set([primary, secondary])].map((name) => registry.get(name)?.()).filter(Boolean);
 }

@@ -111,13 +111,17 @@ async function runProviders(providers, request, options) {
   let reason = 'not_configured';
 
   for (const [index, provider] of providers.entries()) {
-    const circuit = cooldowns.get(provider.id);
+    const cooldownKey = provider.cooldownKey ?? provider.id;
+    const circuit = cooldowns.get(cooldownKey);
     if (circuit && circuit.until > Date.now()) {
       reason = circuit.reason;
       continue;
     }
     // Leave one attempt for a configured secondary provider.
-    const providerLimit = Math.max(1, maxAttempts - (providers.length - index - 1));
+    const providerLimit = Math.min(
+      Math.max(1, maxAttempts - (providers.length - index - 1)),
+      used + (provider.attemptLimit ?? maxAttempts),
+    );
     const providerDeadline = index === providers.length - 1 ? deadline : deadline - Math.min(8_000, taskTimeoutMs / 3);
     for (let retry = 0; used < providerLimit; retry += 1) {
       if (performance.now() >= providerDeadline) {
@@ -127,7 +131,7 @@ async function runProviders(providers, request, options) {
       const reservation = await reserveAttempt(used === 0, options, providerDeadline, spacingDeadline, provider, request);
       if (reservation.reason) {
         reason = reservation.reason;
-        if (reason === 'spending_limit' || reason === 'spending_limit_unavailable') break;
+        if (['spending_limit', 'spending_limit_unavailable', 'provider_daily_limit'].includes(reason)) break;
         return fallback(reason);
       }
       used += 1;
@@ -148,7 +152,7 @@ async function runProviders(providers, request, options) {
 
       reason = failure.reason;
       if (failure.retryAfter) {
-        cooldowns.set(provider.id, { reason, until: Date.now() + failure.retryAfter });
+        cooldowns.set(cooldownKey, { reason, until: Date.now() + failure.retryAfter });
       }
       const delay = Math.max(failure.retryAfter || 0, 250 * 2 ** retry + Math.random() * 100);
       if (!failure.retry || used >= providerLimit || delay > 2_000 || delay >= providerDeadline - performance.now()) break;

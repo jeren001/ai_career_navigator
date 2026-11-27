@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { reserveArkSpend } from './ark-usage.js';
+import { isFreeOpenRouterModel, reserveArkSpend, reserveOpenRouterSpend } from './ai-usage.js';
 
 export function openAiCompatibleProvider() {
   const baseUrl = process.env.AI_OPENAI_COMPATIBLE_BASE_URL?.trim();
@@ -18,6 +18,15 @@ export function arkProvider() {
   });
 }
 
+export function openRouterProvider(model) {
+  const apiKey = process.env.OPENROUTER_API_KEY?.trim();
+  if (!apiKey || !isFreeOpenRouterModel(model)) return undefined;
+  return chatCompletionsProvider({
+    id: 'openrouter', apiKey, baseUrl: 'https://openrouter.ai/api/v1',
+    model,
+  });
+}
+
 function chatCompletionsProvider({ id, baseUrl, model, apiKey }) {
   if (!baseUrl || !model) return undefined;
 
@@ -31,6 +40,7 @@ function chatCompletionsProvider({ id, baseUrl, model, apiKey }) {
       endpoint.username || endpoint.password || endpoint.search || endpoint.hash) return undefined;
   if (id === 'ark' && endpoint.protocol !== 'https:') return undefined;
   const ark = id === 'ark';
+  const openRouter = id === 'openrouter';
   endpoint.pathname = endpoint.pathname.replace(/\/+$/, '') + '/chat/completions';
 
   return {
@@ -38,6 +48,11 @@ function chatCompletionsProvider({ id, baseUrl, model, apiKey }) {
     model,
     cacheScope: createHash('sha256').update(JSON.stringify([endpoint.href, apiKey])).digest('hex'),
     ...(ark && { reserveSpend: (request) => reserveArkSpend(model, request) }),
+    ...(openRouter && {
+      cooldownKey: 'openrouter:' + model,
+      attemptLimit: 1,
+      reserveSpend: (request) => reserveOpenRouterSpend(model, request),
+    }),
     async generate({ contents, systemInstruction, schema, maxOutputTokens, signal }) {
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -49,6 +64,13 @@ function chatCompletionsProvider({ id, baseUrl, model, apiKey }) {
         signal,
         body: JSON.stringify({
           model,
+          ...(openRouter && {
+            provider: {
+              require_parameters: true, allow_fallbacks: false,
+              max_price: { prompt: 0, completion: 0, request: 0 },
+            },
+            reasoning: { enabled: false },
+          }),
           messages: [{ role: 'system', content: ark
             ? systemInstruction + '\nReturn one JSON object matching this schema: ' + JSON.stringify(schema)
             : systemInstruction }, { role: 'user', content: contents }],
@@ -57,7 +79,7 @@ function chatCompletionsProvider({ id, baseUrl, model, apiKey }) {
             thinking: { type: 'disabled' },
             response_format: { type: 'json_object' },
           } : {
-            max_completion_tokens: maxOutputTokens,
+            ...(openRouter ? { max_tokens: maxOutputTokens } : { max_completion_tokens: maxOutputTokens }),
             response_format: {
               type: 'json_schema',
               json_schema: { name: 'career_navigator_response', schema },
@@ -72,9 +94,18 @@ function chatCompletionsProvider({ id, baseUrl, model, apiKey }) {
           retryAfter: response.headers.get('retry-after'),
         });
       }
-      const { choices, usage } = await response.json();
-      const text = choices?.[0]?.finish_reason === 'length' ? undefined : choices?.[0]?.message?.content;
-      return ark ? { text, usage } : text;
+      const { choices, usage, error } = await response.json();
+      if (openRouter && error) {
+        throw Object.assign(new Error('OpenRouter request failed'), {
+          status: error.code,
+          retryAfter: response.headers.get('retry-after'),
+        });
+      }
+      const unexpectedCharge = openRouter && Number(usage?.cost) > 0;
+      const text = unexpectedCharge || choices?.[0]?.finish_reason === 'length'
+        ? undefined
+        : choices?.[0]?.message?.content;
+      return ark || openRouter ? { text, usage } : text;
     },
   };
 }
