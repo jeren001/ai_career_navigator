@@ -7,6 +7,7 @@
 
 // Import React hooks
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 // Import icons from Lucide React
 import {
@@ -54,7 +55,7 @@ const commands = [
     description: 'Discover your strengths and interests',
     keywords: 'test quiz assessment personality',
     icon: ClipboardList,
-    path: '/assessment'
+    path: '/career-test/assessment'
   },
   {
     name: 'Explore Careers',
@@ -89,7 +90,7 @@ const commands = [
     description: 'Chat with your AI career assistant',
     keywords: 'ai chat assistant advice help',
     icon: MessageCircle,
-    path: '/assistant'
+    path: '/ai-assistant'
   },
   {
     name: 'Settings',
@@ -113,6 +114,7 @@ const commands = [
 // ==========================================
 
 function CommandBar() {
+  const navigate = useNavigate()
 
   // Store the text entered by the user
   const [query, setQuery] = useState('')
@@ -222,7 +224,7 @@ function CommandBar() {
     setActiveIndex(0)
 
     // Navigate to the selected page
-    window.location.href = command.path
+    navigate(command.path)
   }
 
 

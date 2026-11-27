@@ -1,0 +1,436 @@
+.career-test {
+  /* Palette */
+  --ct-cream-50: #fffdf5;
+  --ct-cream-100: #fff6db;
+  --ct-cream-200: #ffedb2;
+  --ct-cream-300: #ffe58b;
+  --ct-cream-400: #ffe080;
+  --ct-text: #07149c;
+  --ct-accent: #ffc400;
+  --ct-surface: #ffffff;
+  --ct-border: #d4dfff;
+
+  --ct-assessment-accent: #00b8f0;
+  --ct-assessment-soft: #7dddf8;
+  --ct-assessment-tint: #cdf3ff;
+  --ct-assessment-surface: #edfaff;
+  --ct-assessment-ink: #00536b;
+  --ct-profile-accent: #ffbf00;
+  --ct-profile-soft: #ffdb70;
+  --ct-profile-tint: #fff0c9;
+  --ct-profile-surface: #fff9eb;
+  --ct-profile-ink: #694800;
+  --ct-guidance-accent: #c218f5;
+  --ct-guidance-soft: #da80fa;
+  --ct-guidance-tint: #eecdfc;
+  --ct-guidance-surface: #faeeff;
+  --ct-guidance-ink: #5b1976;
+
+  --ct-gradient-soft: linear-gradient(145deg,
+    var(--ct-cream-50), var(--ct-cream-100), var(--ct-cream-200));
+  --ct-gradient-warm: linear-gradient(145deg,
+    var(--ct-cream-200), var(--ct-cream-300), var(--ct-cream-400));
+  --ct-orbit-line: rgb(255 255 255 / 72%);
+
+  /* Typography uses the application's base family. */
+  --ct-font-family: var(--font-main);
+  --ct-type-hero: 700 clamp(2rem, 1.5rem + 2vw, 3.5rem) / 1.1 var(--ct-font-family);
+  --ct-type-page: 700 clamp(1.5rem, 1.25rem + 1vw, 2rem) / 1.2 var(--ct-font-family);
+  --ct-type-card: 700 1.125rem / 1.3 var(--ct-font-family);
+  --ct-type-body: 400 1rem / 1.5 var(--ct-font-family);
+  --ct-type-label: 700 0.875rem / 1.4 var(--ct-font-family);
+  --ct-type-caption: 400 0.8125rem / 1.4 var(--ct-font-family);
+
+  /* Spacing and intrinsic layout thresholds */
+  --ct-space-sm: 0.5rem;
+  --ct-space-md: 0.75rem;
+  --ct-space-lg: 1rem;
+  --ct-space-xl: 1.5rem;
+  --ct-content-max: 68rem;
+  --ct-card-min: 14rem;
+  --ct-radius-card: 0.75rem;
+  --ct-icon-sm: 1rem;
+  --ct-icon-md: 1.5rem;
+  --ct-icon-lg: 2rem;
+  --ct-shadow-card: 0 4px 14px rgb(161 111 0 / 10%);
+  --ct-shadow-card-hover: 0 6px 18px rgb(161 111 0 / 16%);
+
+  /* Interaction */
+  --ct-hover-border: var(--ct-text);
+  --ct-active-surface: var(--ct-cream-100);
+  --ct-focus-ring: 2px solid var(--ct-text);
+  --ct-focus-offset: 3px;
+  --ct-transition-fast: 150ms;
+  --ct-transition-standard: 200ms;
+  --ct-transition-easing: ease-out;
+
+  color: var(--ct-text);
+  font: var(--ct-type-body);
+}
+
+.career-test .career-test-content {
+  max-width: var(--ct-content-max);
+  margin-inline: auto;
+}
+
+.career-test .dashboard-layout-overlay {
+  background: var(--ct-gradient-soft) var(--ct-cream-50);
+}
+
+.career-test-home .dashboard-layout-overlay {
+  background:
+    radial-gradient(ellipse 78% 46% at 93% 8%,
+      transparent calc(100% - 1px), var(--ct-orbit-line) 100%, transparent calc(100% + 1px)),
+    radial-gradient(ellipse 82% 51% at 93% 8%,
+      transparent calc(100% - 1px), var(--ct-orbit-line) 100%, transparent calc(100% + 1px)),
+    radial-gradient(ellipse 71% 38% at 5% 100%,
+      transparent calc(100% - 1px), var(--ct-orbit-line) 100%, transparent calc(100% + 1px)),
+    var(--ct-gradient-soft);
+  background-color: var(--ct-cream-50);
+}
+
+.career-test .dashboard-layout-overlay > .dashboard-workspace {
+  margin-left: 0;
+}
+
+.career-test .dashboard-layout-overlay > .dashboard-workspace > .dashboard-main {
+  padding: clamp(1rem, 2.5vw, 2rem);
+  background: transparent;
+}
+
+.career-test .dashboard-sidebar-dialog {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.career-test .dashboard-sidebar-dialog::backdrop {
+  background: rgb(7 27 96 / 35%);
+}
+
+.career-test .dashboard-sidebar-dialog .dashboard-sidebar {
+  position: relative;
+  width: min(280px, 85vw);
+  transform: none;
+  visibility: visible;
+}
+
+.career-test .dashboard-sidebar-dialog .sidebar-header {
+  justify-content: space-between;
+  gap: var(--ct-space-sm);
+}
+
+.career-test .dashboard-sidebar-dialog .sidebar-brand img {
+  width: 44px;
+}
+
+.career-test .dashboard-sidebar-dialog .sidebar-brand span {
+  font-size: 19px;
+}
+
+.career-test .dashboard-sidebar-dialog .sidebar-close-button {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--ct-text);
+}
+
+.career-test h1 {
+  font: var(--ct-type-page);
+}
+
+.career-test h2 {
+  font: var(--ct-type-card);
+}
+
+.career-test .career-test-header {
+  display: flex;
+  align-items: center;
+  gap: var(--ct-space-sm);
+  padding: var(--ct-space-sm) clamp(1rem, 3vw, 2rem);
+  color: var(--ct-text);
+}
+
+.career-test .career-test-menu-button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  min-height: 44px;
+  border-radius: var(--ct-radius-card);
+  background: transparent;
+  color: inherit;
+}
+
+.career-test .career-test-menu-button svg {
+  width: var(--ct-icon-md);
+  height: var(--ct-icon-md);
+}
+
+.career-test .career-test-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--ct-space-sm);
+  min-width: 0;
+  min-height: 44px;
+  font: var(--ct-type-card);
+}
+
+.career-test .career-test-brand img {
+  flex: none;
+  width: calc(var(--ct-icon-lg) + var(--ct-space-sm));
+  height: auto;
+}
+
+.career-test .career-test-hero {
+  display: grid;
+  align-items: center;
+  gap: var(--ct-space-xl);
+  padding-block: clamp(1rem, 5vw, 4rem);
+}
+
+.career-test .career-test-hero-title {
+  font: var(--ct-type-hero);
+}
+
+.career-test .career-test-hero-copy p {
+  max-width: 38ch;
+  margin-top: var(--ct-space-xl);
+  font: var(--ct-type-body);
+}
+
+.career-test .career-test-hero-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.career-test .career-test-hero-underline::after {
+  position: absolute;
+  inset: auto 0 -0.14em;
+  height: 0.28em;
+  border-bottom: 0.07em solid var(--ct-accent);
+  border-radius: 50%;
+  pointer-events: none;
+  content: '';
+}
+
+.career-test .career-test-hero-illustration {
+  position: relative;
+  justify-self: center;
+  width: min(100%, clamp(11rem, 56vw, 15rem));
+  pointer-events: none;
+}
+
+.career-test .career-test-hero-illustration img {
+  display: block;
+  width: 88%;
+  height: auto;
+  margin-inline: auto;
+}
+
+.career-test .career-test-illustration-badge {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: clamp(1.5rem, 3vw, 2.25rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--ct-surface);
+  box-shadow: var(--ct-shadow-card);
+}
+
+.career-test .career-test-illustration-badge svg {
+  width: 55%;
+  height: auto;
+}
+
+.career-test .career-test-illustration-star {
+  top: 2%;
+  left: 2%;
+  color: var(--ct-profile-accent);
+}
+
+.career-test .career-test-illustration-pin {
+  right: 2%;
+  bottom: 3%;
+  color: var(--ct-assessment-accent);
+}
+
+@media (max-width: 47.999rem) {
+  .career-test .career-test-hero {
+    gap: var(--ct-space-lg);
+  }
+}
+
+@media (min-width: 48rem) {
+  .career-test .career-test-hero {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  }
+
+  .career-test .career-test-hero-title-line {
+    display: block;
+  }
+
+  .career-test .career-test-hero-illustration {
+    width: min(100%, 24rem);
+  }
+}
+
+.career-test .career-test-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--ct-card-min)), 1fr));
+  gap: var(--ct-space-lg);
+  margin-top: var(--ct-space-lg);
+}
+
+.career-test .career-test-card {
+  display: grid;
+  align-content: start;
+  gap: var(--ct-space-sm);
+  height: 100%;
+  padding: var(--ct-space-lg);
+  border: 1px solid var(--ct-border);
+  border-radius: var(--ct-radius-card);
+  background: var(--ct-surface);
+  box-shadow: var(--ct-shadow-card);
+  transition:
+    border-color var(--ct-transition-fast) var(--ct-transition-easing),
+    background-color var(--ct-transition-fast) var(--ct-transition-easing),
+    box-shadow var(--ct-transition-standard) var(--ct-transition-easing);
+}
+
+.career-test .career-test-card-icon svg {
+  display: block;
+  width: var(--ct-icon-md);
+  height: var(--ct-icon-md);
+}
+
+.career-test .career-test-card[data-accent="assessment"] {
+  --ct-card-accent: var(--ct-assessment-accent);
+  --ct-card-soft: var(--ct-assessment-soft);
+  --ct-card-tint: var(--ct-assessment-tint);
+  --ct-card-tinted-surface: var(--ct-assessment-surface);
+  --ct-card-ink: var(--ct-assessment-ink);
+}
+
+.career-test .career-test-card[data-accent="profile"] {
+  --ct-card-accent: var(--ct-profile-accent);
+  --ct-card-soft: var(--ct-profile-soft);
+  --ct-card-tint: var(--ct-profile-tint);
+  --ct-card-tinted-surface: var(--ct-profile-surface);
+  --ct-card-ink: var(--ct-profile-ink);
+}
+
+.career-test .career-test-card[data-accent="guidance"] {
+  --ct-card-accent: var(--ct-guidance-accent);
+  --ct-card-soft: var(--ct-guidance-soft);
+  --ct-card-tint: var(--ct-guidance-tint);
+  --ct-card-tinted-surface: var(--ct-guidance-surface);
+  --ct-card-ink: var(--ct-guidance-ink);
+}
+
+.career-test .career-test-card[data-accent] {
+  grid-template-rows: auto auto auto 1fr auto;
+}
+
+@media (min-width: 32rem) {
+  @supports (grid-template-rows: subgrid) {
+    .career-test .career-test-cards > li,
+    .career-test .career-test-card[data-accent] {
+      display: grid;
+      grid-row: span 5;
+      grid-template-rows: subgrid;
+      row-gap: var(--ct-space-sm);
+    }
+  }
+}
+
+@media (48rem <= width < 64rem) {
+  .career-test .career-test-card {
+    padding-inline: var(--ct-space-md);
+  }
+}
+
+.career-test .career-test-card[data-accent] .career-test-card-icon,
+.career-test .career-test-card-arrow {
+  display: grid;
+  place-items: center;
+  justify-self: start;
+  padding: var(--ct-space-sm);
+  background: var(--ct-card-tinted-surface);
+}
+
+.career-test .career-test-card[data-accent] .career-test-card-icon {
+  border-radius: var(--ct-radius-card);
+  color: var(--ct-card-accent);
+}
+
+.career-test .career-test-card-label {
+  justify-self: start;
+  padding: 0.25rem var(--ct-space-sm);
+  border-radius: var(--ct-radius-card);
+  background: var(--ct-card-tint);
+  color: var(--ct-card-ink);
+  font: var(--ct-type-label);
+}
+
+.career-test .career-test-card-arrow {
+  justify-self: end;
+  align-self: end;
+  border-radius: 50%;
+  color: var(--ct-card-ink);
+}
+
+.career-test .career-test-card-arrow svg {
+  width: var(--ct-icon-sm);
+  height: var(--ct-icon-sm);
+}
+
+.career-test .career-test-card:hover .career-test-card-arrow {
+  background: var(--ct-card-soft);
+}
+
+.career-test .career-test-card:hover {
+  border-color: var(--ct-hover-border);
+  box-shadow: var(--ct-shadow-card-hover);
+}
+
+.career-test .career-test-card:active {
+  background-color: var(--ct-active-surface);
+}
+
+.career-test .career-test-area a {
+  color: var(--ct-text);
+  text-decoration: underline;
+}
+
+.career-test a:focus-visible,
+.career-test .career-test-menu-button:focus-visible,
+.career-test .sidebar-close-button:focus-visible {
+  outline: var(--ct-focus-ring);
+  outline-offset: var(--ct-focus-offset);
+}
+
+.career-test .career-test-area {
+  display: grid;
+  gap: var(--ct-space-md);
+}
+
+.career-test .career-test-area ul {
+  padding-inline-start: var(--ct-space-xl);
+  list-style: disc;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .career-test {
+    --ct-transition-fast: 0ms;
+    --ct-transition-standard: 0ms;
+  }
+}

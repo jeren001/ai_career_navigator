@@ -5,7 +5,7 @@
 // ==========================================
 
 // Import React Router
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, replace, RouterProvider } from 'react-router-dom'
 
 // Import global user context
 import { UserProvider } from './context/UserContext'
@@ -37,6 +37,40 @@ const router = createBrowserRouter([
     path: '/resume',
     lazy: async () => ({ Component: (await import('./pages/CVBuilder')).default }),
     hydrateFallbackElement: <p role="status">Loading CV Builder…</p>
+  },
+  {
+    path: '/career-test',
+    lazy: async () => ({ Component: (await import('./pages/CareerTest')).default }),
+    hydrateFallbackElement: <p role="status">Loading Career Test…</p>,
+    children: [
+      {
+        index: true,
+        lazy: async () => ({ Component: (await import('./components/career-test/home/CareerTestHome')).default })
+      },
+      {
+        path: 'assessment',
+        children: [
+          {
+            index: true,
+            lazy: async () => ({ Component: (await import('./components/career-test/assessment/Assessment')).default })
+          }
+        ]
+      },
+      {
+        path: 'profile',
+        lazy: async () => ({ Component: (await import('./components/career-test/profile/CareerProfile')).default })
+      },
+      {
+        path: 'guidance',
+        lazy: async () => ({ Component: (await import('./components/career-test/guidance/CareerGuidance')).default })
+      }
+    ]
+  },
+  {
+    path: '/assessment',
+    element: null,
+    hydrateFallbackElement: <p role="status">Loading assessment…</p>,
+    loader: () => replace('/career-test/assessment')
   },
   { path: '*', element: null }
 ])
