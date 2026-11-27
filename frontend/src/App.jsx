@@ -14,6 +14,7 @@ import './styles/integration.css'
 
 const MyProfile = lazy(() => import('./pages/MyProfile'))
 const Settings = lazy(() => import('./pages/Settings'))
+const AIAssistant = lazy(() => import('./pages/AIAssistant'))
 
 export default function App() {
   return (
@@ -39,6 +40,7 @@ export default function App() {
               <Route element={<RequireSession registeredOnly />}>
                 <Route path="/profile" element={<MyProfile />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/ai-assistant" element={<AIAssistant />} />
               </Route>
             </Route>
           </Routes>

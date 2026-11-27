@@ -1,0 +1,451 @@
+/* ==========================================
+   PROJECT: AI CAREER
+   FILE: saved-responses.css
+   PURPOSE: Saved Responses page design
+========================================== */
+
+
+/* ==========================================
+   01. PAGE CONTAINER
+========================================== */
+
+.ai-assistant-page:has(.saved-responses-page) {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.saved-responses-page {
+  width: 100%;
+  max-width: 850px;
+  min-height: 0;
+  flex: 1;
+
+  margin: 0 auto;
+  padding: 32px 24px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  color: #071b60;
+}
+
+
+/* ==========================================
+   02. PAGE HEADER
+========================================== */
+
+.saved-page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.saved-page-heading {
+  flex: 1;
+  min-width: 0;
+}
+
+.saved-page-heading h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #071b60;
+}
+
+.saved-page-heading p {
+  margin: 5px 0 0;
+  font-size: 14px;
+  color: #64749a;
+}
+
+.saved-back-button,
+.saved-page-icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #ffffff;
+  border: 1px solid #e2d6ff;
+  border-radius: 14px;
+
+  color: #9254ff;
+}
+
+.saved-back-button {
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.saved-back-button:hover {
+  background: #f3edff;
+}
+
+.saved-back-button:active {
+  transform: scale(0.95);
+}
+
+
+/* ==========================================
+   03. SEARCH BAR
+========================================== */
+
+.saved-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+
+  padding: 15px 18px;
+
+  background: #ffffff;
+  border: 1px solid #e2d6ff;
+  border-radius: 18px;
+
+  color: #64749a;
+}
+
+.saved-search:focus-within {
+  border-color: #9254ff;
+}
+
+.saved-search svg {
+  flex-shrink: 0;
+}
+
+.saved-search input {
+  width: 100%;
+  min-width: 0;
+
+  background: transparent;
+  border: none;
+  outline: none;
+
+  font-family: inherit;
+  font-size: 15px;
+  color: #071b60;
+}
+
+.saved-search input::placeholder {
+  color: #8993ad;
+}
+
+
+/* ==========================================
+   04. SAVED RESPONSES LIST
+========================================== */
+
+.saved-responses-list {
+  flex: 1;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  padding: 4px;
+  overflow-y: auto;
+}
+
+
+/* ==========================================
+   05. SAVED RESPONSE CARD
+========================================== */
+
+.saved-response-item {
+  flex-shrink: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  padding: 22px;
+
+  background: #ffffff;
+  border: 1px solid #e2d6ff;
+  border-radius: 20px;
+
+  box-shadow: 0 4px 16px rgba(7, 27, 96, 0.04);
+}
+
+
+/* ==========================================
+   06. RESPONSE HEADER
+========================================== */
+
+.saved-response-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.saved-response-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f3edff;
+  border-radius: 12px;
+
+  color: #9254ff;
+}
+
+.saved-response-header h2 {
+  margin: 0;
+
+  font-size: 15px;
+  font-weight: 600;
+  color: #071b60;
+}
+
+
+/* ==========================================
+   07. RESPONSE CONTENT
+========================================== */
+
+.saved-response-content {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #385781;
+
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+
+/* ==========================================
+   08. RESPONSE FOOTER
+========================================== */
+
+.saved-response-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding-top: 14px;
+
+  border-top: 1px solid #eee8fa;
+}
+
+.saved-response-date {
+  font-size: 12px;
+  color: #64749a;
+}
+
+
+/* ==========================================
+   09. RESPONSE ACTION BUTTONS
+========================================== */
+
+.saved-response-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.saved-response-action {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+
+  color: #64749a;
+  cursor: pointer;
+
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.2s;
+}
+
+.saved-response-action:hover {
+  background: #f3edff;
+  color: #9254ff;
+}
+
+.saved-response-action:active {
+  transform: scale(0.92);
+}
+
+.saved-response-action.is-copied {
+  background: #f3edff;
+  color: #9254ff;
+}
+
+.saved-response-remove:hover {
+  background: #feecec;
+  color: #dc3545;
+}
+
+.saved-response-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.saved-back-button:focus-visible,
+.saved-response-action:focus-visible {
+  outline: 2px solid #9254ff;
+  outline-offset: 3px;
+}
+
+
+/* ==========================================
+   10. COPY FEEDBACK
+========================================== */
+
+.saved-copy-status {
+  font-size: 12px;
+  color: #9254ff;
+}
+
+.saved-copy-error {
+  font-size: 12px;
+  color: #dc3545;
+}
+
+
+/* ==========================================
+   11. EMPTY STATE
+========================================== */
+
+.saved-empty-state {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+
+  padding: 40px 20px;
+
+  text-align: center;
+}
+
+.saved-empty-icon {
+  width: 76px;
+  height: 76px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #e0d4ff;
+  border-radius: 24px;
+
+  color: #9254ff;
+}
+
+.saved-empty-state h2 {
+  margin: 0;
+
+  font-size: 21px;
+  font-weight: 600;
+  color: #071b60;
+}
+
+.saved-empty-state p {
+  max-width: 320px;
+  margin: 0;
+
+  font-size: 14px;
+  line-height: 1.7;
+  color: #64749a;
+}
+
+
+/* ==========================================
+   12. MOBILE RESPONSIVE DESIGN
+========================================== */
+
+@media (max-width: 600px) {
+
+  .saved-responses-page {
+    padding: 20px 16px;
+    gap: 20px;
+  }
+
+  .saved-page-header {
+    gap: 10px;
+  }
+
+  .saved-page-heading h1 {
+    font-size: 23px;
+  }
+
+  .saved-page-heading p {
+    font-size: 12px;
+  }
+
+  .saved-back-button,
+  .saved-page-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .saved-search {
+    padding: 12px 14px;
+  }
+
+  .saved-search input {
+    font-size: 16px;
+  }
+
+  .saved-response-item {
+    padding: 16px;
+    border-radius: 18px;
+    gap: 14px;
+  }
+
+  .saved-response-content {
+    font-size: 14px;
+  }
+
+  .saved-response-action {
+    width: 44px;
+    height: 44px;
+  }
+
+  .saved-empty-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+  }
+
+  .saved-empty-state h2 {
+    font-size: 18px;
+  }
+
+}
+
+
+/* ==========================================
+   13. REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .saved-back-button,
+  .saved-response-action {
+    transition: none;
+  }
+
+}

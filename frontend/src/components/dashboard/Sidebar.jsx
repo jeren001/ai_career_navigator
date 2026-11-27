@@ -1,3 +1,4 @@
+import { useSession } from '../../session/session.js'
 // ==========================================
 // PROJECT: AI CAREER
 // COMPONENT: Sidebar
@@ -102,7 +103,7 @@ const mainMenu = [
 // 02. ACCOUNT NAVIGATION
 // ==========================================
 
-const availableRoutes = new Set(['/dashboard', '/profile', '/settings'])
+const availableRoutes = new Set(['/dashboard', '/profile', '/settings', '/ai-assistant'])
 
 const accountMenu = [
   {
@@ -132,10 +133,11 @@ const accountMenu = [
 function SidebarItem({ item, onClose }) {
 
   const Icon = item.icon
+  const { user } = useSession()
   const { t } = useLocale()
   const content = <><Icon size={21} strokeWidth={2} /><span>{t(item.label, item.labelZh)}</span></>
 
-  if (!availableRoutes.has(item.path)) {
+  if (!availableRoutes.has(item.path) || (item.path === '/ai-assistant' && user.is_guest)) {
     return (
       <span className="sidebar-link" aria-disabled="true" title={t('Screen unavailable', '此页面暂不可用')}>
         {content}

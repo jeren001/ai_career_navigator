@@ -149,3 +149,20 @@ test('private profile photos send raw bytes and decode authenticated binary resp
   const restored = await request('/api/profile/photo', { responseType: 'blob', token: 'photo-user' })
   assert.equal(await restored.text(), 'encoded')
 })
+
+test('Assistant uses the conversation revision and sends only selected context', async () => {
+  const { sendAssistantMessage, turnMessages } = await import('../src/services/assistantService.js')
+  const request = async (path, options) => {
+    assert.equal(path, '/api/career-assistant/conversations/conversation-id/messages')
+    assert.equal(options.method, 'POST')
+    assert.deepEqual(options.body, { revision: 2, message: '如何准备面试？', context: ['skills'] })
+    return { revision: 3, turn: { turn_number: 3, user_message: '如何准备面试？',
+      assistant_message: '先准备一个真实例子。', source: 'fallback', reason: 'not_configured' } }
+  }
+  const result = await sendAssistantMessage(request, { id: 'conversation-id', revision: 2 }, '如何准备面试？', ['skills'])
+  const [question, reply] = turnMessages('conversation-id', result.turn)
+  assert.equal(result.revision, 3)
+  assert.equal(question.id, 'conversation-id:3:user')
+  assert.equal(reply.id, 'conversation-id:3:assistant')
+  assert.equal(reply.source, 'fallback')
+})
