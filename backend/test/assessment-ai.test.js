@@ -130,3 +130,59 @@ test('one allowed attempt uses the primary and configured process limits still a
   assert.equal((await generateAssessmentJson({ ...request, contents: 'Another request' })).reason, 'rate_limited');
   assert.deepEqual(calls, ['primary']);
 });
+
+test('OpenAI-compatible configuration uses custom routing, validation, caching, and failover', async (t) => {
+  const env = {
+    AI_PRIMARY_PROVIDER: 'openai-compatible',
+    AI_SECONDARY_PROVIDER: 'gemini',
+    AI_OPENAI_COMPATIBLE_BASE_URL: 'http://127.0.0.1:8000/custom/v1/',
+    AI_OPENAI_COMPATIBLE_MODEL: 'test-model',
+    AI_OPENAI_COMPATIBLE_API_KEY: 'test-fixture',
+    AI_MIN_REQUEST_INTERVAL_MS: '0',
+  };
+  const prior = Object.fromEntries(Object.keys(env).map((key) => [key, process.env[key]]));
+  Object.assign(process.env, env);
+  t.after(() => {
+    for (const [key, value] of Object.entries(prior)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  });
+  const received = [];
+  t.mock.method(globalThis, 'fetch', async (url, options) => {
+    received.push({ url: url.href, options });
+    if (received.length === 3) return new Response(null, { status: 429, headers: { 'retry-after': '30' } });
+    return Response.json({ choices: [{ message: { content: '{"answer":"validated"}' } }] });
+  });
+  setGeminiClientForTests({
+    models: { async generateContent() { return { text: '{"answer":"fallback provider"}' }; } },
+  });
+  let reservations = 0;
+  const aiRequest = { ...request, beforeRequest: async () => ++reservations <= 4 };
+
+  const result = await generateAssessmentJson(aiRequest);
+  assert.equal(result.provider, 'openai-compatible');
+  assert.equal(result.answer, 'validated');
+  const [{ url, options }] = received;
+  assert.equal(url, 'http://127.0.0.1:8000/custom/v1/chat/completions');
+  assert.equal(options.headers.authorization, 'Bearer test-fixture');
+  assert.equal(options.redirect, 'error');
+  assert.ok(options.signal instanceof AbortSignal);
+  const payload = JSON.parse(options.body);
+  assert.equal(payload.model, 'test-model');
+  assert.equal(payload.max_completion_tokens, request.maxOutputTokens);
+  assert.deepEqual(payload.messages.map(({ role }) => role), ['system', 'user']);
+  assert.equal(payload.messages[1].content, request.contents);
+  assert.equal(payload.response_format.type, 'json_schema');
+  assert.deepEqual(payload.response_format.json_schema.schema, schema);
+  assert.equal((await generateAssessmentJson(aiRequest)).cached, true);
+  assert.equal(reservations, 1);
+
+  process.env.AI_OPENAI_COMPATIBLE_MODEL = 'other-model';
+  assert.equal((await generateAssessmentJson(aiRequest)).cached, false);
+  const fallback = await generateAssessmentJson({ ...aiRequest, contents: 'Follow-up' });
+  assert.equal(fallback.provider, 'gemini');
+  assert.equal(fallback.answer, 'fallback provider');
+  assert.equal(reservations, 4);
+  assert.equal(received.length, 3);
+});

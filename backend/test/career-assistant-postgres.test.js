@@ -214,6 +214,45 @@ test('Career Assistant validates history, context consent, shared quotas and iso
       assert.match(invalidReply.data.turn.assistant_message, /can’t verify/);
 
       resetGeminiStateForTests();
+      const concurrentStart = Promise.withResolvers();
+      const concurrentRelease = Promise.withResolvers();
+      let calls = 0;
+      setAiProvidersForTests([{
+        id: 'gemini', model: 'assistant-test',
+        async generate() {
+          calls += 1;
+          concurrentStart.resolve();
+          await concurrentRelease.promise;
+          return JSON.stringify({ reply: 'Outline a project.' });
+        },
+      }]);
+      await database.query('DELETE FROM ai_usage_daily WHERE user_id = $1', [owner.id]);
+      await database.query(
+        `UPDATE career_assistant_conversations
+         SET pending_turn_id = '8fd77c56-ca28-40bf-8b13-c536aad7f613',
+             pending_turn_expires_at = clock_timestamp() - interval '1 second'
+         WHERE id = $1`,
+        [english.data.id],
+      );
+      const requestBody = { message: 'What should I build?', revision: 2 };
+      const firstPending = request(englishUrl + '/messages', 'POST', requestBody);
+      try {
+        await Promise.race([concurrentStart.promise, firstPending.then(() => assert.fail('Provider was not reached'))]);
+        assert.equal((await request(englishUrl + '/messages', 'POST', requestBody)).status, 409);
+        const { rows: [usage] } = await database.query(
+          'SELECT request_count FROM ai_usage_daily WHERE user_id = $1', [owner.id],
+        );
+        assert.equal(usage.request_count, 1);
+        const history = await request(englishUrl);
+        assert.equal(history.data.conversation.revision, 2);
+      } finally {
+        concurrentRelease.resolve();
+      }
+      assert.equal((await firstPending).status, 201);
+      assert.equal(calls, 1);
+      assert.equal((await request(englishUrl)).data.conversation.revision, 3);
+
+      resetGeminiStateForTests();
       const started = Promise.withResolvers();
       const release = Promise.withResolvers();
       setAiProvidersForTests([{
@@ -224,7 +263,7 @@ test('Career Assistant validates history, context consent, shared quotas and iso
           return JSON.stringify({ reply: 'Outline one small project.' });
         },
       }]);
-      const pending = request(englishUrl + '/messages', 'POST', { message: 'How do I start?', revision: 2 });
+      const pending = request(englishUrl + '/messages', 'POST', { message: 'How do I start?', revision: 3 });
       try {
         await Promise.race([started.promise, pending.then(() => assert.fail('Provider was not reached'))]);
         assert.equal((await request(englishUrl, 'DELETE')).status, 204);

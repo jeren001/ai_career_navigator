@@ -17,36 +17,48 @@ function fallback(reason) {
   return { status: 'fallback', reason };
 }
 
-async function reserveAttempt(initial, { beforeRequest, quotaReason, limits }, deadline, spacingDeadline) {
+async function reserveAttempt(initial, options, deadline, spacingDeadline, provider, request) {
+  const { beforeRequest, quotaReason, limits } = options;
   const now = Date.now();
   const day = Math.floor(now / 86_400_000);
   attempts = attempts.filter(({ time }) => time >= day * 86_400_000 || now - time < 60_000);
   const minuteCount = attempts.filter(({ time }) => now - time < 60_000).length;
   const dayCount = attempts.filter(({ time }) => time >= day * 86_400_000).length;
-  if (minuteCount >= limits.attemptsPerMinute || dayCount >= limits.attemptsPerDay) return 'rate_limited';
-  if (performance.now() >= deadline) return 'timeout';
+  if (minuteCount >= limits.attemptsPerMinute || dayCount >= limits.attemptsPerDay) return { reason: 'rate_limited' };
+  if (performance.now() >= deadline) return { reason: 'timeout' };
 
   const lastInitial = attempts.findLast((attempt) => attempt.initial);
   const delay = initial && lastInitial ? lastInitial.time + limits.requestIntervalMs - now : 0;
   if (delay > 0) {
     const waitMs = delay + 5;
-    if (performance.now() + waitMs >= Math.min(spacingDeadline, deadline)) return 'rate_limited';
+    if (performance.now() + waitMs >= Math.min(spacingDeadline, deadline)) return { reason: 'rate_limited' };
     await wait(waitMs);
-    return reserveAttempt(initial, { beforeRequest, quotaReason, limits }, deadline, spacingDeadline);
+    return reserveAttempt(initial, options, deadline, spacingDeadline, provider, request);
   }
 
   const slot = { time: now, initial };
   attempts.push(slot);
+  let spending;
+  let reason;
   try {
-    if (beforeRequest && !(await beforeRequest())) {
-      attempts = attempts.filter((entry) => entry !== slot);
-      return quotaReason;
-    }
+    if (provider.reserveSpend) spending = await provider.reserveSpend(request);
+    reason = spending?.reason;
   } catch {
-    attempts = attempts.filter((entry) => entry !== slot);
-    return 'daily_limit_unavailable';
+    reason = 'spending_limit_unavailable';
   }
-  return undefined;
+  if (!reason) {
+    try {
+      if (performance.now() >= deadline) reason = 'timeout';
+      else if (beforeRequest && !(await beforeRequest())) reason = quotaReason;
+    } catch {
+      reason = 'daily_limit_unavailable';
+    }
+  }
+  if (reason) {
+    attempts = attempts.filter((entry) => entry !== slot);
+    await spending?.cancel?.().catch(() => {});
+  }
+  return { reason, spending };
 }
 
 function retryAfterMs(error) {
@@ -92,7 +104,8 @@ async function generateWithTimeout(provider, request, timeoutMs) {
 
 async function runProviders(providers, request, options) {
   const { validate, maxAttempts = 3, waitForSlot = false, limits } = options;
-  const deadline = performance.now() + (options.taskTimeoutMs ?? TASK_TIMEOUT_MS);
+  const taskTimeoutMs = options.taskTimeoutMs ?? limits.taskTimeoutMs;
+  const deadline = performance.now() + taskTimeoutMs;
   const spacingDeadline = waitForSlot ? performance.now() + limits.requestIntervalMs + 100 : 0;
   let used = 0;
   let reason = 'not_configured';
@@ -105,16 +118,27 @@ async function runProviders(providers, request, options) {
     }
     // Leave one attempt for a configured secondary provider.
     const providerLimit = Math.max(1, maxAttempts - (providers.length - index - 1));
-    const providerDeadline = index === providers.length - 1 ? deadline : deadline - 8_000;
+    const providerDeadline = index === providers.length - 1 ? deadline : deadline - Math.min(8_000, taskTimeoutMs / 3);
     for (let retry = 0; used < providerLimit; retry += 1) {
-      if (performance.now() >= providerDeadline) break;
-      const denied = await reserveAttempt(used === 0, options, providerDeadline, spacingDeadline);
-      if (denied) return fallback(denied);
+      if (performance.now() >= providerDeadline) {
+        reason = 'timeout';
+        break;
+      }
+      const reservation = await reserveAttempt(used === 0, options, providerDeadline, spacingDeadline, provider, request);
+      if (reservation.reason) {
+        reason = reservation.reason;
+        if (reason === 'spending_limit' || reason === 'spending_limit_unavailable') break;
+        return fallback(reason);
+      }
       used += 1;
       let failure;
       try {
-        const timeoutMs = Math.min(ATTEMPT_TIMEOUT_MS, Math.max(1, Math.floor(providerDeadline - performance.now())));
-        const text = await generateWithTimeout(provider, request, timeoutMs);
+        const timeoutMs = Math.min(limits.attemptTimeoutMs, Math.max(1, Math.floor(providerDeadline - performance.now())));
+        const response = await generateWithTimeout(provider, request, timeoutMs);
+        const text = typeof response === 'string' ? response : response?.text;
+        if (reservation.spending && response?.usage) {
+          await reservation.spending.settle(response.usage).catch(() => {});
+        }
         const value = validate(JSON.parse(text || 'null'));
         if (value) return { ...value, status: 'ai', provider: provider.id, cached: false };
         failure = { reason: 'invalid_response', retry: true };
@@ -142,6 +166,8 @@ export async function generateAiJson(options) {
     quotaReason: 'daily_limit',
     ...options,
     limits: {
+      taskTimeoutMs: aiInteger('AI_TASK_TIMEOUT_MS', TASK_TIMEOUT_MS, 1, 90_000),
+      attemptTimeoutMs: aiInteger('AI_ATTEMPT_TIMEOUT_MS', ATTEMPT_TIMEOUT_MS, 1, 90_000),
       attemptsPerMinute: aiInteger('AI_MAX_ATTEMPTS_PER_MINUTE', 10, 1),
       attemptsPerDay: aiInteger('AI_MAX_ATTEMPTS_PER_DAY', 450, 1),
       requestIntervalMs: aiInteger('AI_MIN_REQUEST_INTERVAL_MS', 3_000, 0, 30_000),

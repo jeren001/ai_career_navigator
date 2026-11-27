@@ -138,47 +138,75 @@ export async function addConversationTurn(database, userId, id, raw) {
   }
 
   const { conversation, turns } = await conversationHistory(database, userId, id, 4, null);
-  const stale = () => skillsError(409, 'Conversation changed. Reload the history and retry');
+  const stale = () => skillsError(409, 'Conversation changed or a reply is in progress. Reload the history and retry');
   if (revision !== conversation.revision) throw stale();
   const { language } = conversation;
   const resume = await consentedResume(database, userId, resumeContext);
   const context = await assistantContext(database, userId, sources, resume);
-  const result = await generateAiJson({
-    userId,
-    contents: JSON.stringify({
-      language: language === 'zh-CN' ? 'Simplified Chinese' : 'English',
-      conversation: turns.map(({ user_message, assistant_message, context_used }) => ({
-        user_message,
-        ...(!context_used.includes('resume') && { assistant_message }),
-      })),
-      context,
-      message: content,
-    }),
-    systemInstruction,
-    schema,
-    maxOutputTokens: 900,
-    validate: (value) => validateReply(value, language),
-    beforeRequest: () => reserveDailyAiRequest(database, userId),
-    maxAttempts: 2,
-    waitForSlot: true,
-    cache: false,
-  });
-
-  const reply = result.status === 'ai' ? result.reply : fallbackReply(language, content);
-  // The conditional update and insertion are one statement. A stale or deleted
-  // conversation cannot acquire a partial turn, even if a provider already replied.
-  const { rows: [saved] } = await database.query(
-    `WITH changed AS (
-       UPDATE career_assistant_conversations SET revision = revision + 1, updated_at = clock_timestamp()
-       WHERE id = $1 AND user_id = $2 AND revision = $3 RETURNING id, revision
-     )
-     INSERT INTO career_assistant_turns
-       (conversation_id, turn_number, user_message, assistant_message, source, provider, reason, context_used)
-     SELECT id, revision, $4, $5, $6, $7, $8, $9 FROM changed
-     RETURNING ${turnColumns}`,
-    [id, userId, revision, content, reply, result.status, result.provider ?? null, result.reason ?? null,
-      result.status === 'ai' ? Object.keys(context) : []],
+  const claim = randomUUID();
+  // Keep the claim longer than the AI task deadline and allow recovery after a process crash.
+  const reserved = await database.query(
+    `UPDATE career_assistant_conversations
+     SET pending_turn_id = $4, pending_turn_expires_at = clock_timestamp() + interval '2 minutes'
+     WHERE id = $1 AND user_id = $2 AND revision = $3
+       AND (pending_turn_id IS NULL OR pending_turn_expires_at <= clock_timestamp())`,
+    [id, userId, revision, claim],
   );
+  if (!reserved.rowCount) {
+    await findConversation(database, userId, id);
+    throw stale();
+  }
+
+  let saved;
+  try {
+    const result = await generateAiJson({
+      userId,
+      contents: JSON.stringify({
+        language: language === 'zh-CN' ? 'Simplified Chinese' : 'English',
+        conversation: turns.map(({ user_message, assistant_message, context_used }) => ({
+          user_message,
+          ...(!context_used.includes('resume') && { assistant_message }),
+        })),
+        context,
+        message: content,
+      }),
+      systemInstruction,
+      schema,
+      maxOutputTokens: 900,
+      validate: (value) => validateReply(value, language),
+      beforeRequest: () => reserveDailyAiRequest(database, userId),
+      maxAttempts: 2,
+      waitForSlot: true,
+      cache: false,
+    });
+
+    const reply = result.status === 'ai' ? result.reply : fallbackReply(language, content);
+    // The conditional update and insertion are one statement. A stale or deleted
+    // conversation cannot acquire a partial turn, even if a provider already replied.
+    const { rows } = await database.query(
+      `WITH changed AS (
+         UPDATE career_assistant_conversations
+         SET revision = revision + 1, updated_at = clock_timestamp(),
+             pending_turn_id = NULL, pending_turn_expires_at = NULL
+         WHERE id = $1 AND user_id = $2 AND revision = $3 AND pending_turn_id = $10 RETURNING id, revision
+       )
+       INSERT INTO career_assistant_turns
+         (conversation_id, turn_number, user_message, assistant_message, source, provider, reason, context_used)
+       SELECT id, revision, $4, $5, $6, $7, $8, $9 FROM changed
+       RETURNING ${turnColumns}`,
+      [id, userId, revision, content, reply, result.status, result.provider ?? null, result.reason ?? null,
+        result.status === 'ai' ? Object.keys(context) : [], claim],
+    );
+    [saved] = rows;
+  } finally {
+    if (!saved) {
+      await database.query(
+        `UPDATE career_assistant_conversations SET pending_turn_id = NULL, pending_turn_expires_at = NULL
+         WHERE id = $1 AND user_id = $2 AND pending_turn_id = $3`,
+        [id, userId, claim],
+      ).catch(() => {}); // The claim expires if the database is unavailable.
+    }
+  }
   if (!saved) {
     await findConversation(database, userId, id);
     throw stale();

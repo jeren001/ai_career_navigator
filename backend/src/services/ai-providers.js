@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import { geminiFetch } from './gemini-fetch.js';
+import { arkProvider, openAiCompatibleProvider } from './openai-compatible.js';
 
 export const GEMINI_DEFAULT_MODEL = 'gemini-3.1-flash-lite';
 
@@ -84,10 +85,12 @@ export function ollamaProvider() {
 
 export function configuredAiProviders(injectedGemini) {
   const registry = new Map([
+    ['ark', arkProvider],
     ['gemini', () => geminiProvider(injectedGemini)],
     ['ollama', ollamaProvider],
+    ['openai-compatible', openAiCompatibleProvider],
   ]);
-  const primary = process.env.AI_PRIMARY_PROVIDER?.trim() || 'gemini';
+  const primary = process.env.AI_PRIMARY_PROVIDER?.trim() || (injectedGemini ? 'gemini' : 'ark');
   const secondary = process.env.AI_SECONDARY_PROVIDER?.trim();
   return [...new Set([primary, secondary])].map((name) => registry.get(name)?.()).filter(Boolean);
 }

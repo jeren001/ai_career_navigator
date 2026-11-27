@@ -58,7 +58,7 @@ function operation(operationId, summary, successStatus, successSchema, options =
       400: response('Invalid request fields, conversation ID, or pagination.', ref('Error')),
       401: response('A registered account bearer token is required.', ref('Error')),
       ...(found && { 404: response(found === true ? 'Owned conversation not found.' : found, ref('Error')) }),
-      ...(conflict && { 409: response('Conversation revision changed. Reload history before retrying.', ref('Error')) }),
+      ...(conflict && { 409: response('Conversation revision changed or a reply is in progress. The rejected request uses no AI quota. Reload history before retrying.', ref('Error')) }),
       500: response('Internal server error.', ref('Error')),
       503: response('Authentication configuration or assistant schema unavailable.', ref('Error')),
     },

@@ -83,9 +83,9 @@ const matchFields = {
   match_percent: { ...score, minimum: 1, description: 'Relative score normalized to the top result. Interpret it as a ranking score.' },
   reason: string,
 };
-const provider = choices('gemini', 'ollama');
+const provider = choices('gemini', 'ollama', 'openai-compatible', 'ark');
 const fallbackReason = choices(
-  'not_configured', 'daily_limit', 'session_limit', 'daily_limit_unavailable',
+  'not_configured', 'daily_limit', 'session_limit', 'daily_limit_unavailable', 'spending_limit', 'spending_limit_unavailable',
   'rate_limited', 'quota_exceeded', 'timeout', 'service_unavailable', 'network_error',
   'invalid_response', 'unavailable',
 );
