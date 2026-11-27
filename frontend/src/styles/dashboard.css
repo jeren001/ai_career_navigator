@@ -69,3 +69,13 @@
     font-size: 24px;
   }
 }
+
+
+.dashboard-main {
+  flex: 1;
+  min-width: 0;
+
+  padding: 32px;
+
+  background: #fafbfe;
+}

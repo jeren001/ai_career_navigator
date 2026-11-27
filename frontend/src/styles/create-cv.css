@@ -1,0 +1,1410 @@
+/* ==========================================
+   PROJECT: AI CAREER
+   FILE: create-cv.css
+   PURPOSE: CV creation interface and responsive design
+========================================== */
+
+
+/* ==========================================
+   01. MAIN PAGE
+========================================== */
+
+.create-cv-page {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  color: #071b60;
+  box-sizing: border-box;
+}
+
+.create-cv-page *,
+.create-cv-page *::before,
+.create-cv-page *::after {
+  box-sizing: border-box;
+}
+
+.create-cv-page button,
+.create-cv-page input,
+.create-cv-page select,
+.create-cv-page textarea {
+  font-family: inherit;
+}
+
+
+/* ==========================================
+   02. PAGE HEADER
+========================================== */
+
+.create-cv-header {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.create-cv-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 13px;
+  color: #385781;
+}
+
+.create-cv-home-link {
+  display: inline-flex;
+  align-items: center;
+  color: #385781;
+  text-decoration: none;
+}
+
+.create-cv-breadcrumb-button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #385781;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.create-cv-home-link:hover,
+.create-cv-breadcrumb-button:hover {
+  color: #2987f5;
+}
+
+.create-cv-breadcrumb span[aria-current="page"] {
+  color: #071b60;
+  font-weight: 600;
+}
+
+.create-cv-heading {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.create-cv-heading-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #071b60;
+}
+
+.create-cv-heading-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.create-cv-title {
+  margin: 0;
+  color: #071b60;
+  font-size: 32px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.create-cv-description {
+  margin: 0;
+  color: #385781;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+
+/* ==========================================
+   03. MAIN FORM CONTAINER
+========================================== */
+
+.create-cv-container {
+  width: 100%;
+  min-width: 0;
+  padding: 36px;
+  background: #ffffff;
+  border: 1px solid #e0eaf5;
+  border-radius: 22px;
+  box-shadow: 0 5px 20px rgba(7, 27, 96, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.create-cv-form-content {
+  width: 100%;
+  min-width: 0;
+}
+
+
+/* ==========================================
+   04. STEP INDICATOR
+========================================== */
+
+.cv-step-indicator {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  margin: 0;
+  padding: 0 0 28px;
+  list-style: none;
+  border-bottom: 1px solid #e4edf7;
+}
+
+.cv-step-item {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.cv-step-circle {
+  position: relative;
+  z-index: 1;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #d9f1ff;
+  color: #385781;
+  font-size: 16px;
+  font-weight: 700;
+  transition: background 0.2s ease;
+}
+
+.cv-step-item.active .cv-step-circle {
+  background: #ffd12e;
+  color: #071b60;
+}
+
+.cv-step-item.completed .cv-step-circle {
+  background: #2987f5;
+  color: #ffffff;
+}
+
+.cv-step-label {
+  padding: 0 5px;
+  color: #526b91;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.cv-step-item.active .cv-step-label {
+  color: #071b60;
+  font-weight: 700;
+}
+
+.cv-step-item.completed .cv-step-label {
+  color: #2987f5;
+}
+
+.cv-step-connector {
+  position: absolute;
+  top: 20px;
+  left: calc(50% + 28px);
+  width: calc(100% - 56px);
+  height: 3px;
+  background: #d9eaff;
+  border-radius: 4px;
+}
+
+.cv-step-item.completed .cv-step-connector {
+  background: #2987f5;
+}
+
+
+/* ==========================================
+   05. FORM SECTION
+========================================== */
+
+.cv-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  min-width: 0;
+}
+
+.cv-form-section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: #2987f5;
+}
+
+.cv-form-section-header > svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.cv-form-section-header h2 {
+  margin: 0 0 7px;
+  color: #071b60;
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.cv-form-section-header p {
+  margin: 0;
+  color: #385781;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+
+/* ==========================================
+   06. FORM GRID AND FIELDS
+========================================== */
+
+.cv-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  column-gap: 28px;
+  row-gap: 22px;
+}
+
+.cv-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+}
+
+.cv-form-field-full {
+  grid-column: 1 / -1;
+}
+
+.cv-form-field label {
+  color: #071b60;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.cv-required {
+  color: #dc5353;
+}
+
+.cv-form-field input,
+.cv-form-field select,
+.cv-form-field textarea,
+.cv-skill-input-row input {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  margin: 0;
+  padding: 13px 15px;
+  background: #ffffff;
+  border: 1px solid #d5e2f0;
+  border-radius: 10px;
+  outline: none;
+  color: #071b60;
+  font-size: 14px;
+  line-height: 1.5;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.cv-form-field input::placeholder,
+.cv-form-field textarea::placeholder,
+.cv-skill-input-row input::placeholder {
+  color: #7e91ac;
+  opacity: 1;
+}
+
+.cv-form-field input:focus,
+.cv-form-field select:focus,
+.cv-form-field textarea:focus,
+.cv-skill-input-row input:focus {
+  border-color: #2987f5;
+  box-shadow: 0 0 0 3px rgba(41, 135, 245, 0.1);
+}
+
+.cv-form-field select {
+  cursor: pointer;
+}
+
+.cv-form-field select:invalid {
+  color: #7e91ac;
+}
+
+.cv-form-field textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.cv-form-field input:disabled,
+.cv-form-field select:disabled {
+  background: #f1f5fa;
+  color: #8b9bb0;
+  cursor: not-allowed;
+}
+
+.cv-form-field input[type="month"] {
+  min-width: 0;
+  color-scheme: light;
+}
+
+
+/* ==========================================
+   07. VALIDATION AND CHARACTER COUNTER
+========================================== */
+
+.cv-form-field input[aria-invalid="true"],
+.cv-form-field select[aria-invalid="true"] {
+  border-color: #dc5353;
+}
+
+.cv-field-error {
+  margin: 0;
+  color: #c03939;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.cv-character-counter {
+  align-self: flex-end;
+  color: #7186a4;
+  font-size: 12px;
+}
+
+
+/* ==========================================
+   08. EMPTY STATES
+========================================== */
+
+.cv-experience-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 200px;
+  padding: 28px;
+  background: #f8fbff;
+  border: 1.5px dashed #9acbff;
+  border-radius: 16px;
+  text-align: center;
+}
+
+.cv-experience-empty > svg {
+  color: #2987f5;
+}
+
+.cv-experience-empty h3 {
+  margin: 0;
+  color: #071b60;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.cv-experience-empty p {
+  max-width: 440px;
+  margin: 0;
+  color: #385781;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+
+/* ==========================================
+   09. EXPERIENCE AND EDUCATION CARDS
+========================================== */
+
+.cv-experience-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cv-experience-list:empty {
+  display: none;
+}
+
+.cv-experience-card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  background: #fcfdff;
+  border: 1px solid #dce7f4;
+  border-radius: 15px;
+}
+
+.cv-experience-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e4edf7;
+}
+
+.cv-experience-header h3 {
+  margin: 0;
+  color: #071b60;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.cv-remove-button {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #fff3f3;
+  border: 1px solid #f7dada;
+  border-radius: 9px;
+  color: #dc5353;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.cv-remove-button:hover {
+  background: #ffe1e1;
+}
+
+
+/* ==========================================
+   10. CHECKBOXES
+========================================== */
+
+.cv-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #385781;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.cv-checkbox-label input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: #2987f5;
+  cursor: pointer;
+}
+
+
+/* ==========================================
+   11. ADD BUTTONS
+========================================== */
+
+.cv-add-button {
+  width: fit-content;
+  max-width: 100%;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 20px;
+  background: #eaf5ff;
+  border: 1px solid #b5d9ff;
+  border-radius: 10px;
+  color: #176acb;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.cv-add-button:hover {
+  background: #d9edff;
+}
+
+
+/* ==========================================
+   12. SKILL CATEGORIES
+========================================== */
+
+.cv-skill-category {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+  border: 1px solid #dce7f4;
+  border-radius: 15px;
+  background: #fcfdff;
+}
+
+.cv-skill-category-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: #2987f5;
+}
+
+.cv-skill-category-header > svg {
+  flex-shrink: 0;
+}
+
+.cv-skill-category-header h3 {
+  margin: 0 0 6px;
+  color: #071b60;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.cv-skill-category-header p {
+  margin: 0;
+  color: #385781;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.cv-skill-input-row {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.cv-skill-input-row input {
+  flex: 1;
+}
+
+.cv-skill-add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 88px;
+  padding: 10px 16px;
+  border: 1px solid #b5d9ff;
+  border-radius: 10px;
+  background: #eaf5ff;
+  color: #176acb;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.cv-skill-add-button:hover:not(:disabled) {
+  background: #d9edff;
+}
+
+.cv-skill-add-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* ==========================================
+   13. SKILL TAGS
+========================================== */
+
+.cv-skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cv-skill-tags:empty {
+  display: none;
+}
+
+.cv-skill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 7px 10px 7px 13px;
+  background: #e1efff;
+  border: 1px solid #cce2ff;
+  border-radius: 30px;
+  color: #071b60;
+  font-size: 13px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.cv-skill-tag button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: #385781;
+  cursor: pointer;
+}
+
+.cv-skill-tag button:hover {
+  background: #c7dfff;
+}
+
+.cv-skill-empty {
+  margin: 0;
+  color: #7186a4;
+  font-size: 13px;
+}
+
+
+/* ==========================================
+   14. LANGUAGE FIELDS
+========================================== */
+
+.cv-language-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cv-language-list:empty {
+  display: none;
+}
+
+.cv-language-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cv-language-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 38px;
+  align-items: end;
+  gap: 14px;
+}
+
+.cv-language-row .cv-remove-button {
+  margin-bottom: 5px;
+}
+
+
+/* ==========================================
+   15. TEMPLATE SELECTION
+========================================== */
+
+.cv-template-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 20px;
+}
+
+.cv-template-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 18px;
+  min-width: 0;
+  padding: 18px;
+  background: #ffffff;
+  border: 2px solid #dce7f4;
+  border-radius: 15px;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.cv-template-card:hover {
+  border-color: #9acbff;
+  transform: translateY(-3px);
+}
+
+.cv-template-card.selected {
+  background: #f0f8ff;
+  border-color: #2987f5;
+}
+
+.cv-template-selected {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  background: #ffffff;
+  border-radius: 50%;
+  color: #2987f5;
+}
+
+.cv-template-information {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cv-template-name {
+  color: #071b60;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.cv-template-description {
+  color: #385781;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+
+/* ==========================================
+   16. TEMPLATE PREVIEWS
+========================================== */
+
+.cv-template-preview {
+  width: 100%;
+  aspect-ratio: 210 / 297;
+  min-width: 0;
+  padding: 8%;
+  display: flex;
+  flex-direction: column;
+  gap: 5%;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e0e5ed;
+  border-radius: 3px;
+  box-shadow: 0 3px 10px rgba(7, 27, 96, 0.06);
+}
+
+.cv-preview-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cv-preview-header strong {
+  color: var(--template-color);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.cv-preview-header span {
+  color: #475569;
+  font-size: 8px;
+}
+
+.cv-preview-header small {
+  color: #718096;
+  font-size: 6px;
+}
+
+.cv-preview-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cv-preview-section strong {
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--template-color);
+  color: var(--template-color);
+  font-size: 7px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.cv-preview-line {
+  width: 100%;
+  height: 2px;
+  flex-shrink: 0;
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.cv-preview-line.medium {
+  width: 85%;
+}
+
+.cv-preview-line.short {
+  width: 65%;
+}
+
+.template-modern .cv-preview-header {
+  padding: 10px;
+  background: #e1efff;
+}
+
+.template-professional .cv-preview-header {
+  align-items: center;
+  text-align: center;
+}
+
+.cv-template-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: #eaf5ff;
+  border-radius: 10px;
+  color: #2987f5;
+}
+
+.cv-template-note svg {
+  flex-shrink: 0;
+}
+
+.cv-template-note p {
+  margin: 0;
+  color: #385781;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* ==========================================
+   17. FORM NAVIGATION
+========================================== */
+
+.cv-form-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 26px;
+  border-top: 1px solid #e4edf7;
+}
+
+.cv-navigation-back,
+.cv-navigation-next {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 13px 22px;
+  border-radius: 10px;
+  color: #071b60;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.5;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.cv-navigation-back {
+  background: #ffffff;
+  border: 1px solid #9bb9df;
+}
+
+.cv-navigation-back:hover:not(:disabled) {
+  background: #eaf5ff;
+}
+
+.cv-navigation-next {
+  background: #ffd12e;
+  border: 1px solid #ffd12e;
+}
+
+.cv-navigation-next:hover:not(:disabled) {
+  background: #f5c51c;
+  transform: translateY(-1px);
+}
+
+.cv-navigation-back:disabled,
+.cv-navigation-next:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* ==========================================
+   18. ACCESSIBILITY
+========================================== */
+
+.create-cv-page button:focus-visible,
+.create-cv-page a:focus-visible,
+.cv-checkbox-label input:focus-visible {
+  outline: 3px solid #2987f5;
+  outline-offset: 3px;
+}
+
+
+/* ==========================================
+   19. RESPONSIVE — SMALL DESKTOP
+========================================== */
+
+@media (max-width: 1200px) {
+
+  .create-cv-container {
+    padding: 28px;
+  }
+
+  .cv-form-grid {
+    column-gap: 20px;
+  }
+
+  .cv-template-grid {
+    gap: 14px;
+  }
+
+  .cv-template-card {
+    padding: 12px;
+  }
+
+}
+
+
+/* ==========================================
+   20. RESPONSIVE — TABLET
+========================================== */
+
+@media (max-width: 900px) {
+
+  .create-cv-page {
+    gap: 24px;
+  }
+
+  .create-cv-container {
+    padding: 24px;
+    gap: 26px;
+  }
+
+  .create-cv-title {
+    font-size: 28px;
+  }
+
+  .cv-step-circle {
+    width: 38px;
+    height: 38px;
+  }
+
+  .cv-step-connector {
+    top: 18px;
+    left: calc(50% + 25px);
+    width: calc(100% - 50px);
+  }
+
+  .cv-step-label {
+    font-size: 11px;
+  }
+
+}
+
+
+/* ==========================================
+   21. RESPONSIVE — MOBILE
+========================================== */
+
+@media (max-width: 600px) {
+
+  .create-cv-page {
+    gap: 20px;
+  }
+
+  .create-cv-header {
+    gap: 18px;
+  }
+
+  .create-cv-heading {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .create-cv-heading-icon svg {
+    width: 34px;
+    height: 34px;
+  }
+
+  .create-cv-title {
+    font-size: 25px;
+  }
+
+  .create-cv-description {
+    font-size: 13px;
+  }
+
+  .create-cv-breadcrumb {
+    gap: 7px;
+    font-size: 11px;
+  }
+
+  .create-cv-breadcrumb-button {
+    font-size: 11px;
+  }
+
+  .create-cv-container {
+    padding: 18px 14px;
+    border-radius: 16px;
+    gap: 24px;
+  }
+
+  /* Compact step indicator */
+
+  .cv-step-indicator {
+    padding-bottom: 20px;
+  }
+
+  .cv-step-item {
+    gap: 8px;
+  }
+
+  .cv-step-circle {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .cv-step-circle svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .cv-step-label {
+    padding: 0 2px;
+    font-size: 9px;
+    overflow-wrap: anywhere;
+  }
+
+  .cv-step-connector {
+    top: 14px;
+    left: calc(50% + 19px);
+    width: calc(100% - 38px);
+    height: 2px;
+  }
+
+  /* Single-column forms */
+
+  .cv-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .cv-form-section {
+    gap: 22px;
+  }
+
+  .cv-form-section-header h2 {
+    font-size: 20px;
+  }
+
+  .cv-form-section-header p {
+    font-size: 12px;
+  }
+
+  .cv-form-field input,
+  .cv-form-field select,
+  .cv-form-field textarea,
+  .cv-skill-input-row input {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  /* Experience and education */
+
+  .cv-experience-card,
+  .cv-skill-category {
+    padding: 16px;
+    gap: 18px;
+  }
+
+  .cv-experience-empty {
+    min-height: 180px;
+    padding: 20px 14px;
+  }
+
+  .cv-add-button {
+    width: 100%;
+  }
+
+  .cv-remove-button {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Skills */
+
+  .cv-skill-input-row {
+    gap: 8px;
+  }
+
+  .cv-skill-add-button {
+    min-width: 65px;
+    padding: 10px;
+  }
+
+  .cv-language-row {
+    grid-template-columns: minmax(0, 1fr) 44px;
+    gap: 12px;
+  }
+
+  .cv-language-row .cv-form-field:first-child {
+    grid-column: 1 / -1;
+  }
+
+  /* Templates */
+
+  .cv-template-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .cv-template-card {
+    padding: 20px;
+  }
+
+  .cv-template-preview {
+    max-width: 220px;
+    align-self: center;
+  }
+
+  /* Navigation */
+
+  .cv-form-navigation {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 12px;
+    padding-top: 20px;
+  }
+
+  .cv-navigation-back,
+  .cv-navigation-next {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 16px;
+  }
+
+}
+
+
+/* ==========================================
+   22. REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .create-cv-page *,
+  .create-cv-page *::before,
+  .create-cv-page *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .cv-template-card:hover,
+  .cv-navigation-next:hover {
+    transform: none;
+  }
+
+}
+/* ==========================================
+   23. INTERNATIONAL PHONE NUMBER
+========================================== */
+
+.cv-phone-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 14px;
+  background: #ffffff;
+  border: 1px solid #d5e2f0;
+  border-radius: 10px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  --PhoneInputCountryFlag-height: 20px;
+  --PhoneInputCountrySelectArrow-color: #385781;
+  --PhoneInputCountrySelectArrow-opacity: 1;
+  --PhoneInputCountrySelectArrow-width: 6px;
+}
+
+.cv-phone-input:focus-within {
+  border-color: #2987f5;
+  box-shadow: 0 0 0 3px rgba(41, 135, 245, 0.1);
+}
+
+
+/* Country selector */
+
+.cv-phone-input .PhoneInputCountry {
+  align-self: stretch;
+  margin: 0;
+  padding-right: 12px;
+  border-right: 1px solid #d5e2f0;
+}
+
+.cv-phone-input .PhoneInputCountrySelect {
+  cursor: pointer;
+}
+
+.cv-phone-input .PhoneInputCountryIcon {
+  border-radius: 2px;
+}
+
+.cv-phone-input .PhoneInputCountrySelectArrow {
+  margin-left: 9px;
+}
+
+
+/* Phone number field */
+
+.cv-form-field .cv-phone-input .PhoneInputInput {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  padding: 12px 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #071b60;
+  box-shadow: none;
+}
+
+.cv-form-field .cv-phone-input .PhoneInputInput:focus {
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+
+/* Invalid phone number */
+
+.cv-phone-input:has(input[aria-invalid="true"]) {
+  border-color: #dc5353;
+}
+
+
+/* Mobile responsive */
+
+@media (max-width: 600px) {
+
+  .cv-phone-input {
+    gap: 10px;
+    padding: 0 12px;
+  }
+
+  .cv-phone-input .PhoneInputInput {
+    font-size: 16px;
+  }
+
+}
+
+
+/* ==========================================
+   24. MONTH AND YEAR PICKER
+========================================== */
+
+.cv-month-year-picker {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+}
+
+
+/* ==========================================
+   MONTH AND YEAR SELECTORS
+========================================== */
+
+.cv-month-year-picker select {
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  min-height: 48px;
+  padding: 0 34px 0 14px;
+  border: 1px solid #d5e2f0;
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: #071b60;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+
+/* ==========================================
+   CONSISTENT SELECT APPEARANCE
+========================================== */
+
+.cv-form-field select:not(.PhoneInputCountrySelect) {
+  appearance: none;
+  -webkit-appearance: none;
+
+  height: 48px;
+  min-height: 48px;
+
+  padding: 0 34px 0 14px;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23526ba8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+
+/* ==========================================
+   DISABLED DATE SELECTORS
+========================================== */
+
+.cv-month-year-picker select:disabled {
+  background-color: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+
+/* ==========================================
+   MOBILE RESPONSIVE DESIGN
+========================================== */
+
+@media (max-width: 600px) {
+
+  .cv-month-year-picker {
+    grid-template-columns: 1.3fr 1fr;
+    gap: 8px;
+  }
+
+  .cv-month-year-picker select {
+    font-size: 16px;
+  }
+
+}
+
+.cv-save-settings {
+  width: min(100%, 440px);
+}
+
+.cv-save-settings p {
+  margin: 8px 0 0;
+  color: #385781;
+  font-size: 14px;
+}
+
+.cv-save-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 600px) {
+  .cv-save-actions {
+    width: 100%;
+  }
+
+  .cv-save-actions > button {
+    flex: 1 1 100%;
+  }
+}

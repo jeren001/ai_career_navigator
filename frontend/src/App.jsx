@@ -5,7 +5,7 @@
 // ==========================================
 
 // Import React Router
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 // Import global user context
 import { UserProvider } from './context/UserContext'
@@ -21,53 +21,27 @@ import Settings from './pages/Settings'
 
 import AIAssistant from './pages/AIAssistant'
 
-// Main application component
+import CVBuilder from './pages/CVBuilder'
+
+const router = createBrowserRouter([
+  { path: '/', element: <Home /> },
+  { path: '/dashboard', element: <Dashboard /> },
+  { path: '/profile', element: <MyProfile /> },
+  { path: '/about', element: <About /> },
+  { path: '/signin', element: <SignIn /> },
+  { path: '/signup', element: <SignUp /> },
+  { path: '/settings', element: <Settings /> },
+  { path: '/ai-assistant', element: <AIAssistant /> },
+  { path: '/resume', element: <CVBuilder /> },
+  { path: '*', element: null }
+])
 
 function App() {
-
   return (
-
     <UserProvider>
-
-      <BrowserRouter>
-
-        {/* Define application routes */}
-
-        <Routes>
-
-          {/* Home Page */}
-          <Route path="/" element={<Home />} />
-
-          {/* Dashboard Page */}
-          <Route path="/dashboard" element={<Dashboard />} />
-
-          {/* My Profile Page */}
-          <Route path="/profile" element={<MyProfile />} />
-
-          {/* About Page */}
-          <Route path="/about" element={<About />} />
-
-          {/* Sign In Page */}
-          <Route path="/signin" element={<SignIn />} />
-
-          {/* Create an Account Page */}
-          <Route path="/signup" element={<SignUp />} />
-
-          {/* Settings Page */}
-          <Route path="/settings" element={<Settings />} />
-
-          {/* AI Assistant Page */}
-          <Route path="/ai-assistant" element={<AIAssistant />} />
-
-        </Routes>
-
-      </BrowserRouter>
-
+      <RouterProvider router={router} />
     </UserProvider>
-
   )
-
 }
 
-// Export the application
 export default App
