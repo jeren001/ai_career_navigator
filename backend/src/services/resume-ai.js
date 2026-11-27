@@ -48,7 +48,7 @@ function withoutContact(value) {
   return value.replace(/\b[\w.+-]+@[\w.-]+\.[a-z]{2,}\b|(?:https?:\/\/|www\.)\S+|(?:\+?\d[\s().-]*){8,}/giu, '[…]');
 }
 
-function resumeEvidence(resume) {
+export function resumeEvidence(resume) {
   const entries = Object.entries(resume.sections).flatMap(([section, items]) => items.slice(0, 5).map((entry) => ({
     section,
     text: [entry.name, entry.organization, entry.dates, entry.details].filter(Boolean).join(' — ').slice(0, 400),

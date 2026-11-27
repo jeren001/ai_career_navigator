@@ -6,7 +6,7 @@ AI-powered career guidance project.
 
 The Express API lives in `backend`. It reads `DATABASE_URL` from `backend/.env` and exposes active career roles at `GET /api/careers`. Optional query parameters are `cluster`, `category`, and `niche_pivot_friendly=true|false`. `cluster` filters `career_roles.cluster`. `category` filters the `career_field` metadata in `market_pulse`. The response uses the database column names, including `slug`, `title`, `cluster`, `summary`, and `is_active`.
 
-Gemini is the primary assessment provider. Set `GEMINI_API_KEY` in `backend/.env` and optionally set `GEMINI_MODEL`. The default is `gemini-3.1-flash-lite`. The backend uses Gemini for clarification questions, evidence from custom answers, and final guidance.
+Gemini is the default primary provider. Set `AI_PRIMARY_PROVIDER` and `AI_SECONDARY_PROVIDER` to `gemini`, `ollama`, or `none` to configure the provider chain. An unavailable provider is skipped and existing fallback responses apply if no configured provider can respond. Set `GEMINI_API_KEY` in `backend/.env` and optionally set `GEMINI_MODEL`. The default is `gemini-3.1-flash-lite`. The backend uses Gemini for clarification questions, evidence from custom answers, and final guidance.
 
 Set `GEMINI_HTTP_PROXY` in the local backend environment if Gemini needs an HTTP or HTTPS CONNECT proxy. Leave it unset for the default transport. This setting applies to Gemini requests.
 
@@ -94,6 +94,24 @@ An empty create request uses the top match, your profile language, and 180 minut
 Roadmaps use current skill gaps and practice history to select relevant catalog materials. Resource links include the actual learning language, which can differ from the roadmap language. Milestone estimates cover the suggested activity. Provider estimates, when available, refer to the listed resource. Progress reflects milestones you mark complete.
 
 Gemini personalizes the actions and outcomes within the shared account quota and cache. A roadmap using rule-based guidance exposes the reason in `personalization`. Reading a plan and updating a milestone require zero AI calls.
+
+## Career Assistant API
+
+Run `npm run migrate` from `backend`, then open **Career Assistant** in Swagger UI at `/api-docs`. All operations require a registered account bearer token.
+
+| Method and path | Purpose |
+| --- | --- |
+| `POST /api/career-assistant/conversations` | Create a conversation. Supply `en` or `zh-CN` as `language`, or use the account preference. |
+| `GET /api/career-assistant/conversations` | List your conversations. Continue with `next_offset` when present. |
+| `GET /api/career-assistant/conversations/{id}` | Read the most recent saved turns in chronological order. Use `next_before` to load the previous page. |
+| `POST /api/career-assistant/conversations/{id}/messages` | Send a message with the current `revision` and optional context sources. Saves the message and reply together and returns the next revision. |
+| `DELETE /api/career-assistant/conversations/{id}` | Permanently delete the conversation and its saved turns from the application database. |
+
+A new conversation starts at revision `0`. If a message returns HTTP 409, reload the history before retrying. Omit `context` for general guidance. Select any of `profile`, `assessment`, `career_match`, `skills`, `roadmap`, and `practice` per turn. Roadmap context uses your latest saved My Roadmap, with milestone completion and progress totals. If you have no saved roadmap, it uses the learning steps saved in Career Match when available. Practice context includes challenge activity and interview metadata. Assessment context uses trait summaries. Email, raw assessment answers, skill and milestone notes, practice artifacts, and interview transcripts are excluded from the automatic context payload.
+
+The selected context summary, the message, and up to four previous exchanges go to the configured AI providers. To share limited excerpts from a saved résumé, send `"resume_context": {"resume_id": "<uuid>", "consent": true}` on that turn. The backend verifies ownership and filters common contact patterns. Replies generated with résumé context remain visible in saved history and are omitted from future AI prompts. Other prior replies can contain information shared in earlier turns. The application disables AI response caching for these conversations. Deletion removes local history and cannot retract requests already sent to a provider. The assistant uses the shared AI provider configuration. Provider attempts count against the shared daily account allowance, including retries and failover. The API saves a bilingual local fallback when generation is unavailable, and guidance has no live vacancy or salary source.
+
+Run `RUN_SKILLS_POSTGRES_TEST=1 npm test` against a disposable, migrated and seeded database to include the Assistant's HTTP/PostgreSQL tests.
 
 ## My Skills API
 
@@ -329,9 +347,9 @@ Example completed response shape:
 
 Validation returns HTTP 400 for unknown questions, invalid options, duplicate questions, missing required fields, malformed answer arrays, and notes longer than 1000 characters. Assessment state is process-local until completion, so a restart invalidates unfinished assessments. The persisted completed session remains in PostgreSQL.
 
-Each assessment has one logical AI request for clarification and one for final guidance. The additive guest-budget migration creates `guest_assessment_ai_usage`. A guest can use provider attempts in one assessment per UTC start date, with two attempts reserved for clarification and two for final guidance. A direct `/evaluate` request uses the final allowance for its own assessment. Registered accounts keep their existing five-attempt daily allowance.
+Each assessment has one logical AI request for clarification and one for final guidance. The additive guest-budget migration creates `guest_assessment_ai_usage`. A guest can use provider attempts in one assessment per UTC start date, with up to `AI_GUEST_STAGE_ATTEMPTS` attempts each for clarification and final guidance (default 2). A direct `/evaluate` request uses the final allowance for its own assessment. The shared registered-account allowance is `AI_ACCOUNT_DAILY_LIMIT` (default 5). A value of zero disables the corresponding guest or registered-account provider allowance.
 
-Each backend process allows 10 provider attempts per rolling minute and 450 per UTC day across providers. Initial requests are spaced by three seconds, and interactive final guidance can briefly wait for that window. Requests use bounded exponential backoff with jitter, honor provider `Retry-After` cooldowns, and have a 15-second attempt timeout within a 34-second task budget. Cache hits for the same user, providers, and request expire after five minutes and leave usage allowances available.
+Each backend process enforces `AI_MAX_ATTEMPTS_PER_MINUTE` per rolling minute (default 10) and `AI_MAX_ATTEMPTS_PER_DAY` per UTC day (default 450) across providers. Initial requests are spaced by `AI_MIN_REQUEST_INTERVAL_MS` (default 3000), and interactive final guidance can briefly wait for that window. Requests use bounded exponential backoff with jitter, honor provider `Retry-After` cooldowns, and have a 15-second attempt timeout within a 34-second task budget. Cache hits for the same user, providers, and request expire after five minutes and leave usage allowances available.
 
 When Gemini fails and the secondary provider is configured, it can use a remaining attempt. If both providers fail or a limit is reached, the API preserves assessment progress and uses predefined clarification questions or deterministic guidance. `personalization.status` and `personalization.reason` describe final guidance independently of `clarifications.status`. A guest who has exhausted the session budget receives `session_limit`.
 

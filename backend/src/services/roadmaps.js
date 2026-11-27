@@ -44,6 +44,14 @@ export async function readRoadmap(database, userId, id) {
   return presentRoadmap(roadmap);
 }
 
+export async function latestRoadmap(database, userId) {
+  const { rows: [roadmap] } = await database.query(
+    `${readRoadmaps} WHERE r.user_id = $1 GROUP BY r.id ORDER BY r.created_at DESC, r.id DESC LIMIT 1`,
+    [userId],
+  );
+  return roadmap ? presentRoadmap(roadmap) : undefined;
+}
+
 export async function listRoadmaps(database, userId, offset) {
   const { rows } = await database.query(
     `${readRoadmaps} WHERE r.user_id = $1 GROUP BY r.id

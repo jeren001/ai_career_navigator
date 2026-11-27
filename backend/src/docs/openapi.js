@@ -1,4 +1,5 @@
 import { QUESTIONS } from '../services/assessment.js';
+import { assistantPaths, assistantSchemas } from './career-assistant.js';
 import { array, ref, schemas, string } from './schemas.js';
 
 const optionalBearer = [{}, { bearerAuth: [] }];
@@ -231,10 +232,11 @@ export const openapi = {
   servers: [{ url: '/', description: 'Current backend' }],
   tags: [
     { name: 'Health' }, { name: 'Authentication' }, { name: 'Profile' }, { name: 'Settings' },
-    { name: 'Careers' }, { name: 'Career Match' }, { name: 'My Roadmap' }, { name: 'My Skills' }, { name: 'Practical Challenges' }, { name: 'Learning Hub' },
+    { name: 'Careers' }, { name: 'Career Match' }, { name: 'Career Assistant' }, { name: 'My Roadmap' }, { name: 'My Skills' }, { name: 'Practical Challenges' }, { name: 'Learning Hub' },
     { name: 'Interview Simulator' }, { name: 'My Resume' }, { name: 'Assessment' }, { name: 'Quiz aliases' },
   ],
   paths: {
+    ...assistantPaths,
     '/api/health': { get: {
       tags: ['Health'], operationId: 'getHealth', summary: 'Check API health',
       responses: { 200: response('API is reachable.', ref('Health')) },
@@ -740,6 +742,6 @@ export const openapi = {
         description: 'Paste the access_token returned by guest creation, assessment start, registration, or login.',
       },
     },
-    schemas,
+    schemas: { ...schemas, ...assistantSchemas },
   },
 };

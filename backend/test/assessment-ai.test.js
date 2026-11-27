@@ -105,3 +105,28 @@ test('a follow-up waits for process spacing and reserves a new attempt', async (
   })).status, 'ai');
   assert.equal(reservations, 2);
 });
+
+test('one allowed attempt uses the primary and configured process limits still apply', async (t) => {
+  const prior = Object.fromEntries(['AI_MAX_ATTEMPTS_PER_MINUTE', 'AI_MIN_REQUEST_INTERVAL_MS']
+    .map((key) => [key, process.env[key]]));
+  t.after(() => {
+    for (const [key, value] of Object.entries(prior)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  });
+  process.env.AI_MAX_ATTEMPTS_PER_MINUTE = '1';
+  process.env.AI_MIN_REQUEST_INTERVAL_MS = '0';
+  const calls = [];
+  setAiProvidersForTests(['primary', 'secondary'].map((id) => ({
+    id,
+    async generate() {
+      calls.push(id);
+      return '{"answer":"ok"}';
+    },
+  })));
+  assert.equal((await generateAssessmentJson({ ...request, maxAttempts: 1 })).provider, 'primary');
+  assert.equal((await generateAssessmentJson(request)).cached, true);
+  assert.equal((await generateAssessmentJson({ ...request, contents: 'Another request' })).reason, 'rate_limited');
+  assert.deepEqual(calls, ['primary']);
+});

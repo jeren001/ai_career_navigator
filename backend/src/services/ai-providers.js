@@ -48,7 +48,7 @@ export function geminiProvider(injectedClient) {
 
 export function ollamaProvider() {
   const model = process.env.OLLAMA_MODEL?.trim();
-  if (process.env.AI_SECONDARY_PROVIDER?.trim() !== 'ollama' || !model) return undefined;
+  if (!model) return undefined;
   const baseUrl = process.env.OLLAMA_BASE_URL?.trim() || 'http://127.0.0.1:11434';
   return {
     id: 'ollama',
@@ -80,4 +80,14 @@ export function ollamaProvider() {
       return (await response.json()).message?.content;
     },
   };
+}
+
+export function configuredAiProviders(injectedGemini) {
+  const registry = new Map([
+    ['gemini', () => geminiProvider(injectedGemini)],
+    ['ollama', ollamaProvider],
+  ]);
+  const primary = process.env.AI_PRIMARY_PROVIDER?.trim() || 'gemini';
+  const secondary = process.env.AI_SECONDARY_PROVIDER?.trim();
+  return [...new Set([primary, secondary])].map((name) => registry.get(name)?.()).filter(Boolean);
 }
