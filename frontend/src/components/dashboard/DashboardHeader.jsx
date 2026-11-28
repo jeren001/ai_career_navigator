@@ -5,7 +5,7 @@
 // ==========================================
 
 // Import React tools
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 // Import global user context
@@ -16,7 +16,6 @@ import '../../styles/dashboard-header.css'
 
 // Import icons
 import {
-  Bell,
   UserRound,
   ChevronDown,
   Settings,
@@ -26,6 +25,7 @@ import {
 
 // Import reusable search component
 import CommandBar from '../CommandBar'
+import NotificationBell from '../notifications/NotificationBell'
 
 
 function DashboardHeader({ onMenuClick }) {
@@ -53,7 +53,10 @@ function DashboardHeader({ onMenuClick }) {
   // 04. DROPDOWN REFERENCES
 
   const profileRef = useRef(null)
-  const notificationsRef = useRef(null)
+  const handleNotificationsOpen = useCallback(open => {
+    setNotificationsOpen(open)
+    if (open) setProfileOpen(false)
+  }, [])
 
 
   // 05. CLOSE DROPDOWNS
@@ -69,20 +72,12 @@ function DashboardHeader({ onMenuClick }) {
         setProfileOpen(false)
       }
 
-      if (
-        notificationsRef.current &&
-        !notificationsRef.current.contains(event.target)
-      ) {
-        setNotificationsOpen(false)
-      }
-
     }
 
     function handleEscape(event) {
 
       if (event.key === 'Escape') {
         setProfileOpen(false)
-        setNotificationsOpen(false)
       }
 
     }
@@ -192,39 +187,7 @@ function DashboardHeader({ onMenuClick }) {
 
         {/* Notifications */}
 
-        <div
-          className="dashboard-notifications"
-          ref={notificationsRef}
-        >
-
-          <button
-            type="button"
-            className="notification-button"
-            aria-label="Notifications"
-            aria-expanded={notificationsOpen}
-            onClick={() => {
-              setNotificationsOpen(!notificationsOpen)
-              setProfileOpen(false)
-            }}
-          >
-
-            <Bell size={23} />
-
-          </button>
-
-          {notificationsOpen && (
-
-            <div className="notification-dropdown">
-
-              <h3>Notifications</h3>
-
-              <p>No new notifications.</p>
-
-            </div>
-
-          )}
-
-        </div>
+        <NotificationBell open={notificationsOpen} onOpenChange={handleNotificationsOpen} />
 
 
         {/* User profile */}

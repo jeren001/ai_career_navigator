@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom'
 import { Menu } from 'lucide-react'
 import mascot from '../../assets/mascot.png'
 import Sidebar from '../dashboard/Sidebar'
+import NotificationBell from '../notifications/NotificationBell'
 
-export default function CVBuilderHeader({ isHome }) {
+export default function CVBuilderHeader({ isHome, notificationsOpen, onNotificationsOpenChange }) {
   const drawer = useRef(null)
   const menuButton = useRef(null)
   const drawerId = useId()
@@ -12,6 +13,7 @@ export default function CVBuilderHeader({ isHome }) {
   const Title = isHome ? 'h1' : 'p'
 
   function openDrawer() {
+    onNotificationsOpenChange(false)
     drawer.current.showModal()
     setOpen(true)
     drawer.current.querySelector('.sidebar-close-button')?.focus()
@@ -34,6 +36,8 @@ export default function CVBuilderHeader({ isHome }) {
         <Title className="cv-builder-title">CV Builder</Title>
         <p className="cv-builder-description">Create, improve and personalize your CV for your next career opportunity.</p>
       </div>
+
+      <NotificationBell open={notificationsOpen} onOpenChange={onNotificationsOpenChange} />
 
       <dialog id={drawerId} ref={drawer} className="cv-builder-drawer" aria-label="Navigation menu"
         onClick={event => { if (event.target === event.currentTarget) closeDrawer() }}

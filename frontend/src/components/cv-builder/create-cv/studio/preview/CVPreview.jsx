@@ -1,9 +1,9 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { pageDimensions, resolveDesign } from '../design/designDefaults'
-import { Download } from 'lucide-react'
 import DOCXExportDialog from '../export/DOCXExportDialog'
 import PDFExportDialog from '../export/PDFExportDialog'
 import CVPaginationSource from './CVPaginationSource'
+import PreviewExportMenu from './PreviewExportMenu'
 import PreviewPagination from './PreviewPagination'
 import PreviewToolbar from './PreviewToolbar'
 import useCVPagination from './useCVPagination'
@@ -126,23 +126,25 @@ export default function CVPreview({ cvData, template, titleId, exportTitle }) {
       aria-modal={fallback || undefined}
       aria-labelledby={titleId}
     >
-      <h3 id={titleId}>Live Preview</h3>
-      <p className="cv-studio-preview-caption" role="status">
-        {design.pageSize}{!result ? ' · Preparing pages…' : result.continuous ? ' · Continuous preview. A content block could not be paginated.' : ''}
-      </p>
+      <header className="cv-preview-workspace-header">
+        <div className="cv-preview-heading">
+          <h3 id={titleId}>Live Preview</h3>
+          <span className="cv-preview-format">{design.pageSize}</span>
+        </div>
+        <PreviewExportMenu onExport={setExportFormat} />
+      </header>
+      {(!result || result.continuous) && (
+        <p className="cv-studio-preview-caption" role="status">
+          {!result ? 'Preparing pages…' : 'Continuous preview. A content block could not be paginated.'}
+        </p>
+      )}
+
       <PreviewToolbar mode={mode} zoom={zoom} scale={scale} expanded={expanded}
         onZoom={value => { setZoom(value); setMode('manual') }}
-        onMode={setMode} onFullscreen={toggle} />
-      {numberOfPages > 0 && <PreviewPagination current={activePage} total={numberOfPages} onNavigate={navigate} />}
+        onMode={setMode} onFullscreen={toggle}>
+        {numberOfPages > 0 && <PreviewPagination current={activePage} total={numberOfPages} onNavigate={navigate} />}
+      </PreviewToolbar>
 
-      <div className="cv-preview-controls">
-        <button type="button" onClick={() => setExportFormat('pdf')}>
-          <Download size={17} aria-hidden="true" /> Download PDF
-        </button>
-        <button type="button" onClick={() => setExportFormat('docx')}>
-          <Download size={17} aria-hidden="true" /> Download DOCX
-        </button>
-      </div>
       {exportFormat === 'pdf' && (
         <PDFExportDialog title={exportTitle} result={result} width={width} height={height} onClose={() => setExportFormat(null)} />
       )}

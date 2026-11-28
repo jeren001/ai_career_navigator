@@ -431,7 +431,7 @@ function getCurrentMonth() {
 
    // ==========================================
 
-   
+
 function validateWorkExperience(draft = cvData) {
 
   const validationErrors = {}
@@ -499,7 +499,7 @@ function validateWorkExperience(draft = cvData) {
 
    // ==========================================
 
-   
+
 
 function validateEducation(draft = cvData) {
 

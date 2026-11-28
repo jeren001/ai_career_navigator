@@ -1,5 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
+import { useLocation, useNavigationType } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
+import { useNotifications } from '../context/useNotifications'
+import { getCVNotificationTarget, unavailableCVMessage } from '../components/cv-builder/cvNotificationNavigation'
+import { isCVWorkspaceActive } from '../services/cvWorkspace'
+import { createCVNotification } from '../components/cv-builder/cvNotificationEvents'
 import CVBuilderHeader from '../components/cv-builder/CVBuilderHeader'
 import CVBuilderActions from '../components/cv-builder/CVBuilderActions'
 import RecentCVs from '../components/cv-builder/RecentCVs'
@@ -15,6 +20,15 @@ import '../styles/cv-builder.css'
 import '../styles/my-cvs.css'
 
 function CVBuilderWorkspace({ profile, workspaceId }) {
+  const { publish, markAsRead, notifications } = useNotifications()
+  const location = useLocation()
+  const navigationType = useNavigationType()
+  const notificationRequest = location.state?.cvNotification
+  const handledNotification = useRef(null)
+  const workspace = useRef(null)
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [notificationEditKey, setNotificationEditKey] = useState(null)
+  const [notificationError, setNotificationError] = useState('')
   const [cvs, setCVs] = useState([])
   const [activeView, setActiveView] = useState('home')
   const [dialog, setDialog] = useState(null)
@@ -50,25 +64,89 @@ function CVBuilderWorkspace({ profile, workspaceId }) {
     return () => { mounted = false }
   }, [loadAttempt, workspaceId])
 
+  const finishNotificationOpen = useEffectEvent((record, notificationId, navigationKey) => {
+    if (!notifications.some(item => item.id === notificationId && getCVNotificationTarget(item)?.id === record.id)) return
+
+    setNotificationError('')
+    setMessage('')
+    setNotificationsOpen(false)
+
+    if (record.status === 'draft') {
+      openEditor(record, 'my-cvs', navigationKey)
+    } else {
+      setActiveView('my-cvs')
+      setDialog({ record, action: 'view', fromNotification: true })
+      window.scrollTo(0, 0)
+    }
+
+    markAsRead(notificationId)
+  })
+
+  useEffect(() => {
+    // Only handle a fresh router navigation, never a reload or history replay.
+    if (!notificationRequest || navigationType === 'POP' || handledNotification.current === location.key) return
+
+    const target = getCVNotificationTarget(notificationRequest)
+    if (!target || notificationRequest.workspaceId !== workspaceId || !isCVWorkspaceActive(workspaceId)) return
+
+    let cancelled = false
+    async function open() {
+      let record
+      try {
+        record = await cvRepository.get(workspaceId, target.id)
+      } catch {
+        record = null
+      }
+
+      if (cancelled || !isCVWorkspaceActive(workspaceId)) return
+      handledNotification.current = location.key
+      if (!record?.data) {
+        setNotificationError(unavailableCVMessage)
+        return
+      }
+      finishNotificationOpen(record, notificationRequest.notificationId, location.key)
+    }
+    open()
+    return () => { cancelled = true }
+  }, [location.key, navigationType, notificationRequest, workspaceId])
+
+  useEffect(() => {
+    if (notificationEditKey && activeView === 'create') {
+      workspace.current?.querySelector('.create-cv-breadcrumb-button')?.focus()
+    }
+  }, [activeView, notificationEditKey])
+
   function upsert(saved) {
     revision.current++
     setCVs(previous => [saved, ...previous.filter(cv => cv.id !== saved.id)])
   }
 
-  function openEditor(record = null) {
+  function openEditor(record = null, backTo = activeView, editorKey = null) {
     setDialog(null)
-    setReturnView(activeView)
+    setReturnView(backTo)
     setEditing(record)
+    setNotificationEditKey(editorKey)
+    setNotificationError('')
     setMessage('')
     setActiveView('create')
     window.scrollTo(0, 0)
+  }
+
+  function closeViewer() {
+    setDialog(null)
+    if (dialog?.fromNotification) {
+      requestAnimationFrame(() => {
+        workspace.current?.parentElement.querySelector('.notification-bell-trigger')?.focus()
+      })
+    }
   }
 
   async function saveCV(record) {
     const saved = await cvRepository.save(workspaceId, record, Boolean(editing))
     upsert(saved)
     const wasComplete = editing && editing.status !== 'draft'
-    setMessage(saved.status === 'draft' ? 'Draft saved.' : wasComplete ? 'CV updated.' : 'CV created.')
+    const type = saved.status === 'draft' ? 'cv.draftSaved' : wasComplete ? 'cv.updated' : 'cv.created'
+    publish(createCVNotification(type, saved.id))
     setActiveView('my-cvs')
     window.scrollTo(0, 0)
   }
@@ -78,10 +156,11 @@ function CVBuilderWorkspace({ profile, workspaceId }) {
       await cvRepository.remove(workspaceId, id)
       revision.current++
       setCVs(previous => previous.filter(cv => cv.id !== id))
-      setMessage('CV deleted.')
+      publish(createCVNotification('cv.deleted'))
     } else {
-      upsert(await cvRepository.rename(workspaceId, id, name))
-      setMessage('CV renamed.')
+      const saved = await cvRepository.rename(workspaceId, id, name)
+      upsert(saved)
+      publish(createCVNotification('cv.renamed', saved.id))
     }
   }
 
@@ -91,8 +170,9 @@ function CVBuilderWorkspace({ profile, workspaceId }) {
     setManagementError('')
     setMessage('')
     try {
-      upsert(await cvRepository.duplicate(workspaceId, record.id))
-      setMessage('CV duplicated.')
+      const saved = await cvRepository.duplicate(workspaceId, record.id)
+      upsert(saved)
+      publish(createCVNotification('cv.duplicated', saved.id))
     } catch (failure) {
       setManagementError(failure?.message || 'The CV could not be duplicated. Please try again.')
     } finally {
@@ -127,9 +207,11 @@ function CVBuilderWorkspace({ profile, workspaceId }) {
   }
 
   return (
-    <div className="cv-builder-page">
-      <CVBuilderHeader isHome={activeView === 'home'} />
-      <main className="cv-builder-workspace">
+    <div className={activeView === 'my-cvs' ? 'cv-builder-page cv-builder-library' : 'cv-builder-page'}>
+      <CVBuilderHeader isHome={activeView === 'home'} notificationsOpen={notificationsOpen}
+        onNotificationsOpenChange={setNotificationsOpen} />
+      <main ref={workspace} className="cv-builder-workspace">
+        {notificationError && <p role="status" className="cv-builder-feedback">{notificationError}</p>}
         {activeView !== 'create' && (
           <>
             {message && <p className="cv-builder-feedback" role="status">{message}</p>}
@@ -157,7 +239,7 @@ function CVBuilderWorkspace({ profile, workspaceId }) {
           </>
         )}
         {activeView === 'create' && (
-          <CreateCV key={editing?.id ?? 'new'} profile={profile} record={editing}
+          <CreateCV key={notificationEditKey ?? editing?.id ?? 'new'} profile={profile} record={editing}
             onBack={() => setActiveView(returnView)} onSave={saveCV} />
         )}
         {activeView === 'my-cvs' && (
@@ -176,7 +258,7 @@ function CVBuilderWorkspace({ profile, workspaceId }) {
         {dialog?.action === 'docx' && (
           <DOCXExportDialog title={dialog.record.title} cvData={getSavedDocument(dialog.record).cvData} onClose={() => setDialog(null)} />
         )}
-        {dialog?.action === 'view' && <CVViewer cv={dialog.record} onClose={() => setDialog(null)} onEdit={openEditor} />}
+        {dialog?.action === 'view' && <CVViewer cv={dialog.record} onClose={closeViewer} onEdit={openEditor} />}
         {['rename', 'delete'].includes(dialog?.action) && (
           <CVManagementDialog cv={dialog.record} action={dialog.action} onClose={() => setDialog(null)} onConfirm={manage} />
         )}

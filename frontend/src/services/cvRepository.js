@@ -87,6 +87,18 @@ export const cvRepository = {
       request.onsuccess = () => complete(request.result)
     })
   },
+  async get(workspaceId, id) {
+    requireWorkspace(workspaceId)
+    const record = await transaction('readonly', (store, complete) => {
+      const request = store.get(id)
+      request.onsuccess = () => {
+        const saved = request.result
+        complete(saved?.workspaceId === workspaceId ? saved : null)
+      }
+    })
+    requireWorkspace(workspaceId)
+    return record
+  },
   save(workspaceId, record, updating = false) {
     requireWorkspace(workspaceId)
     const saved = { ...record, workspaceId }

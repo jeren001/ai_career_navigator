@@ -9,6 +9,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 // Import global user context
 import { UserProvider } from './context/UserContext'
+import { NotificationProvider } from './context/NotificationContext'
 
 // Import application pages
 import Home from './pages/Home'
@@ -44,7 +45,9 @@ const router = createBrowserRouter([
 function App() {
   return (
     <UserProvider>
-      <RouterProvider router={router} />
+      <NotificationProvider>
+        <RouterProvider router={router} />
+      </NotificationProvider>
     </UserProvider>
   )
 }

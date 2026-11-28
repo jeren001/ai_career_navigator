@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Copy, Eye, MoreVertical, Pencil, Sparkles, Trash2 } from 'lucide-react'
+import { Copy, Download, FileType, Eye, MoreVertical, Pencil, Sparkles, Trash2 } from 'lucide-react'
 
 const actions = [
   ['view', 'View CV', Eye],
@@ -10,7 +10,7 @@ const actions = [
   ['delete', 'Delete CV', Trash2]
 ]
 
-export default function CVActionsMenu({ cv, onAction }) {
+export default function CVActionsMenu({ cv, onAction, onEdit, onDownload }) {
   const menu = useRef(null)
   const [open, setOpen] = useState(false)
 
@@ -24,6 +24,16 @@ export default function CVActionsMenu({ cv, onAction }) {
     return () => document.removeEventListener('pointerdown', closeOutside)
   }, [open])
 
+  const menuActions = [
+    actions[0],
+    ...(onEdit ? [['edit', cv.status === 'draft' ? 'Resume draft' : 'Edit', Pencil, () => onEdit(cv.id)]] : []),
+    ...(onDownload ? [
+      ['pdf', 'Download PDF', Download, () => onDownload(cv.id, 'pdf')],
+      ['docx', 'Download DOCX', FileType, () => onDownload(cv.id, 'docx')]
+    ] : []),
+    ...actions.slice(1)
+  ]
+
   return (
     <details ref={menu} className="cv-card-menu" onToggle={event => setOpen(event.currentTarget.open)} onKeyDown={event => {
       if (event.key === 'Escape' && menu.current.open) {
@@ -36,11 +46,12 @@ export default function CVActionsMenu({ cv, onAction }) {
         <MoreVertical size={20} aria-hidden="true" />
       </summary>
       <div className="cv-card-menu-content">
-        {actions.map(([id, label, Icon]) => (
+        {menuActions.map(([id, label, Icon, run]) => (
           <button key={id} type="button" onClick={() => {
             menu.current.open = false
             menu.current.querySelector('summary').focus()
-            onAction(cv.id, id)
+            if (run) run()
+            else onAction(cv.id, id)
           }}>
             <Icon size={16} aria-hidden="true" /> {label}
           </button>

@@ -47,6 +47,8 @@ export default function usePreviewFullscreen(workspace) {
     element.querySelector('[data-preview-fullscreen]')?.focus()
 
     function handleKey(event) {
+      // Native dialogs handle their own keyboard events above the preview.
+      if (event.defaultPrevented || element.querySelector('dialog[open]')) return
       if (event.key === 'Escape') {
         event.preventDefault()
         setFallback(false)
@@ -54,7 +56,8 @@ export default function usePreviewFullscreen(workspace) {
         restoreFocus()
       }
       if (event.key === 'Tab') {
-        const controls = [...element.querySelectorAll('button:not(:disabled), select:not(:disabled), [tabindex="0"]')]
+        const controls = [...element.querySelectorAll('button:not(:disabled), select:not(:disabled), summary, [tabindex="0"]')]
+          .filter(control => control.getClientRects().length)
         const edge = event.shiftKey ? controls[0] : controls.at(-1)
         if (!element.contains(document.activeElement) || document.activeElement === edge) {
           event.preventDefault()

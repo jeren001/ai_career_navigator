@@ -222,7 +222,8 @@ function Skills({
   data,
   onChange,
   errors = {},
-  mode = 'all'
+  mode = 'all',
+  inSectionEditor = false
 }) {
 
   const technicalSkills = data.technicalSkills || []
@@ -292,6 +293,16 @@ function Skills({
   // 07. COMPONENT INTERFACE
   // ==========================================
 
+  function renderRemoveLanguage(language, index) {
+    return (
+      <button type="button" className="cv-remove-button"
+        onClick={() => handleRemoveLanguage(language.id)}
+        aria-label={`Remove language ${index + 1}`} title="Remove language">
+        <Trash2 size={18} aria-hidden="true" />
+      </button>
+    )
+  }
+
   return (
 
     <section className="cv-form-section">
@@ -349,7 +360,7 @@ function Skills({
       {/* LANGUAGES */}
 
       {mode !== 'skills' && (
-      <div className="cv-skill-category">
+      <div className="cv-skill-category cv-language-category">
 
         <div className="cv-skill-category-header">
 
@@ -389,6 +400,13 @@ function Skills({
               key={language.id}
               className="cv-language-item"
             >
+
+              {inSectionEditor && (
+                <div className="cv-experience-header">
+                  <h3>Language {index + 1}</h3>
+                  {renderRemoveLanguage(language, index)}
+                </div>
+              )}
 
               <div className="cv-language-row">
 
@@ -459,21 +477,7 @@ function Skills({
                 </div>
 
 
-                {/* REMOVE LANGUAGE */}
-
-                <button
-                  type="button"
-                  className="cv-remove-button"
-                  onClick={() =>
-                    handleRemoveLanguage(language.id)
-                  }
-                  aria-label={`Remove language ${index + 1}`}
-                  title="Remove language"
-                >
-
-                  <Trash2 size={18} />
-
-                </button>
+                {!inSectionEditor && renderRemoveLanguage(language, index)}
 
               </div>
 

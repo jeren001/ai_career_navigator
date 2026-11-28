@@ -1,13 +1,16 @@
+import { useId } from 'react'
 import { getInternationalTargetId, internationalFormatCatalog, internationalRegions } from '../templates/internationalFormatCatalog'
 
 const countryNames = new Intl.DisplayNames(['en'], { type: 'region' })
 
 export default function CountryFormatSelector({ value, onChange }) {
+  const helpId = useId()
   const supported = internationalFormatCatalog.some(template => getInternationalTargetId(template) === value)
   return (
     <label className="cv-gallery-field">
       <span>Target country or region</span>
-      <select value={value} onChange={event => onChange(event.target.value)}>
+      <small id={helpId}>Where are you planning to apply for a job?</small>
+      <select aria-describedby={helpId} value={value} onChange={event => onChange(event.target.value)}>
         <option value="">No target market</option>
         {value && !supported && <option value={value}>{countryNames.of(value)} (guidelines unavailable)</option>}
         {internationalRegions.map(region => (

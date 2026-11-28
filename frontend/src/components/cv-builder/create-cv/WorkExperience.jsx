@@ -291,7 +291,7 @@ function WorkExperience({
               </div>
 
 
-              
+
 
               {/* START DATE */}
 
@@ -348,7 +348,7 @@ function WorkExperience({
   />
 
 </div>
-              
+
 
 
               {/* CURRENT POSITION */}

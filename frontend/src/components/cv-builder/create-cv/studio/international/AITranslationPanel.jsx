@@ -1,3 +1,4 @@
+import { Languages } from 'lucide-react'
 import { useState } from 'react'
 import CVLanguageSelector from './CVLanguageSelector'
 import { customFields, standardSections } from '../sections/sectionCatalog'
@@ -29,24 +30,28 @@ export default function AITranslationPanel({ cvData, locale }) {
   const [target, setTarget] = useState(null)
 
   return (
-    <details className="cv-international-details">
-      <summary>AI Translation · Unavailable</summary>
-      <p>Translation will require an approved service and manual review before changes can be applied.</p>
-      <CVLanguageSelector label="Original language" value={source} onChange={setSource} />
-      <CVLanguageSelector label="Target language" value={target ?? locale} onChange={setTarget} />
-      <label className="cv-gallery-field">
-        <span>Original content</span>
-        <textarea dir="auto" rows={5} value={getOriginalText(cvData)} readOnly />
-      </label>
-      <label className="cv-gallery-field">
-        <span>Translated content · Manual review</span>
-        <textarea rows={5} disabled placeholder="Translation is unavailable." />
-      </label>
-      <div className="cv-section-actions">
-        {['Translate', 'Apply Translation', 'Restore Original'].map(label => (
-          <button className="cv-design-action" type="button" disabled key={label}>{label}</button>
-        ))}
-      </div>
-    </details>
+    <section className="cv-international-card">
+      <h4><Languages size={18} aria-hidden="true" /> AI Translation <span className="cv-international-badge">Coming Soon</span></h4>
+      <p>Translate your professional summary, experience and other written content into your chosen language.</p>
+      <details className="cv-international-details">
+        <summary>Translation options</summary>
+        <p>Translation will require an approved service and manual review before changes can be applied.</p>
+        <CVLanguageSelector label="Original language" value={source} onChange={setSource} />
+        <CVLanguageSelector label="Target language" value={target ?? locale} onChange={setTarget} />
+        <label className="cv-gallery-field">
+          <span>Original content</span>
+          <textarea dir="auto" rows={5} value={getOriginalText(cvData)} readOnly />
+        </label>
+        <label className="cv-gallery-field">
+          <span>Translated content · Manual review</span>
+          <textarea rows={5} disabled placeholder="Translation is unavailable." />
+        </label>
+        <div className="cv-section-actions">
+          {['Translate', 'Apply Translation', 'Restore Original'].map(label => (
+            <button className="cv-design-action" type="button" disabled key={label}>{label}</button>
+          ))}
+        </div>
+      </details>
+    </section>
   )
 }

@@ -5,6 +5,7 @@ import AITranslationPanel from './AITranslationPanel'
 import CountryFormatSelector from './CountryFormatSelector'
 import CountryGuidelines from './CountryGuidelines'
 import CVLanguageSelector from './CVLanguageSelector'
+import FormatRecommendations from './FormatRecommendations'
 import LocalizationSettings from './LocalizationSettings'
 import { countryGuidelinesCatalog } from './countryGuidelinesCatalog'
 import { getLocalization, localizationDefaults } from './localizationUtils'
@@ -24,6 +25,7 @@ export default function InternationalPanel({ cvData, template, onChange }) {
   const [status, setStatus] = useState('')
   const targetTemplate = internationalFormatCatalog.find(item => getInternationalTargetId(item) === draft.target)
   const { pageSize: currentPageSize } = resolveDesign(template, cvData.design)
+  const guidelines = countryGuidelinesCatalog[draft.target]
   const direction = getLocalization(draft).direction
 
   function update(key, value) {
@@ -55,25 +57,31 @@ export default function InternationalPanel({ cvData, template, onChange }) {
 
   return (
     <div className="cv-international-panel">
-      <CountryFormatSelector value={draft.target} onChange={value => update('target', value)} />
-      {draft.target === 'europass' && <p>Europass is regional. Your Basic Information target country stays as entered.</p>}
-      <CVLanguageSelector value={draft.locale} onChange={value => update('locale', value)} />
-      <label className="cv-gallery-field">
-        <span>International template</span>
-        <select value={draft.templateId} onChange={event => update('templateId', event.target.value)}>
-          <option value="">Keep {template.name}</option>
-          {targetTemplate && targetTemplate.id !== template.id && <option value={targetTemplate.id}>{targetTemplate.name}</option>}
-        </select>
-      </label>
-      <CountryGuidelines guidelines={countryGuidelinesCatalog[draft.target]} onChange={update} />
-      <LocalizationSettings draft={draft} currentPageSize={currentPageSize} onChange={update} />
-      <p>Review before applying. The document will use {direction.toUpperCase()} direction and {draft.pageSize || currentPageSize} paper. Your original text and custom headings are preserved.</p>
-      <div className="cv-section-actions">
-        <button type="button" className="cv-design-action" onClick={apply}>Apply International Format</button>
-        <button type="button" className="cv-design-action" onClick={reset}>Reset International Settings</button>
+      <div className="cv-international-card">
+        <CountryFormatSelector value={draft.target} onChange={value => update('target', value)} />
+        {draft.target === 'europass' && <p>Europass is regional. Your Basic Information target country stays as entered.</p>}
+        <CVLanguageSelector showHelp value={draft.locale} onChange={value => update('locale', value)} />
       </div>
-      <p role="status">{status}</p>
+
+      <FormatRecommendations guidelines={guidelines} locale={draft.locale} currentPageSize={currentPageSize} />
+      <LocalizationSettings draft={draft} currentPageSize={currentPageSize} onChange={update} />
+      <CountryGuidelines guidelines={guidelines} onChange={update} />
       <AITranslationPanel cvData={cvData} locale={draft.locale} />
+
+      <section className="cv-international-card">
+        <label className="cv-gallery-field">
+          <span>International template</span>
+          <select value={draft.templateId} onChange={event => update('templateId', event.target.value)}>
+            <option value="">Keep {template.name}</option>
+            {targetTemplate && targetTemplate.id !== template.id && <option value={targetTemplate.id}>{targetTemplate.name}</option>}
+          </select>
+        </label>
+        <p>Review before applying. The document will use {direction.toUpperCase()} direction and {draft.pageSize || currentPageSize} paper.</p>
+        <p>These settings change how your CV is presented without changing your original personal or professional information.</p>
+        <button type="button" className="cv-design-action cv-international-apply" onClick={apply}>Apply International Format</button>
+        <button type="button" className="cv-design-action" onClick={reset}>Reset International Settings</button>
+        {status && <p role="status">{status}</p>}
+      </section>
     </div>
   )
 }

@@ -52,14 +52,14 @@ export default function EditSectionPanel({ item, cvData, validateStep, onSave, o
         return <Education education={draft.education} errors={errors} onChange={value => update('education', value)} />
       case 'skills':
       case 'languages':
-        return <Skills mode={item.id} data={draft.skills} errors={errors} onChange={(field, value) => update('skills', { ...draft.skills, [field]: value })} />
+        return <Skills inSectionEditor mode={item.id} data={draft.skills} errors={errors} onChange={(field, value) => update('skills', { ...draft.skills, [field]: value })} />
       default:
         return <SectionFields fields={fields} entries={entries} onChange={setEntries} />
     }
   }
 
   return (
-    <section className="cv-section-editor" aria-label={item.isNew ? 'Create custom section' : 'Edit section'}>
+    <section className="cv-section-editor cv-section-edit-form" aria-label={item.isNew ? 'Create custom section' : 'Edit section'}>
       <h4>{item.isNew ? 'Create custom section' : `Edit ${item.title}`}</h4>
       <label className="cv-gallery-field">
         <span>Section heading</span>

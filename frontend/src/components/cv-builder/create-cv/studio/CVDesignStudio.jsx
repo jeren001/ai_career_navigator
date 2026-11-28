@@ -24,7 +24,7 @@ const panels = {
   },
   international: {
     title: 'International Format',
-    description: 'Choose a target market and localize the document.'
+    description: 'Adapt your CV to the language and recruitment conventions of your target country.'
   }
 }
 
@@ -60,7 +60,7 @@ export default function CVDesignStudio({ cvData, exportTitle, onChange, onDesign
       />
 
       <div className="cv-studio-workspace">
-        <section className="cv-studio-panel" id={panelId} aria-labelledby={`${id}-panel-title`}>
+        <section className="cv-studio-panel" data-panel={activePanel} id={panelId} aria-labelledby={`${id}-panel-title`}>
           <h3 id={`${id}-panel-title`}>{panel.title}</h3>
           <p>{panel.description}</p>
 

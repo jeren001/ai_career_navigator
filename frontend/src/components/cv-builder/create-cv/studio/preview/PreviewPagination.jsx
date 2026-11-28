@@ -10,22 +10,21 @@ export default function PreviewPagination({ current, total, onNavigate }) {
 
   function renderButton([label, Icon, target, disabled]) {
     return (
-      <button key={label} type="button" aria-label={label} disabled={disabled} onClick={() => onNavigate(target)}>
-        <Icon size={18} aria-hidden="true" />
+      <button key={label} type="button" aria-label={label} title={label} disabled={disabled} onClick={() => onNavigate(target)}>
+        <Icon size={16} aria-hidden="true" />
       </button>
     )
   }
 
   return (
-    <nav className="cv-preview-controls cv-preview-pagination" aria-label="CV preview pages">
+    <nav className="cv-preview-group cv-preview-pagination" aria-label="CV preview pages">
       {buttons.slice(0, 2).map(renderButton)}
-      <label>
-        Page
+      <div className="cv-preview-page-count">
         <select aria-label="Go to page" value={current} onChange={event => onNavigate(Number(event.target.value))} disabled={total <= 1}>
           {Array.from({ length: total }, (_, index) => <option key={index + 1} value={index + 1}>{index + 1}</option>)}
         </select>
-        <span>of {total}</span>
-      </label>
+        <span aria-label={`of ${total} pages`}>/ {total}</span>
+      </div>
       {buttons.slice(2).map(renderButton)}
     </nav>
   )
