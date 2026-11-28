@@ -61,9 +61,8 @@ const [deletingConversation, setDeletingConversation] = useState(null)
 
   // 03. GROUP CONVERSATIONS
 
-  const pinnedConversations = sortedConversations.filter(
-    (conversation) => conversation.isPinned
-  )
+  const pinnedConversations = sortedConversations.filter((conversation) => conversation.isPinned)
+    .sort((a, b) => b.pinnedAt.localeCompare(a.pinnedAt))
 
   const recentConversations = sortedConversations.filter(
     (conversation) => !conversation.isPinned
@@ -304,7 +303,7 @@ function handleConfirmDelete(conversationId) {
         {t('Retry', '重试')}
       </button>}
       <p className="assistant-api-note">
-        {t('Search covers loaded conversation titles. Pins, custom titles and saved responses last only while this page is open.', '搜索仅涵盖已加载的对话标题。置顶、自定义标题和收藏回复仅在此页面打开期间保留。')}
+        {t('Search covers loaded conversation titles.', '搜索仅涵盖已加载的对话标题。')}
       </p>
       {/* SAVED RESPONSES */}
 

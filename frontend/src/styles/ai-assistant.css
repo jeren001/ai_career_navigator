@@ -1781,3 +1781,29 @@
   margin: 8px auto;
   padding: 6px 12px;
 }
+
+.assistant-resume {
+  position: relative;
+  z-index: 1;
+  width: min(90vw, 850px);
+  margin: 0 auto 8px;
+  padding-inline: 14px;
+  font-size: 0.86rem;
+}
+
+.assistant-resume-options {
+  max-height: 10rem;
+  overflow: auto;
+}
+
+.assistant-resume-options label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-block: 6px;
+}
+
+.assistant-resume-options select {
+  min-width: 0;
+  max-width: 70%;
+}

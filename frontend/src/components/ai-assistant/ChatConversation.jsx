@@ -15,7 +15,6 @@ import LoadingIndicator from './LoadingIndicator'
 function ChatConversation({
   messages,
   isLoading,
-  savedResponses = [],
   onSaveResponse,
   onEditMessage,
   onRegenerateResponse
@@ -64,9 +63,7 @@ function ChatConversation({
             key={message.id}
             message={message}
             isLoading={isLoading}
-            isSaved={savedResponses.some(
-              (response) => response.id === message.id
-            )}
+            isSaved={Boolean(message.savedAt)}
             onSaveResponse={onSaveResponse}
             onEditMessage={onEditMessage}
             onRegenerateResponse={

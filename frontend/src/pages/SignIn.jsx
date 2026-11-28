@@ -7,7 +7,7 @@
 
 // Import React and navigation tools
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 // Import social authentication icons
 import { FcGoogle } from 'react-icons/fc'
@@ -40,6 +40,7 @@ function SignIn() {
   const { language, setLanguage, t } = useLocale()
   const { accountUpdated, authenticate, status } = useSession()
   const navigate = useNavigate()
+  const { state } = useLocation()
   const accountNotice = {
     password: t('Password updated. Sign in with your new password.', '密码已更新。请使用新密码登录。'),
     'email-change': t('Email updated. Sign in with your new email.', '邮箱已更新。请使用新邮箱登录。'),
@@ -61,7 +62,10 @@ function SignIn() {
         body: { email: fields.get('email').trim(), password: fields.get('password') },
         remember: fields.has('remember')
       })
-      if (signedIn) navigate('/dashboard', { replace: true })
+      if (signedIn) {
+        const search = state?.assistantSearch
+        navigate(typeof search === 'string' && search.startsWith('?') ? '/ai-assistant' + search : '/dashboard', { replace: true })
+      }
     } catch (error) {
       setMessage(apiErrorText(error, t, 'login'))
     } finally {

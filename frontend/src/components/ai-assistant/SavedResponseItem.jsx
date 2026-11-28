@@ -142,7 +142,7 @@ function SavedResponseItem({
             }`}
             onClick={handleCopy}
             aria-label={t('Copy response', '复制回复')}
-            title={isCopied ? 'Copied!' : t('Copy response', '复制回复')}
+            title={isCopied ? t('Copied!', '已复制！') : t('Copy response', '复制回复')}
           >
 
             {isCopied

@@ -103,7 +103,7 @@ const mainMenu = [
 // 02. ACCOUNT NAVIGATION
 // ==========================================
 
-const availableRoutes = new Set(['/dashboard', '/profile', '/settings', '/ai-assistant'])
+const availableRoutes = new Set(['/dashboard', '/profile', '/settings', '/resume', '/ai-assistant'])
 
 const accountMenu = [
   {
@@ -137,7 +137,7 @@ function SidebarItem({ item, onClose }) {
   const { t } = useLocale()
   const content = <><Icon size={21} strokeWidth={2} /><span>{t(item.label, item.labelZh)}</span></>
 
-  if (!availableRoutes.has(item.path) || (item.path === '/ai-assistant' && user.is_guest)) {
+  if (!availableRoutes.has(item.path) || (['/ai-assistant', '/resume'].includes(item.path) && user.is_guest)) {
     return (
       <span className="sidebar-link" aria-disabled="true" title={t('Screen unavailable', '此页面暂不可用')}>
         {content}

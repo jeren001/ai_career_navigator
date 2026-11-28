@@ -1,0 +1,31 @@
+const labels = {
+  Website: '个人网站', 'Review extracted fields': '核对提取字段',
+  'Manage the resumes saved to your account.': '管理已保存到账户的简历。',
+  'Create CV': '创建简历', 'Analyze CV': '分析简历', 'Target-role advice': '目标岗位建议',
+  'My CVs': '我的简历', 'CV Builder': '简历制作', 'CV Builder actions': '简历制作操作',
+  'Build a professional CV from scratch.': '从零开始制作专业简历。',
+  'Get feedback on your saved resume.': '获取已保存简历的反馈。',
+  'Get suggestions for a target role.': '获取目标岗位的简历建议。',
+  'Manage, edit and export your saved CVs.': '管理、编辑并导出已保存的简历。',
+  'Review and update your saved CV.': '查看并更新已保存的简历。',
+  'Recent CVs': '最近的简历', 'View All': '查看全部', 'View all CVs': '查看全部简历', 'No CVs yet': '暂无简历',
+  'CV Name': '简历名称', 'CV name': '简历名称', 'CV Title': '简历标题', 'Full Name': '姓名',
+  'Email Address': '邮箱地址', 'Phone Number': '电话号码', 'Location': '地点', 'Job Title': '职位名称',
+  'Career Level': '职业阶段', 'Target Country': '目标国家', 'Professional Summary': '职业简介',
+  'Basic Information': '基本资料', 'Work Experience': '工作经历', 'Education': '教育背景', 'Skills': '技能',
+  'Template & Create': '模板与生成', 'Save Draft': '保存草稿', 'Saving draft…': '正在保存草稿…',
+  'Saving CV…': '正在保存简历…', 'Save Changes': '保存更改', 'Back to CV Builder': '返回简历制作',
+  'Back': '返回', 'Home': '首页', 'Resume Draft': '继续编辑草稿', 'Resume draft': '继续编辑草稿',
+  'Edit': '编辑', 'Edit CV': '编辑简历', 'View CV': '查看简历', 'Rename CV': '重命名简历',
+  'Duplicate CV': '复制简历', 'Delete CV': '删除简历', 'Save name': '保存名称', 'Saving…': '正在保存…',
+  'Download PDF': '下载 PDF', 'Download DOCX': '下载 DOCX', 'Download original': '下载原始文件',
+  'Export CV as DOCX': '导出 DOCX 简历', 'Export CV as PDF': '导出 PDF 简历',
+  'Export DOCX': '导出 DOCX', 'Export PDF': '导出 PDF',
+  'Cancel': '取消', 'Close': '关闭', 'Draft': '草稿', 'Completed': '成稿',
+  'Not available': '不可用', 'Untitled CV': '未命名简历', 'Template unavailable': '暂无模板',
+  'More options': '更多选项', 'Breadcrumb': '路径导航', 'Dashboard': '仪表板',
+  'File name': '文件名', 'Filename': '文件名', 'Save or cancel the section edit before saving your CV.': '请先保存或取消当前栏目编辑。',
+  'Wait for the photo to finish loading before saving your CV.': '请等待照片加载完成再保存简历。'
+}
+
+export const cvLabel = (label, locale) => locale === 'zh-CN' ? labels[label] ?? label : label

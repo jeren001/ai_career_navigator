@@ -24,7 +24,7 @@ function RenameChatModal({
   const dialogRef = useRef(null)
   const inputRef = useRef(null)
 
-  const maxLength = 80
+  const maxLength = 120
 
 
   // 02. OPEN MODAL AND FOCUS INPUT
@@ -53,11 +53,11 @@ function RenameChatModal({
 
     const newTitle = title.trim()
 
-    if (!newTitle || newTitle.length > maxLength) {
+    if ([...newTitle].length > maxLength) {
       return
     }
 
-    onSave(conversation.id, newTitle)
+    onSave(conversation.id, newTitle || null)
 
   }
 
@@ -131,7 +131,7 @@ function RenameChatModal({
           </h2>
 
           <p>
-            {t('Give your conversation a new name.', '为对话输入新名称。')}
+            {t('Give your conversation a new name, or leave it blank to reset it.', '为对话输入新名称，留空可恢复默认名称。')}
           </p>
 
         </div>
@@ -154,7 +154,7 @@ function RenameChatModal({
             className="rename-modal-input"
             type="text"
             value={title}
-            maxLength={maxLength}
+            maxLength={maxLength * 2}
             onChange={(event) =>
               setTitle(event.target.value)
             }
@@ -167,7 +167,7 @@ function RenameChatModal({
 
           <span className="rename-modal-counter">
 
-            {title.length}/{maxLength}
+            {[...title].length}/{maxLength}
 
           </span>
 
@@ -190,9 +190,8 @@ function RenameChatModal({
               type="submit"
               className="rename-modal-save"
               disabled={
-                !title.trim() ||
-                title.trim() === conversation.title ||
-                title.length > maxLength
+                (title.trim() || null) === conversation.customTitle ||
+                [...title.trim()].length > maxLength
               }
             >
 

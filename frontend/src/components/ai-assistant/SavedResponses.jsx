@@ -24,7 +24,7 @@ import '../../styles/saved-responses.css'
 function SavedResponses({
   savedResponses = [],
   onBack,
-  onRemoveResponse
+  onRemoveResponse, loading, loadError, onLoadMore, onRetry
 }) {
   const { t } = useLocale()
 
@@ -82,7 +82,7 @@ function SavedResponses({
 
           <h1>{t('Saved Responses', '已收藏回复')}</h1>
 
-          <p>Your saved insights, all in one place.</p>
+          <p>{t('Your saved insights, all in one place.', '集中查看收藏的回复。')}</p>
 
         </div>
 
@@ -117,9 +117,12 @@ function SavedResponses({
 
       {/* SAVED RESPONSES LIST */}
 
+      {loadError && !savedResponses.length && onRetry && <button type="button" className="assistant-page-more" onClick={onRetry}>
+        {t('Retry', '重试')}
+      </button>}
       <div className="saved-responses-list">
 
-        {sortedResponses.length === 0 ? (
+        {sortedResponses.length === 0 ? (!loading && !loadError && (
 
           <div className="saved-empty-state">
 
@@ -146,7 +149,7 @@ function SavedResponses({
             <p>
 
               {savedResponses.length === 0
-                ? t('Save helpful AI responses to find them here later.', '收藏有用的回复，以便在本次会话中查看。')
+                ? t('Save helpful AI responses to find them here later.', '收藏有用的回复，以便稍后查看。')
                 : t('Try a different search term.', '请尝试其他关键词。')
               }
 
@@ -154,7 +157,7 @@ function SavedResponses({
 
           </div>
 
-        ) : (
+        )) : (
 
           sortedResponses.map((response) => (
 
@@ -170,6 +173,9 @@ function SavedResponses({
 
       </div>
 
+      {onLoadMore && <button type="button" className="assistant-page-more" onClick={onLoadMore}>
+        {t('Load older saved responses', '加载更早的收藏回复')}
+      </button>}
     </div>
 
   )

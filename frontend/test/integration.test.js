@@ -166,3 +166,69 @@ test('Assistant uses the conversation revision and sends only selected context',
   assert.equal(reply.id, 'conversation-id:3:assistant')
   assert.equal(reply.source, 'fallback')
 })
+
+test('Assistant history resolves the first turn when upstream omits its preview', async () => {
+  const { listConversations, conversationTitle } = await import('../src/services/assistantService.js')
+  const calls = []
+  const page = await listConversations(async (path) => {
+    calls.push(path)
+    if (path.endsWith('?offset=0')) return {
+      conversations: [{ id: 'with-preview', revision: 1, preview: 'Already here' },
+        { id: 'without-preview', revision: 35 }, { id: 'empty', revision: 0 }],
+      next_offset: 3
+    }
+    return { turns: [{ user_message: '探索\n数据分析' }] }
+  }, 0)
+  assert.deepEqual(calls, [
+    '/api/career-assistant/conversations?offset=0',
+    '/api/career-assistant/conversations/without-preview?before=2&limit=1'
+  ])
+  const t = (_, zh) => zh
+  assert.deepEqual(page.conversations.map((item) => conversationTitle(item, 'zh-CN', t)),
+    ['Already here', '探索 数据分析', '未命名对话'])
+  assert.equal(page.next_offset, 3)
+})
+
+test('Assistant sends resume context only with an explicitly selected and consented resume', async () => {
+  const { sendAssistantMessage, supportsResumeContext } = await import('../src/services/assistantService.js')
+  const conversation = { id: 'conversation-id', revision: 0 }
+  const request = async (_, options) => options.body
+  for (const selection of [undefined, { id: 'saved-resume', consent: false }, { id: '', consent: true }]) {
+    const body = await sendAssistantMessage(request, conversation, 'Help me plan', [], undefined, selection)
+    assert.equal(Object.hasOwn(body, 'resume_context'), false)
+  }
+  const body = await sendAssistantMessage(request, conversation, 'Help me plan', [], undefined,
+    { id: 'saved-resume', consent: true })
+  assert.deepEqual(body.resume_context, { resume_id: 'saved-resume', consent: true })
+  assert.equal(await supportsResumeContext(async () => ({ components: { schemas: { AssistantMessage: { properties: {} } } } })), false)
+  assert.equal(await supportsResumeContext(async () => ({
+    components: { schemas: { AssistantMessage: { properties: { resume_context: {} } } } }
+  })), true)
+})
+
+test('Assistant titles and bookmarks use the persisted conversation and turn contracts', async () => {
+  const { conversationTitle, listBookmarkedResponses, setResponseBookmark, updateConversation } =
+    await import('../src/services/assistantService.js')
+  const id = 'conversation-id'
+  const prefix = '/api/career-assistant'
+  const requests = []
+  const request = async (path, options) => {
+    requests.push([path, options.method, options.body])
+    if (path === prefix + '/bookmarks?offset=20') return {
+      bookmarks: [{ conversation_id: id, turn_number: 3, assistant_message: '下一步', bookmarked_at: '2026-11-28' }],
+      next_offset: 40
+    }
+    return { title: '我的规划', revision: 3 }
+  }
+  const result = await updateConversation(request, id, { title: '我的规划', pinned: true })
+  assert.equal(conversationTitle({ ...result, preview: 'Old preview' }, 'zh-CN'), '我的规划')
+  const page = await listBookmarkedResponses(request, 20)
+  assert.equal(page.nextOffset, 40)
+  assert.equal(page.responses[0].savedAt, '2026-11-28')
+  await setResponseBookmark(request, page.responses[0], false)
+  assert.deepEqual(requests, [
+    [prefix + '/conversations/' + id, 'PATCH', { title: '我的规划', pinned: true }],
+    [prefix + '/bookmarks?offset=20', undefined, undefined],
+    [prefix + '/conversations/' + id + '/messages/3/bookmark', 'PUT', { bookmarked: false }]
+  ])
+})

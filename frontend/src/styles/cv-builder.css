@@ -1,0 +1,812 @@
+/* ==========================================
+   PROJECT: AI CAREER
+   FILE: cv-builder.css
+   PURPOSE: CV Builder layout and design
+========================================== */
+
+
+/* ==========================================
+   01. MAIN PAGE
+========================================== */
+
+.cv-builder-page {
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+
+  padding: 40px;
+
+  background: #d9f1ff;
+  color: #071b60;
+}
+
+
+/* ==========================================
+   02. PAGE HEADER
+========================================== */
+
+.cv-builder-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+  min-width: 0;
+  flex: 1;
+}
+
+.cv-builder-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cv-builder-menu-button,
+.cv-builder-home-link {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  color: #071b60;
+  border-radius: 10px;
+}
+
+.cv-builder-menu-button {
+  cursor: pointer;
+}
+
+.cv-builder-menu-button:hover,
+.cv-builder-home-link:hover {
+  background: #eaf5ff;
+}
+
+.cv-builder-home-link img {
+  width: 100%;
+  height: 100%;
+  padding: 3px;
+  object-fit: contain;
+}
+
+.cv-builder-home-link:focus-visible,
+.cv-builder-drawer .sidebar-brand:focus-visible {
+  outline: 2px solid #2987f5;
+  outline-offset: 3px;
+}
+
+.cv-builder-drawer {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: min(280px, 85vw);
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: #fff;
+  box-shadow: 8px 0 30px rgb(7 27 96 / 10%);
+}
+
+.cv-builder-drawer::backdrop {
+  background: rgb(7 27 96 / 30%);
+  backdrop-filter: blur(3px);
+}
+
+body:has(.cv-builder-drawer[open]) {
+  overflow: hidden;
+}
+
+.cv-builder-drawer .dashboard-sidebar {
+  position: static;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  transform: none;
+  visibility: visible;
+  overscroll-behavior: contain;
+}
+
+.cv-builder-drawer .sidebar-header {
+  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.cv-builder-drawer .sidebar-brand span {
+  font-size: 19px;
+}
+
+.cv-builder-drawer .sidebar-brand img {
+  width: 44px;
+}
+
+.cv-builder-drawer .sidebar-close-button {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  min-width: 36px;
+  min-height: 36px;
+  color: #071b60;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cv-builder-drawer[open] {
+    animation: cv-builder-drawer-enter 0.25s ease;
+  }
+}
+
+@keyframes cv-builder-drawer-enter {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.cv-builder-header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.cv-builder-title {
+  margin: 0;
+
+  font-size: 27px;
+  font-weight: 750;
+  line-height: 1.3;
+
+  color: #071b60;
+}
+
+.cv-builder-description {
+  margin: 0;
+
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.6;
+
+  color: #385781;
+}
+
+
+/* ==========================================
+   03. MAIN ACTIONS GRID
+========================================== */
+
+.cv-builder-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+
+/* ==========================================
+   04. ACTION CARD
+========================================== */
+
+.cv-action-card {
+  width: 100%;
+  min-width: 0;
+  min-height: 145px;
+
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  padding: 24px;
+  box-sizing: border-box;
+
+  background: #ffffff;
+  border: 1px solid #e0eaf5;
+  border-radius: 20px;
+
+  text-align: left;
+  font-family: inherit;
+  color: #071b60;
+
+  cursor: pointer;
+
+  box-shadow: 0 4px 15px rgba(7, 27, 96, 0.04);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.cv-action-card:hover {
+  transform: translateY(-3px);
+
+  border-color: #8bbcff;
+
+  box-shadow: 0 8px 24px rgba(7, 27, 96, 0.09);
+}
+
+.cv-action-card:active {
+  transform: translateY(0);
+}
+
+
+/* ==========================================
+   05. ACTION ICON
+========================================== */
+
+.cv-action-icon {
+  width: 76px;
+  height: 76px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  background: #fff4ce;
+  color: #b58a00;
+
+  border-radius: 18px;
+}
+
+
+/* ==========================================
+   06. ACTION DIVIDER
+========================================== */
+
+.cv-action-divider {
+  width: 1px;
+  height: 70px;
+
+  flex-shrink: 0;
+
+  background: #e0e7f0;
+}
+
+
+/* ==========================================
+   07. ACTION CONTENT
+========================================== */
+
+.cv-action-content {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cv-action-title {
+  margin: 0;
+
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.3;
+
+  color: #071b60;
+}
+
+.cv-action-description {
+  margin: 0;
+
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+
+  color: #385781;
+}
+
+.cv-action-arrow {
+  flex-shrink: 0;
+
+  color: #071b60;
+
+  transition: transform 0.2s ease;
+}
+
+.cv-action-card:hover .cv-action-arrow {
+  transform: translateX(4px);
+}
+
+
+/* ==========================================
+   08. RECENT CVS SECTION
+========================================== */
+
+.recent-cvs {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.recent-cvs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.recent-cvs-title {
+  margin: 0;
+
+  font-size: 23px;
+  font-weight: 700;
+
+  color: #071b60;
+}
+
+.recent-cvs-view-all {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px;
+
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+
+  color: #071b60;
+
+  cursor: pointer;
+}
+
+.recent-cvs-view-all:hover {
+  color: #2987f5;
+}
+
+
+/* ==========================================
+   09. EMPTY STATE
+========================================== */
+
+.cv-empty-state {
+  width: 100%;
+  min-height: 230px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+
+  padding: 32px;
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 2px dashed #9acbff;
+  border-radius: 20px;
+
+  text-align: center;
+}
+
+.cv-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #2987f5;
+}
+
+.cv-empty-title {
+  margin: 0;
+
+  font-size: 20px;
+  font-weight: 700;
+
+  color: #071b60;
+}
+
+.cv-empty-description {
+  margin: 0;
+
+  font-size: 14px;
+  line-height: 1.6;
+
+  color: #385781;
+}
+
+
+/* ==========================================
+   10. RECENT CVS GRID
+========================================== */
+
+.recent-cvs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+
+/* ==========================================
+   11. SAVED CV CARD
+========================================== */
+
+.cv-card {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  padding: 18px;
+
+  background: #ffffff;
+
+  border: 1px solid #e0eaf5;
+  border-radius: 18px;
+
+  box-shadow: 0 4px 15px rgba(7, 27, 96, 0.04);
+}
+
+
+/* CV Preview */
+
+.cv-card-preview {
+  width: 100%;
+  height: 190px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  background: #f1f6fc;
+  border-radius: 12px;
+
+  color: #2987f5;
+}
+
+.cv-card-preview img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+}
+
+
+/* CV Information */
+
+.cv-card-information {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cv-card-details {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cv-card-title {
+  margin: 0;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  color: #071b60;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cv-card-template {
+  margin: 0;
+
+  font-size: 13px;
+  color: #526ba8;
+}
+
+.cv-card-date {
+  margin: 0;
+
+  font-size: 12px;
+  color: #526ba8;
+}
+
+
+/* ==========================================
+   12. CV CARD ACTIONS
+========================================== */
+
+.cv-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-top: 12px;
+
+  border-top: 1px solid #e0e7f0;
+}
+
+.cv-card-menu-button,
+.cv-card-download-button,
+.cv-card-edit-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  min-width: 36px;
+  min-height: 36px;
+
+  padding: 8px;
+
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+
+  color: #071b60;
+
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+}
+
+.cv-card-edit-button {
+  color: #1c65af;
+}
+
+.cv-card-menu-button:hover,
+.cv-card-download-button:hover,
+.cv-card-edit-button:hover {
+  background: #eaf5ff;
+}
+
+
+/* ==========================================
+   13. TEMPORARY PAGE PLACEHOLDER
+========================================== */
+
+.cv-builder-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+
+  padding: 32px;
+
+  background: #ffffff;
+  border-radius: 20px;
+}
+
+.cv-builder-placeholder h1,
+.cv-builder-placeholder p {
+  margin: 0;
+}
+
+.cv-builder-back-button {
+  padding: 10px 20px;
+
+  background: #eaf5ff;
+  border: none;
+  border-radius: 10px;
+
+  font-family: inherit;
+  font-weight: 600;
+
+  color: #071b60;
+
+  cursor: pointer;
+}
+
+
+/* ==========================================
+   14. KEYBOARD ACCESSIBILITY
+========================================== */
+
+.cv-builder-page button:focus-visible {
+  outline: 2px solid #2987f5;
+  outline-offset: 4px;
+}
+
+
+/* ==========================================
+   15. SMALL DESKTOP
+========================================== */
+
+@media (max-width: 1200px) {
+
+  .cv-builder-page {
+    padding: 28px;
+  }
+
+  .cv-action-card {
+    padding: 18px;
+    gap: 14px;
+  }
+
+  .cv-action-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .cv-action-title {
+    font-size: 18px;
+  }
+
+}
+
+
+/* ==========================================
+   16. TABLET
+========================================== */
+
+@media (max-width: 900px) {
+
+  .cv-builder-page {
+    padding: 24px;
+    gap: 28px;
+  }
+
+  .cv-builder-actions {
+    gap: 16px;
+  }
+
+  .recent-cvs-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+}
+
+
+/* ==========================================
+   17. MOBILE
+========================================== */
+
+@media (max-width: 600px) {
+
+  .cv-builder-page {
+    padding: 20px 16px;
+    gap: 28px;
+  }
+
+  .cv-builder-header {
+    gap: 8px;
+  }
+
+  .cv-builder-title {
+    font-size: 22px;
+  }
+
+  .cv-builder-description {
+    font-size: 13px;
+  }
+
+  .cv-builder-actions {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .cv-action-card {
+    min-height: 110px;
+
+    padding: 16px;
+    gap: 12px;
+
+    border-radius: 16px;
+  }
+
+  .cv-action-icon {
+    width: 54px;
+    height: 54px;
+
+    border-radius: 14px;
+  }
+
+  .cv-action-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .cv-action-divider {
+    height: 52px;
+  }
+
+  .cv-action-title {
+    font-size: 17px;
+  }
+
+  .cv-action-description {
+    font-size: 12px;
+  }
+
+  .cv-action-arrow {
+    width: 18px;
+    height: 18px;
+  }
+
+  .recent-cvs-title {
+    font-size: 20px;
+  }
+
+  .recent-cvs-view-all {
+    min-height: 44px;
+    font-size: 13px;
+  }
+
+  .cv-empty-state {
+    min-height: 200px;
+    padding: 24px 16px;
+  }
+
+  .cv-empty-title {
+    font-size: 18px;
+  }
+
+  .cv-empty-description {
+    font-size: 13px;
+  }
+
+  .recent-cvs-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cv-card-menu-button,
+  .cv-card-download-button,
+  .cv-card-edit-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .cv-builder-placeholder {
+    padding: 24px;
+  }
+
+}
+
+
+/* ==========================================
+   18. REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .cv-builder-page *,
+  .cv-builder-page *::before,
+  .cv-builder-page *::after {
+    transition: none;
+    animation: none;
+  }
+
+  .cv-action-card:hover,
+  .cv-action-card:hover .cv-action-arrow {
+    transform: none;
+  }
+
+}
+
+
+/* ==========================================
+   19. DASHBOARD LAYOUT OVERRIDE
+========================================== */
+
+.dashboard-main:has(> .cv-builder-page) {
+  padding: 0;
+  background: #d9f1ff;
+}
+.cv-builder-feedback {
+  padding: 12px 16px;
+  color: #071b60;
+  background: #d9f1ff;
+  border-radius: 10px;
+}

@@ -12,8 +12,8 @@ export function createApiClient({
 } = {}) {
   const base = baseUrl.replace(/\/+$/, '')
 
-  return async function request(path, { method = 'GET', body, token, signal, rawBody, responseType = 'json' } = {}) {
-    const headers = { Accept: responseType === 'blob' ? 'image/jpeg' : 'application/json' }
+  return async function request(path, { method = 'GET', body, token, signal, rawBody, accept, responseType = 'json' } = {}) {
+    const headers = { Accept: accept ?? (responseType === 'blob' ? 'image/jpeg' : 'application/json') }
     if (rawBody) headers['Content-Type'] = rawBody.type
     if (body !== undefined) headers['Content-Type'] = 'application/json'
     if (token) headers.Authorization = `Bearer ${token}`

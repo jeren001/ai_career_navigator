@@ -7,6 +7,7 @@
 // Import dashboard components
 import { useState } from 'react'
 import { useSession } from '../session/session.js'
+import DashboardSummary from '../components/dashboard/DashboardSummary'
 import ChallengeProgress from '../components/dashboard/ChallengeProgress'
 import DashboardLayout from '../components/dashboard/DashboardLayout'
 import DashboardBackground from '../components/dashboard/DashboardBackground'
@@ -37,7 +38,12 @@ function Dashboard() {
 
       </div>
 
-      {showProgress && !user.is_guest && <ChallengeProgress />}
+      {showProgress && !user.is_guest && (
+        <>
+          <DashboardSummary />
+          <ChallengeProgress />
+        </>
+      )}
     </DashboardLayout>
   )
 }
