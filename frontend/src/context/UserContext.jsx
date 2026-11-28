@@ -6,6 +6,7 @@
 
 // Import React tools
 import { createContext, useContext, useEffect, useState } from 'react'
+import { resetInterviewWorkspace } from '../services/interviewSessionDatabase'
 import { clearCVWorkspace, getCVWorkspace, workspaceRevocationPrefix } from '../services/cvWorkspace'
 
 
@@ -85,6 +86,7 @@ export function UserProvider({ children }) {
   // Reset user profile
 
   function resetProfile() {
+    resetInterviewWorkspace()
     clearCVWorkspace()
     setCVWorkspace(getCVWorkspace())
 

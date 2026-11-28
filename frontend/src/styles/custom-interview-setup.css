@@ -1,0 +1,69 @@
+.custom-interview-fields h3 {
+  font-size: 1.1rem;
+  font-weight: 750;
+}
+
+.custom-interview-fields textarea {
+  resize: vertical;
+}
+
+.custom-question-list {
+  display: grid;
+  gap: 6px;
+  padding-inline-start: 1.5rem;
+  list-style: decimal;
+}
+
+.custom-question-list li {
+  padding: 6px 8px;
+  border: 1px solid var(--interview-border);
+  border-radius: 9px;
+}
+
+.custom-question-list li > span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.custom-question-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.custom-question-list .custom-question-actions {
+  margin-top: 4px;
+}
+
+.custom-question-list button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #eeebff;
+  cursor: pointer;
+}
+
+.custom-question-list button:disabled {
+  background: #f2f4fa;
+  color: #52617d;
+  cursor: default;
+}
+
+.custom-question-list button:not(:disabled):hover {
+  background: #dfd6fd;
+}
+
+.custom-question-actions .interview-setup-secondary {
+  min-height: 36px;
+}
+
+@media (min-width: 741px) {
+  .interview-setup-form:has(.custom-interview-fields) > .interview-setup-summary {
+    position: sticky;
+    top: 12px;
+    max-height: calc(100dvh - 24px);
+    overflow: auto;
+  }
+}

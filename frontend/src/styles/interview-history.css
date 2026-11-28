@@ -1,0 +1,230 @@
+.interview-history-page,
+.interview-history-list,
+.interview-history-controls {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.interview-history-breadcrumb,
+.interview-history-toolbar,
+.interview-history-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.interview-history-breadcrumb {
+  color: var(--interview-muted);
+  font-size: .875rem;
+}
+
+.interview-history-breadcrumb a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  border-radius: 6px;
+  color: #3047b5;
+  font-weight: 700;
+}
+
+.interview-history-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.interview-history-breadcrumb span::before {
+  margin-inline-end: 8px;
+  content: "/";
+}
+
+.interview-history-toolbar {
+  justify-content: space-between;
+}
+
+.interview-history-toolbar h2 {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 800;
+}
+
+.interview-history-stats,
+.interview-history-filter-grid,
+.interview-history-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: 8px;
+}
+
+.interview-history-stats > div,
+.interview-history-controls,
+.interview-history-record {
+  padding: clamp(12px, 2vw, 16px);
+  border: 1px solid var(--interview-border);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: var(--interview-shadow);
+}
+
+.interview-history-stats > div {
+  background: linear-gradient(110deg, #eaf5ff, #f2ebff);
+}
+
+.interview-history-stats dt,
+.interview-history-facts dt,
+.interview-history-record-heading p {
+  color: var(--interview-muted);
+  font-size: .84rem;
+}
+
+.interview-history-stats dd {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  font-weight: 750;
+}
+
+.interview-history-filter-grid {
+  grid-template-columns: minmax(0, 1.5fr) repeat(5, minmax(0, 1fr));
+}
+
+.interview-history-filter-grid label {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  font-size: .875rem;
+  font-weight: 700;
+}
+
+.interview-history-filter-grid input,
+.interview-history-filter-grid select {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 6px 8px;
+  border: 1px solid #aebce2;
+  border-radius: 8px;
+  background: #fafbff;
+  font-size: .875rem;
+  font-weight: 500;
+}
+
+.interview-history-filter-grid input::placeholder {
+  color: var(--interview-muted);
+  opacity: 1;
+}
+
+.interview-history-filter-grid input[aria-invalid="true"] {
+  border-color: #98253b;
+}
+
+.interview-history-record {
+  display: grid;
+  gap: 10px;
+}
+
+.interview-section .interview-history-list {
+  margin-top: 7px;
+}
+
+.interview-history-record-heading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+}
+
+.interview-history-record-heading h3 {
+  font-size: 1.075rem;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.interview-history-record-heading p,
+.interview-history-facts dd {
+  overflow-wrap: anywhere;
+}
+
+.interview-history-facts dd {
+  font-size: .875rem;
+  font-weight: 700;
+}
+
+.interview-history-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #e9f0ff;
+  color: #214cc3;
+}
+
+.interview-history-icon[data-type="behavioral"] {
+  background: #f2eaff;
+  color: #6736b7;
+}
+
+.interview-history-icon[data-type="general"] {
+  background: #e4f6ff;
+  color: #176681;
+}
+
+.interview-history-icon[data-type="custom"],
+.interview-history-status {
+  background: #eeebff;
+  color: #5144bb;
+}
+
+.interview-history-status {
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: .8125rem;
+  font-weight: 750;
+}
+
+.interview-history-delete {
+  color: #98253b;
+}
+
+.interview-history-deletion-options label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-block: 8px 14px;
+  font-size: .9rem;
+  font-weight: 650;
+}
+
+.interview-history-deletion-options input {
+  margin-top: 4px;
+  accent-color: #5144bb;
+}
+
+@media (max-width: 1020px) {
+  .interview-history-filter-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 540px) {
+  .interview-history-filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .interview-history-filter-grid label:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .interview-history-record-heading {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .interview-history-status {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .interview-history-filter-grid input,
+  .interview-history-filter-grid select {
+    font-size: 1rem;
+  }
+}
