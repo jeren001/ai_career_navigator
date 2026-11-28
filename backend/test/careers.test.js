@@ -115,10 +115,11 @@ test('GET /api/careers rejects an invalid niche-pivot flag', async () => {
 });
 
 test('GET /api/careers rejects an empty category', async () => {
-  const response = await fetch(`${baseUrl}/api/careers?category=`);
-
-  assert.equal(response.status, 400);
-  assert.deepEqual(await response.json(), { error: 'category must be a non-empty string' });
+  for (const category of ['', 'Tech%00Data']) {
+    const response = await fetch(`${baseUrl}/api/careers?category=${category}`);
+    assert.equal(response.status, 400);
+    assert.deepEqual(await response.json(), { error: 'category must be a non-empty string' });
+  }
 });
 
 test('GET /api/careers rejects conflicting category and cluster filters', async () => {
@@ -138,10 +139,11 @@ test('GET /api/careers/:id returns one career', async () => {
 });
 
 test('GET /api/careers/:id rejects an invalid ID', async () => {
-  const response = await fetch(`${baseUrl}/api/careers/invalid`);
-
-  assert.equal(response.status, 400);
-  assert.deepEqual(await response.json(), { error: 'Career id must be a positive integer' });
+  for (const id of ['invalid', '2147483648']) {
+    const response = await fetch(`${baseUrl}/api/careers/${id}`);
+    assert.equal(response.status, 400);
+    assert.deepEqual(await response.json(), { error: 'Career id must be a positive integer' });
+  }
 });
 
 test('GET /api/careers/:id returns 404 when the career is missing', async () => {

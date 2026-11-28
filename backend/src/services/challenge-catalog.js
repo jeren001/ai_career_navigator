@@ -3,6 +3,7 @@ import learningHub from '../../database/learning-hub-resources.json' with { type
 import { skillKey, skillsError } from './user-skills.js';
 
 const challenges = new Map(catalog.challenges.map((challenge) => [challenge.id, challenge]));
+const resourcesById = new Map(learningHub.resources.map((resource) => [resource.id, resource]));
 export const challengeSkillKey = (name) => skillKey(name.replace(/-/g, ' '));
 
 export function catalogLanguage(language) {
@@ -79,6 +80,15 @@ export function challengeDetail(id, language) {
   };
 }
 
+function localizedResource(resource, language) {
+  return { ...resource, title: resource.title[language], description: resource.description[language] };
+}
+
+export function learningResource(id, language) {
+  const resource = resourcesById.get(id);
+  return resource && localizedResource(resource, language);
+}
+
 export function discoverResources(query) {
   const language = catalogLanguage(query.language);
   const field = filterText(query.career_field, 'career_field');
@@ -89,10 +99,6 @@ export function discoverResources(query) {
     (!key || [...resource.skills, ...resource.catalogSkillMatches].some((name) => challengeSkillKey(name) === key)));
   return {
     language,
-    resources: resources.map((resource) => ({
-      ...resource,
-      title: resource.title[language],
-      description: resource.description[language],
-    })),
+    resources: resources.map((resource) => localizedResource(resource, language)),
   };
 }

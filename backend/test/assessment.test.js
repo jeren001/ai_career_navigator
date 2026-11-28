@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { after, before, test } from 'node:test';
 import { createApp } from '../src/app.js';
-import { clearAssessmentSessions } from '../src/routes/assessment.js';
 import { localizeBankQuestion } from '../src/services/assessment-language.js';
 import { collectSignals, GENERAL_QUESTION_IDS, getQuestion, QUESTIONS, selectNextQuestion, validateAnswers } from '../src/services/assessment.js';
 
@@ -56,8 +55,38 @@ let server;
 let baseUrl;
 let nextSessionId = 42;
 let guestInsertError;
+const drafts = new Map();
 const database = {
   async query(query, values = []) {
+    if (query.startsWith('INSERT INTO assessment_drafts')) {
+      drafts.set(values[0], { userId: values[1], state: values[2] });
+      return { rowCount: 1 };
+    }
+    if (query.startsWith('SELECT state FROM assessment_drafts')) {
+      const draft = drafts.get(values[0]);
+      return { rows: draft?.userId === values[1] ? [{ state: JSON.parse(draft.state) }] : [] };
+    }
+    if (query.startsWith('UPDATE assessment_drafts SET claim_id = $4')) {
+      const draft = drafts.get(values[0]);
+      if (draft?.userId !== values[1] || draft.claim || JSON.parse(draft.state).question.id !== values[2]) {
+        return { rowCount: 0 };
+      }
+      draft.claim = values[3];
+      return { rowCount: 1 };
+    }
+    if (query.startsWith('UPDATE assessment_drafts SET state')) {
+      const draft = drafts.get(values[0]);
+      if (draft?.userId !== values[1] || draft.claim !== values[2]) return { rowCount: 0 };
+      draft.state = values[3];
+      draft.claim = null;
+      return { rowCount: 1 };
+    }
+    if (query.startsWith('WITH finished AS')) {
+      const draft = drafts.get(values[5]);
+      if (draft?.userId !== values[0] || draft.claim !== values[7]) return { rows: [] };
+      drafts.delete(values[5]);
+      return { rows: [{ id: nextSessionId++, completed_at: '2026-11-24T00:00:00.000Z' }] };
+    }
     if (query.startsWith('SELECT id, is_guest, session_version FROM users')) return { rows: [{ id: values[0], is_guest: true }] };
     if (query.startsWith('SELECT id FROM users')) return { rows: values[0] === 7 ? [{ id: 7 }] : [] };
     if (query.startsWith('INSERT INTO ai_usage_daily')) return { rows: [{ request_count: 1, request_limit: 1 }] };
@@ -74,7 +103,7 @@ const database = {
 };
 
 before(async () => {
-  clearAssessmentSessions();
+  drafts.clear();
   server = createApp(database).listen(0);
   await new Promise((resolve, reject) => {
     server.once('listening', resolve);
@@ -84,7 +113,6 @@ before(async () => {
 });
 
 after(async () => {
-  clearAssessmentSessions();
   await new Promise((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
 });
 
@@ -314,4 +342,13 @@ test('quiz evaluate rejects malformed answers', async () => {
 
   assert.equal(response.status, 400);
   assert.match((await response.json()).error, /between 15 and 18/);
+});
+
+test('assessment rejects text that PostgreSQL JSONB cannot store', () => {
+  for (const invalid of ['数据\0分析', 'data\ud800']) {
+    assert.throws(() => validateAnswers([{ question_id: 'q1', custom_answer: invalid }]),
+      { status: 400, message: /custom_answer/ });
+    assert.throws(() => validateAnswers([{ question_id: 'q1', option_id: 'q1-analytical', note: invalid }]),
+      { status: 400, message: /note/ });
+  }
 });

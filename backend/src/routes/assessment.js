@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import {
   CLARIFICATION_START,
@@ -15,11 +16,18 @@ import {
 import { prepareClarifications } from '../services/assessment-clarifications.js';
 import { localizeBankQuestion } from '../services/assessment-language.js';
 import { addEnrichment, enrichRecommendations } from '../services/gemini.js';
-import { assertAuthConfigured, createAccessToken, optionalAuthentication } from '../services/auth.js';
+import { assertAuthConfigured, createAccessToken, optionalAuthentication, requireAnyIdentity } from '../services/auth.js';
 import { assessmentAiBudget } from '../services/ai-limits.js';
 import { buildUserContext } from '../services/user-context.js';
+import { skillsError } from '../services/user-skills.js';
 
-const sessions = new Map();
+const uuid = /^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/i;
+const historyPageSize = 20;
+
+function assessmentId(value) {
+  if (typeof value !== 'string' || !uuid.test(value)) throw validationError('assessment_id must be a UUID');
+  return value;
+}
 
 function validationError(message) {
   const error = new Error(message);
@@ -87,21 +95,44 @@ async function createGuest(database) {
   return result.rows[0].id;
 }
 
-async function persistResult(database, state, evaluation, recommendations) {
-  const result = await database.query(
-    `INSERT INTO quiz_sessions (user_id, answers, trait_scores, recommended_roles, career_match)
-     VALUES ($1, $2::jsonb, $3::jsonb, $4::jsonb, $5::jsonb)
-     RETURNING id, completed_at`,
-    [
-      state.userId,
-      JSON.stringify(state.answers),
-      JSON.stringify(evaluation.trait_scores),
-      JSON.stringify(evaluation.recommendations.professions),
-      JSON.stringify({ language: state.language, trait_scores: evaluation.trait_scores, ...recommendations }),
-    ],
-  );
-  return result.rows[0] || {};
+async function persistResult(database, state, evaluation, recommendations, result, claim = null) {
+  const values = [
+    state.userId, JSON.stringify(state.answers), JSON.stringify(evaluation.trait_scores),
+    JSON.stringify(evaluation.recommendations.professions),
+    JSON.stringify({ language: state.language, trait_scores: evaluation.trait_scores, ...recommendations }),
+    state.id, JSON.stringify(result),
+  ];
+  const columns = 'user_id, answers, trait_scores, recommended_roles, career_match, assessment_id, assessment_result';
+  const fields = '$1, $2::jsonb, $3::jsonb, $4::jsonb, $5::jsonb, $6, $7::jsonb';
+  const { rows: [saved] } = claim
+    ? await database.query(
+      `WITH finished AS (
+         DELETE FROM assessment_drafts WHERE id = $6 AND user_id = $1 AND claim_id = $8 RETURNING id
+       )
+       INSERT INTO quiz_sessions (${columns}) SELECT ${fields} FROM finished RETURNING id, completed_at`,
+      [...values, claim],
+    )
+    : await database.query(
+      `INSERT INTO quiz_sessions (${columns}) VALUES (${fields}) RETURNING id, completed_at`, values,
+    );
+  if (!saved) throw skillsError(409, 'Assessment progress changed. Reload the assessment.');
+  return { ...result, assessment_id: state.id, session_id: saved.id, user_id: state.userId, completed_at: saved.completed_at };
 }
+
+function savedResult(row, userId) {
+  return {
+    ...(row.assessment_result ?? {
+      ...(row.career_match ?? { professions: row.recommended_roles, language: null }),
+      trait_scores: row.trait_scores,
+    }),
+    assessment_id: row.assessment_id,
+    session_id: row.id,
+    user_id: userId,
+    completed_at: row.completed_at,
+  };
+}
+
+const resultColumns = 'id, assessment_id, completed_at, assessment_result, career_match, trait_scores, recommended_roles';
 
 async function enrichForUser(database, state, evaluation, isGuest, waitForSlot = false) {
   const { userId, answers, language } = state;
@@ -123,23 +154,18 @@ async function enrichForUser(database, state, evaluation, isGuest, waitForSlot =
   });
 }
 
-async function finish(database, state, isGuest) {
+async function finish(database, state, isGuest, claim) {
   const roles = await loadActiveCareers(database);
   const evaluation = evaluateAnswers(state.answers, roles, state.language);
   const enrichment = await enrichForUser(database, state, evaluation, isGuest, true);
   const recommendations = addEnrichment(evaluation.recommendations, enrichment, state.language);
-  const saved = await persistResult(database, state, evaluation, recommendations);
-  return {
-    assessment_id: state.id,
-    session_id: saved.id || null,
-    user_id: state.userId,
-    completed_at: saved.completed_at || new Date().toISOString(),
+  return persistResult(database, state, evaluation, recommendations, {
     trait_scores: evaluation.trait_scores,
     language: state.language,
     clarifications: clarificationSummary(state.clarificationPlan),
     custom_analysis: customAnalysis(state.answers, state.clarificationPlan.custom_evidence, enrichment),
     ...recommendations,
-  };
+  }, claim);
 }
 
 export default function createAssessmentRouter(database) {
@@ -156,7 +182,8 @@ export default function createAssessmentRouter(database) {
       const state = createAssessmentState(userId);
       state.language = language;
       state.question = localizeBankQuestion(getQuestion(GENERAL_QUESTION_IDS[0]), state.language);
-      sessions.set(state.id, state);
+      await database.query('INSERT INTO assessment_drafts (id, user_id, state) VALUES ($1, $2, $3)',
+        [state.id, userId, JSON.stringify(state)]);
 
       return response.status(201).json({
         assessment_id: state.id,
@@ -169,28 +196,76 @@ export default function createAssessmentRouter(database) {
     }
   });
 
+  router.get('/history', requireAnyIdentity, async (request, response, next) => {
+    try {
+      const { userId } = request.auth;
+      const { before } = request.query;
+      if (before !== undefined && (typeof before !== 'string' || !/^[1-9]\d{0,9}$/.test(before) || Number(before) > 2_147_483_647)) {
+        throw validationError('before must be a positive session ID');
+      }
+      const { rows } = await database.query(
+        `SELECT ${resultColumns} FROM quiz_sessions
+         WHERE user_id = $1 AND ($2::integer IS NULL OR id < $2)
+         ORDER BY id DESC LIMIT $3`, [userId, before ?? null, historyPageSize + 1],
+      );
+      response.set('Cache-Control', 'private, no-store').json({
+        assessments: rows.slice(0, historyPageSize).map((row) => savedResult(row, userId)),
+        next_before: rows.length > historyPageSize ? rows[historyPageSize - 1].id : null,
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get('/drafts', requireAnyIdentity, async (request, response, next) => {
+    try {
+      const { rows } = await database.query(
+        `SELECT id, updated_at, state->>'language' AS language, jsonb_array_length(state->'answers') AS answered
+         FROM assessment_drafts WHERE user_id = $1 ORDER BY updated_at DESC, id DESC LIMIT 20`, [request.auth.userId],
+      );
+      response.set('Cache-Control', 'private, no-store').json({
+        drafts: rows.map(({ id, updated_at, language, answered }) => ({
+          assessment_id: id, updated_at, language, progress: { answered, target: MAX_QUESTIONS },
+        })),
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get('/:id', requireAnyIdentity, async (request, response, next) => {
+    try {
+      const id = assessmentId(request.params.id);
+      const { userId } = request.auth;
+      const { rows: [draft] } = await database.query(
+        'SELECT state FROM assessment_drafts WHERE id = $1 AND user_id = $2', [id, userId],
+      );
+      response.set('Cache-Control', 'private, no-store');
+      if (draft) return response.json({ complete: false, assessment_id: id, ...publicProgress(draft.state, draft.state.question) });
+      const { rows: [saved] } = await database.query(
+        `SELECT ${resultColumns} FROM quiz_sessions WHERE assessment_id = $1 AND user_id = $2`, [id, userId],
+      );
+      if (!saved) throw skillsError(404, 'Assessment not found');
+      return response.json({ complete: true, result: savedResult(saved, userId) });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
   router.post('/answer', async (request, response, next) => {
     try {
       const body = bodyObject(request.body);
-      if (typeof body.assessment_id !== 'string' || !body.assessment_id.trim()) {
-        throw validationError('assessment_id must be a non-empty string');
-      }
+      const id = assessmentId(body.assessment_id);
       if (typeof body.question_id !== 'string' || !body.question_id.trim()) {
         throw validationError('question_id must be a non-empty string');
       }
-      const state = sessions.get(body.assessment_id);
-      if (!state) {
-        const error = new Error('Assessment not found or expired');
-        error.status = 404;
-        throw error;
-      }
-      if (!request.auth || request.auth.userId !== state.userId) {
-        const error = new Error('Assessment requires its owner bearer token');
-        error.status = 403;
-        throw error;
-      }
-
-      if (state.processing) return response.status(409).json({ error: 'Assessment answer is already being processed' });
+      if (!request.auth) throw skillsError(403, 'Assessment requires its owner bearer token');
+      const { userId, isGuest } = request.auth;
+      const { rows: [draft] } = await database.query(
+        'SELECT state FROM assessment_drafts WHERE id = $1 AND user_id = $2', [id, userId],
+      );
+      if (!draft) throw skillsError(404, 'Assessment not found or expired');
+      const state = draft.state;
       const currentQuestion = state.question;
       if (currentQuestion.id !== body.question_id) {
         throw validationError('question_id is not the current assessment question');
@@ -203,31 +278,48 @@ export default function createAssessmentRouter(database) {
         note: body.note,
       }], { questionFor: () => currentQuestion });
       if (currentQuestion.source) answer.question = { ...publicQuestion(currentQuestion), source: currentQuestion.source };
-      state.answers.push(answer);
-      state.processing = true;
+
+      const claim = randomUUID();
+      const claimed = await database.query(
+        `UPDATE assessment_drafts SET claim_id = $4, claim_expires_at = clock_timestamp() + interval '2 minutes'
+         WHERE id = $1 AND user_id = $2 AND state->'question'->>'id' = $3
+           AND (claim_id IS NULL OR claim_expires_at <= clock_timestamp())`,
+        [id, userId, currentQuestion.id, claim],
+      );
+      if (!claimed.rowCount) throw skillsError(409, 'Assessment answer is already being processed or progress changed');
+
+      let saved = false;
       try {
+        state.answers.push(answer);
         if (state.answers.length === MAX_QUESTIONS) {
-          const result = await finish(database, state, request.auth.isGuest);
-          sessions.delete(state.id);
+          const result = await finish(database, state, isGuest, claim);
+          saved = true;
           return response.json({ complete: true, result });
         }
         if (state.answers.length === CLARIFICATION_START) {
           state.clarificationPlan = await prepareClarifications({
-            userId: state.userId,
-            answers: state.answers,
-            language: state.language,
-            ...assessmentAiBudget(database, state, request.auth.isGuest, 'clarification'),
+            userId, answers: state.answers, language: state.language,
+            ...assessmentAiBudget(database, state, isGuest, 'clarification'),
           });
         }
         state.question = state.clarificationPlan
           ? state.clarificationPlan.questions[state.answers.length - CLARIFICATION_START]
           : localizeBankQuestion(selectNextQuestion(state.answers), state.language);
-        return response.json({ complete: false, assessment_id: state.id, ...publicProgress(state, state.question) });
-      } catch (error) {
-        state.answers.pop();
-        throw error;
+        const updated = await database.query(
+          `UPDATE assessment_drafts SET state = $4, updated_at = clock_timestamp(), claim_id = NULL, claim_expires_at = NULL
+           WHERE id = $1 AND user_id = $2 AND claim_id = $3`,
+          [id, userId, claim, JSON.stringify(state)],
+        );
+        if (!updated.rowCount) throw skillsError(409, 'Assessment progress changed. Reload the assessment.');
+        saved = true;
+        return response.json({ complete: false, assessment_id: id, ...publicProgress(state, state.question) });
       } finally {
-        state.processing = false;
+        if (!saved) {
+          await database.query(
+            'UPDATE assessment_drafts SET claim_id = NULL, claim_expires_at = NULL WHERE id = $1 AND user_id = $2 AND claim_id = $3',
+            [id, userId, claim],
+          ).catch(() => {});
+        }
       }
     } catch (error) {
       return next(error);
@@ -249,18 +341,15 @@ export default function createAssessmentRouter(database) {
       state.language = language;
       const enrichment = await enrichForUser(database, state, evaluation, request.auth?.isGuest ?? true);
       const recommendations = addEnrichment(evaluation.recommendations, enrichment, language);
-      const saved = await persistResult(database, state, evaluation, recommendations);
-
-      return response.status(201).json({
-        assessment_id: state.id,
-        session_id: saved.id || null,
-        user_id: userId,
-        ...(!request.auth ? { access_token: createAccessToken({ id: userId, is_guest: true }), token_type: 'Bearer' } : {}),
-        completed_at: saved.completed_at || new Date().toISOString(),
+      const result = await persistResult(database, state, evaluation, recommendations, {
         trait_scores: evaluation.trait_scores,
         language,
         custom_analysis: customAnalysis(answers, [], enrichment),
         ...recommendations,
+      });
+      return response.status(201).json({
+        ...result,
+        ...(!request.auth ? { access_token: createAccessToken({ id: userId, is_guest: true }), token_type: 'Bearer' } : {}),
       });
     } catch (error) {
       return next(error);
@@ -275,14 +364,4 @@ export default function createAssessmentRouter(database) {
   });
 
   return router;
-}
-
-export function clearAssessmentSessions(userId) {
-  if (userId === undefined) {
-    sessions.clear();
-    return;
-  }
-  for (const [id, session] of sessions) {
-    if (session.userId === userId) sessions.delete(id);
-  }
 }

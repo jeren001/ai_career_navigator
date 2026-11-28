@@ -1,4 +1,5 @@
-CREATE TABLE career_assistant_conversations (
+-- frontend-integration previously created the same tables in 010_career_assistant.sql.
+CREATE TABLE IF NOT EXISTS career_assistant_conversations (
   id uuid PRIMARY KEY,
   user_id integer NOT NULL REFERENCES users (id) ON DELETE CASCADE,
   language text NOT NULL CHECK (language IN ('en', 'zh-CN')),
@@ -7,11 +8,11 @@ CREATE TABLE career_assistant_conversations (
   updated_at timestamptz NOT NULL DEFAULT clock_timestamp()
 );
 
-CREATE INDEX career_assistant_conversations_owner_idx
+CREATE INDEX IF NOT EXISTS career_assistant_conversations_owner_idx
   ON career_assistant_conversations (user_id, updated_at DESC, id DESC);
 
 -- A turn stores a complete exchange. Deletion cascades to all its messages.
-CREATE TABLE career_assistant_turns (
+CREATE TABLE IF NOT EXISTS career_assistant_turns (
   conversation_id uuid NOT NULL REFERENCES career_assistant_conversations (id) ON DELETE CASCADE,
   turn_number integer NOT NULL CHECK (turn_number > 0),
   user_message text NOT NULL CHECK (char_length(user_message) BETWEEN 1 AND 2000),

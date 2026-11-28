@@ -51,6 +51,45 @@ const catalogLanguage = catalogQuery('language', 'Display language.', { type: 's
 const catalogField = catalogQuery('career_field', 'Exact career field label from the catalog.');
 const catalogSkill = catalogQuery('skill', 'Skill name or dataset skill slug.');
 const pathId = (schema, example) => ({ name: 'id', in: 'path', required: true, schema, example });
+const uuid = { ...string, format: 'uuid' };
+const timestamp = { ...string, format: 'date-time' };
+const nullableTimestamp = { ...timestamp, nullable: true };
+const count = { type: 'integer', minimum: 0 };
+const flag = { type: 'boolean' };
+const object = (properties, required = Object.keys(properties)) => ({
+  type: 'object', properties, ...(required.length && { required }),
+});
+const jsonPatch = (properties, required = Object.keys(properties)) => ({
+  required: true,
+  content: { 'application/json': { schema: {
+    ...object(properties, required), minProperties: 1, additionalProperties: false,
+  } } },
+});
+const protectedOperation = (tag, operationId, summary, schema, options = {}) => ({
+  tags: [tag], operationId, summary, security: requireBearer, ...options,
+  responses: {
+    ...(schema ? { 200: response(summary + '.', schema) } : { 204: { description: summary + '.' } }),
+    ...errors({ 400: 'Invalid request.', 401: 'A valid bearer token is required.', 404: 'Owned record not found.' }),
+  },
+});
+const learningProgress = object({ resource_id: string, bookmarked_at: nullableTimestamp, completed_at: nullableTimestamp });
+const assessmentReads = {
+  '/drafts': ['listAssessmentDrafts', 'List your 20 most recently updated drafts', object({
+    drafts: array(object({
+      assessment_id: uuid, updated_at: timestamp, language: catalogLanguage.schema,
+      progress: object({ answered: count, target: count }),
+    })),
+  }), []],
+  '/history': ['listAssessmentHistory', 'List your completed assessment results', object({
+    assessments: array(object({
+      assessment_id: { ...uuid, nullable: true }, session_id: count, user_id: count, completed_at: timestamp,
+    })),
+    next_before: { ...count, nullable: true },
+  }), [catalogQuery('before', 'Pass next_before to the next request.', { type: 'integer', minimum: 1 })]],
+  '/{id}': ['readAssessment', 'Resume your assessment or read its completed result', {
+    oneOf: [ref('AssessmentInProgress'), ref('AssessmentEvaluatedEnvelope')],
+  }, [pathId(uuid, '3c2243f4-289a-4fa2-8299-23dd7d06d076')]],
+};
 const challengeId = pathId(string, 'sc-ta-query-library');
 const submissionId = pathId({ ...string, format: 'uuid' }, demoId);
 const roadmapId = pathId({ ...string, format: 'uuid' }, demoId);
@@ -143,7 +182,7 @@ const assessmentPaths = {
   },
   answer: {
     summary: 'Submit the current answer and advance',
-    description: 'Use the same owner token and assessment_id throughout. Copy question.id and a question.options[].id from the previous response or provide custom_answer. After answer 14, the server builds the clarification batch. The final answer returns complete: true and the result. In-progress sessions are held by the running server.',
+    description: 'Use the same owner token and assessment_id throughout. Copy question.id and a question.options[].id from the previous response or provide custom_answer. After answer 14, the server builds the clarification batch. The final answer returns complete: true and the result. PostgreSQL stores the current question and progress for resuming after a restart.',
     security: requireBearer,
     requestBody: body('AssessmentAnswer', {
       option: example('First question with a predefined option', { assessment_id: demoId, question_id: 'q1', option_id: 'q1-analytical' }),
@@ -227,16 +266,30 @@ export const openapi = {
       '5. On `complete: true`, inspect `result.clarifications`, `result.custom_analysis`, and `result.personalization`. If guidance uses fallback, its `reason` explains why. Career scores are computed by the rules in either case.',
       '',
       'Registered users can log in, authorize with the returned token, and follow the same assessment steps. You can also create a guest explicitly with **POST /api/auth/guest**.',
+      'Errors use an object with an English error string. Use HTTP status to choose localized client copy. Successful responses follow the schema for each operation. HTTP 204 has no response body, and photos and résumé downloads return binary content.',
+      'GET /api/dashboard aggregates progress, statistics, recommendations and recent activity for the registered account.',
     ].join('\n\n'),
   },
   servers: [{ url: '/', description: 'Current backend' }],
   tags: [
-    { name: 'Health' }, { name: 'Authentication' }, { name: 'Profile' }, { name: 'Settings' },
+    { name: 'Health' }, { name: 'Authentication' }, { name: 'Profile' }, { name: 'Settings' }, { name: 'Dashboard' },
     { name: 'Careers' }, { name: 'Career Match' }, { name: 'Career Assistant' }, { name: 'My Roadmap' }, { name: 'My Skills' }, { name: 'Practical Challenges' }, { name: 'Learning Hub' },
     { name: 'Interview Simulator' }, { name: 'My Resume' }, { name: 'Assessment' }, { name: 'Quiz aliases' },
   ],
   paths: {
     ...assistantPaths,
+    '/api/dashboard': { get: protectedOperation('Dashboard', 'readDashboard', 'Read account progress and recent activity',
+      object({
+        language: catalogLanguage.schema,
+        display_name: { ...string, nullable: true },
+        statistics: { type: 'object', additionalProperties: count },
+        progress: object({
+          assessment: { type: 'object', nullable: true },
+          roadmap: { type: 'object', nullable: true },
+        }),
+        recommendations: { type: 'object', nullable: true },
+        recent_activity: array(object({ kind: string, item_id: string, occurred_at: timestamp, label: string })),
+      }), { parameters: [catalogLanguage] }) },
     '/api/health': { get: {
       tags: ['Health'], operationId: 'getHealth', summary: 'Check API health',
       responses: { 200: response('API is reachable.', ref('Health')) },
@@ -387,7 +440,7 @@ export const openapi = {
     },
     '/api/careers': { get: {
       tags: ['Careers'], operationId: 'listCareers', summary: 'List active careers',
-      description: 'Results are ordered by ID. Supply at most one of category and cluster. Filters match exact catalog values.',
+      description: 'Results are ordered by ID. Supply at most one of category and cluster. Filters match the original catalog values. Simplified Chinese labels, when seeded, are under market_pulse.translations["zh-CN"].',
       parameters: [
         { name: 'category', in: 'query', description: 'Career field from market_pulse.career_field.', schema: { ...string, minLength: 1 }, example: 'Technology & AI' },
         { name: 'cluster', in: 'query', description: 'Career cluster.', schema: { ...string, minLength: 1 } },
@@ -400,7 +453,8 @@ export const openapi = {
     } },
     '/api/careers/{id}': { get: {
       tags: ['Careers'], operationId: 'getCareer', summary: 'Get an active career by ID',
-      parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer', minimum: 1 }, example: 1 }],
+      description: 'Use the numeric catalog ID. Simplified Chinese labels, when seeded, are under market_pulse.translations["zh-CN"].',
+      parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer', minimum: 1, maximum: 2147483647 }, example: 1 }],
       responses: {
         200: response('Active career.', ref('Career')),
         ...errors({ 400: 'ID must be a positive integer.', 404: 'Active career not found.' }),
@@ -417,7 +471,7 @@ export const openapi = {
     } },
     '/api/career-match/refresh': { post: {
       tags: ['Career Match'], operationId: 'refreshCareerMatch', summary: 'Refresh and save career recommendations',
-      description: 'Uses the existing assessment ranker with the latest completed answers and active catalog. Gemini guidance uses the current profile, structured skills, skill gaps, and challenge activity. Language defaults to the profile preference. If AI is unavailable, the response saves the deterministic recommendations and identifies the fallback reason.',
+      description: 'Uses the existing assessment ranker with the latest completed answers and active catalog. AI guidance uses the current profile, structured skills, skill gaps, and challenge activity. Language defaults to the profile preference. If AI is unavailable, the response saves the deterministic recommendations and identifies the fallback reason.',
       security: requireBearer,
       requestBody: body('CareerMatchRefresh', {
         defaults: example('Use the profile language', {}),
@@ -522,6 +576,8 @@ export const openapi = {
         security: requireBearer,
         parameters: [catalogQuery('offset', 'Number of roadmaps to skip. Use next_offset to fetch another page.', {
           type: 'integer', minimum: 0, maximum: 2147483647, default: 0,
+        }), catalogQuery('status', 'Choose which roadmaps to list.', {
+          ...string, enum: ['active', 'archived', 'all'], default: 'active',
         })],
         responses: {
           200: response('Up to 20 roadmaps, newest first.', ref('RoadmapList')),
@@ -537,7 +593,13 @@ export const openapi = {
         200: response('Saved roadmap.', ref('RoadmapResponse')),
         ...errors({ ...roadmapErrors, 400: 'Invalid roadmap ID.', 404: 'Owned roadmap not found.' }),
       },
-    } },
+    },
+    patch: protectedOperation('My Roadmap', 'archiveRoadmap', 'Archive or restore a roadmap',
+      object({ roadmap: object({ id: uuid, archived_at: nullableTimestamp }) }),
+      { parameters: [roadmapId], requestBody: jsonPatch({ archived: flag }) }),
+    delete: protectedOperation('My Roadmap', 'deleteRoadmap', 'Delete a roadmap and its milestones',
+      null, { parameters: [roadmapId] }),
+    },
     '/api/roadmaps/{id}/milestones/{milestoneId}': { patch: {
       tags: ['My Roadmap'], operationId: 'updateRoadmapMilestone', summary: 'Edit, complete, or reopen a milestone',
       security: requireBearer,
@@ -664,12 +726,25 @@ export const openapi = {
     } },
     '/api/learning/resources': { get: {
       tags: ['Learning Hub'], operationId: 'discoverLearningResources', summary: 'Find learning resources',
+      description: 'Public catalog discovery. The language parameter selects the displayed title and description. Each resource retains its own learning language.',
       parameters: [catalogLanguage, catalogField, catalogSkill],
       responses: {
         200: response('Matching resources with localized descriptions and provider metadata.', ref('LearningResourceList')),
         ...errors({ 400: 'Invalid catalog filters.' }),
       },
     } },
+    '/api/learning/progress': { get: protectedOperation('Learning Hub', 'listLearningProgress', 'Read your learning progress',
+      object({
+        language: catalogLanguage.schema,
+        progress: array(object({ ...learningProgress.properties, resource: { type: 'object', nullable: true } })),
+      }), { parameters: [catalogLanguage, catalogQuery('status', 'Filter learning progress.', {
+        ...string, enum: ['all', 'bookmarked', 'completed'], default: 'all',
+      })] }) },
+    '/api/learning/progress/{resourceId}': { patch: protectedOperation('Learning Hub', 'updateLearningProgress',
+      'Update a resource bookmark or completion', object({ progress: learningProgress }), {
+        parameters: [{ name: 'resourceId', in: 'path', required: true, schema: string }],
+        requestBody: jsonPatch({ bookmarked: flag, completed: flag }, []),
+      }) },
     '/api/interviews': {
       post: {
         tags: ['Interview Simulator'], operationId: 'createInterview', summary: 'Start a practice interview',
@@ -730,6 +805,10 @@ export const openapi = {
         ...errors(interviewErrors),
       },
     } },
+    ...Object.fromEntries(Object.entries(assessmentReads).flatMap(([suffix, [operationId, summary, schema, parameters]]) => [
+      ['/api/assessment' + suffix, { get: protectedOperation('Assessment', operationId, summary, schema, { parameters }) }],
+      ['/api/quiz' + suffix, { get: protectedOperation('Quiz aliases', operationId + 'Alias', summary, schema, { parameters }) }],
+    ])),
     ...Object.fromEntries(Object.entries(assessmentPaths).flatMap(([action, operation]) => [
       [`/api/assessment/${action}`, { post: { ...operation, tags: ['Assessment'], operationId: `assessment_${action}` } }],
       [`/api/quiz/${action}`, { post: { ...operation, tags: ['Quiz aliases'], operationId: `quiz_${action}`, summary: `Alias for /api/assessment/${action}` } }],

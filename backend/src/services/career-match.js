@@ -46,10 +46,9 @@ function legacySnapshot(assessment) {
   };
 }
 
-export async function getCareerMatch(database, userId) {
-  const assessment = requireAssessment(await latestCompletedAssessment(database, userId));
-  const skills = await listUserSkills(database, userId);
-  const history = await challengeProgress(database, userId);
+export async function getSavedCareerMatch(database, userId) {
+  const assessment = await latestCompletedAssessment(database, userId);
+  if (!assessment) return null;
   const stored = assessment.career_match ?? legacySnapshot(assessment);
   const snapshot = localizeRecommendations(stored, stored.language);
   return {
@@ -57,8 +56,14 @@ export async function getCareerMatch(database, userId) {
     completed_at: assessment.completed_at,
     ...snapshot,
     refreshed_at: snapshot.refreshed_at ?? null,
-    ...matchDetails(snapshot.professions, skills, history, snapshot.language),
   };
+}
+
+export async function getCareerMatch(database, userId) {
+  const match = requireAssessment(await getSavedCareerMatch(database, userId));
+  const skills = await listUserSkills(database, userId);
+  const history = await challengeProgress(database, userId);
+  return { ...match, ...matchDetails(match.professions, skills, history, match.language) };
 }
 
 function enrichmentEvidence({ skills, skill_gaps: skillGaps, challenge_practice: practice }) {

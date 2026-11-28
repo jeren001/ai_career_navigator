@@ -7,8 +7,8 @@ import { skillsBody, skillsError } from './user-skills.js';
 
 const MAX_MESSAGE_LENGTH = 2000;
 const uuidPattern = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
-const conversationColumns = 'id, language, revision, created_at, updated_at';
-const turnColumns = 'turn_number, user_message, assistant_message, source, provider, reason, context_used, created_at';
+const conversationColumns = 'id, language, revision, created_at, updated_at, title, pinned_at';
+const turnColumns = 'turn_number, user_message, assistant_message, source, provider, reason, context_used, created_at, bookmarked_at';
 const schema = { type: 'object', properties: { reply: { type: 'string' } }, required: ['reply'] };
 const systemInstruction = [
   'You are a career conversation assistant. Return only JSON with a plain text reply.',
@@ -72,15 +72,15 @@ async function findConversation(database, userId, id) {
 }
 
 export async function createConversation(database, userId, raw) {
-  const { language } = skillsBody(raw, ['language']);
+  const { language, title } = skillsBody(raw, ['language', 'title']);
   if (language !== undefined && !['en', 'zh-CN'].includes(language)) {
     throw skillsError(400, 'language must be en or zh-CN');
   }
   const { rows: [conversation] } = await database.query(
-    `INSERT INTO career_assistant_conversations (id, user_id, language)
-     SELECT $1, id, COALESCE($3, preferred_language) FROM users WHERE id = $2 AND NOT is_guest
+    `INSERT INTO career_assistant_conversations (id, user_id, language, title)
+     SELECT $1, id, COALESCE($3, preferred_language), $4 FROM users WHERE id = $2 AND NOT is_guest
      RETURNING ${conversationColumns}`,
-    [randomUUID(), userId, language ?? null],
+    [randomUUID(), userId, language ?? null, title === undefined ? null : conversationTitle(title)],
   );
   if (!conversation) throw skillsError(401, 'Authentication required');
   return conversation;
@@ -89,10 +89,65 @@ export async function createConversation(database, userId, raw) {
 export async function listConversations(database, userId, limit, offset) {
   const { rows } = await database.query(
     `SELECT ${conversationColumns} FROM career_assistant_conversations WHERE user_id = $1
-     ORDER BY updated_at DESC, id DESC LIMIT $2 OFFSET $3`,
+     ORDER BY pinned_at DESC NULLS LAST, updated_at DESC, id DESC LIMIT $2 OFFSET $3`,
     [userId, limit + 1, offset],
   );
   return { conversations: rows.slice(0, limit), next_offset: rows.length > limit ? offset + limit : null };
+}
+
+function conversationTitle(value) {
+  if (value === null) return null;
+  const title = typeof value === 'string' ? value.trim() : '';
+  if (!title || [...title].length > 120 || title.includes('\0') || !title.isWellFormed()) {
+    throw skillsError(400, 'title must be null or nonempty text of at most 120 characters');
+  }
+  return title;
+}
+
+export async function updateConversation(database, userId, id, raw) {
+  checkId(id);
+  const { title, pinned } = skillsBody(raw, ['title', 'pinned']);
+  if (title === undefined && pinned === undefined) throw skillsError(400, 'Supply title or pinned');
+  if (pinned !== undefined && typeof pinned !== 'boolean') throw skillsError(400, 'pinned must be a boolean');
+  const { rows: [conversation] } = await database.query(
+    `UPDATE career_assistant_conversations SET
+       title = CASE WHEN $3 THEN $4::text ELSE title END,
+       pinned_at = CASE WHEN $5 THEN COALESCE(pinned_at, clock_timestamp())
+                        WHEN NOT $5 THEN NULL ELSE pinned_at END
+     WHERE id = $1 AND user_id = $2 RETURNING ${conversationColumns}`,
+    [id, userId, title !== undefined, title === undefined ? null : conversationTitle(title), pinned ?? null],
+  );
+  if (!conversation) throw notFound();
+  return conversation;
+}
+
+export async function listBookmarks(database, userId, limit, offset) {
+  const { rows } = await database.query(
+    `SELECT c.id AS conversation_id, c.title AS conversation_title, c.language, t.turn_number,
+            t.assistant_message, t.source, t.provider, t.reason, t.created_at, t.bookmarked_at
+     FROM career_assistant_turns t JOIN career_assistant_conversations c ON c.id = t.conversation_id
+     WHERE c.user_id = $1 AND t.bookmarked_at IS NOT NULL
+     ORDER BY t.bookmarked_at DESC, c.id DESC, t.turn_number DESC LIMIT $2 OFFSET $3`,
+    [userId, limit + 1, offset],
+  );
+  return { bookmarks: rows.slice(0, limit), next_offset: rows.length > limit ? offset + limit : null };
+}
+
+export async function setBookmark(database, userId, id, number, raw) {
+  checkId(id);
+  const turnNumber = pageValue(number, 'turn number', 2147483647);
+  const { bookmarked } = skillsBody(raw, ['bookmarked']);
+  if (typeof bookmarked !== 'boolean') throw skillsError(400, 'bookmarked must be a boolean');
+  const { rows: [turn] } = await database.query(
+    `UPDATE career_assistant_turns t
+     SET bookmarked_at = CASE WHEN $4 THEN COALESCE(t.bookmarked_at, clock_timestamp()) ELSE NULL END
+     FROM career_assistant_conversations c
+     WHERE t.conversation_id = c.id AND c.id = $1 AND c.user_id = $2 AND t.turn_number = $3
+     RETURNING t.turn_number, t.bookmarked_at`,
+    [id, userId, turnNumber, bookmarked],
+  );
+  if (!turn) throw skillsError(404, 'Assistant response not found');
+  return turn;
 }
 
 export async function conversationHistory(database, userId, id, limit, before) {

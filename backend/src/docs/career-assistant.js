@@ -7,6 +7,8 @@ const integer = { type: 'integer', minimum: 0 };
 const positive = { ...integer, minimum: 1 };
 const nullable = (schema) => ({ ...schema, nullable: true });
 const language = { ...text, enum: ['en', 'zh-CN'] };
+const title = nullable({ ...text, minLength: 1, maxLength: 120 });
+const flag = { type: 'boolean' };
 const context = {
   type: 'array', uniqueItems: true, items: { ...text, enum: contextSources },
 };
@@ -24,21 +26,33 @@ const requestBody = (name, required) => ({
 const idParameter = { name: 'id', in: 'path', required: true, schema: uuid };
 const query = (name, description, schema) => ({ name, description, in: 'query', schema });
 const limit = query('limit', 'Maximum records to return.', { ...positive, maximum: 50, default: 20 });
+const offset = query('offset', 'Start at this offset.', { ...integer, default: 0 });
 
 export const assistantSchemas = {
-  AssistantCreate: { ...object({ language }, []), additionalProperties: false },
+  AssistantCreate: { ...object({ language, title }, []), additionalProperties: false },
+  AssistantUpdate: { ...object({ title, pinned: flag }, []), minProperties: 1, additionalProperties: false },
+  AssistantBookmark: { ...object({ bookmarked: flag }), additionalProperties: false },
+  AssistantBookmarkStatus: object({ turn_number: positive, bookmarked_at: nullable(date) }),
+  AssistantBookmarkList: object({
+    bookmarks: array(object({
+      conversation_id: uuid, conversation_title: title, language, turn_number: positive,
+      assistant_message: message, source: { ...text, enum: ['ai', 'fallback'] },
+      provider: nullable(text), reason: nullable(text), created_at: date, bookmarked_at: date,
+    })),
+    next_offset: nullable(integer),
+  }),
   AssistantMessage: {
     ...object({ message, revision: integer, context, resume_context: ref('ResumeContext') }, ['message', 'revision']),
     additionalProperties: false,
   },
   AssistantConversation: object({
-    id: uuid, language, revision: integer, created_at: date, updated_at: date,
+    id: uuid, language, revision: integer, created_at: date, updated_at: date, title, pinned_at: nullable(date),
   }),
   AssistantTurn: object({
     turn_number: positive, user_message: message, assistant_message: message,
     source: { ...text, enum: ['ai', 'fallback'] },
     provider: nullable(text), reason: nullable(text), context_used: { ...context, items: { ...text, enum: recordedContextSources } },
-    created_at: date,
+    created_at: date, bookmarked_at: nullable(date),
   }),
   AssistantConversationList: object({
     conversations: array(ref('AssistantConversation')), next_offset: nullable(integer),
@@ -69,7 +83,8 @@ const path = '/api/career-assistant/conversations';
 export const assistantPaths = {
   [path]: {
     get: operation('listAssistantConversations', 'List your conversations', 200, ref('AssistantConversationList'), {
-      parameters: [limit, query('offset', 'Start at this offset.', { ...integer, default: 0 })],
+      parameters: [limit, offset],
+      description: 'Pinned conversations sort first.',
     }),
     post: operation('createAssistantConversation', 'Start a conversation', 201, ref('AssistantConversation'), {
       description: 'Language defaults to the account preference. Supply en or zh-CN to override it for this conversation.',
@@ -77,6 +92,9 @@ export const assistantPaths = {
     }),
   },
   [path + '/{id}']: {
+    patch: operation('updateAssistantConversation', 'Set the title or the pinned state', 200, ref('AssistantConversation'), {
+      found: true, parameters: [idParameter], requestBody: requestBody('AssistantUpdate', true),
+    }),
     get: operation('getAssistantHistory', 'Read conversation history', 200, ref('AssistantHistory'), {
       found: true,
       description: 'Returns the latest page in chronological order. Pass next_before as before for the previous page.',
@@ -84,6 +102,18 @@ export const assistantPaths = {
     }),
     delete: operation('deleteAssistantConversation', 'Delete a conversation and its turns', 204, undefined, {
       found: true, parameters: [idParameter],
+    }),
+  },
+  '/api/career-assistant/bookmarks': {
+    get: operation('listAssistantBookmarks', 'List your bookmarked responses', 200, ref('AssistantBookmarkList'), {
+      parameters: [limit, offset],
+    }),
+  },
+  [path + '/{id}/messages/{turnNumber}/bookmark']: {
+    put: operation('setAssistantBookmark', 'Save or clear a response bookmark', 200, ref('AssistantBookmarkStatus'), {
+      found: 'Owned assistant response not found.',
+      parameters: [idParameter, { name: 'turnNumber', in: 'path', required: true, schema: positive }],
+      requestBody: requestBody('AssistantBookmark', true),
     }),
   },
   [path + '/{id}/messages']: {

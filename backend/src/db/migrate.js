@@ -6,30 +6,31 @@ import pool from './pool.js';
 const migrationsPath = join(dirname(fileURLToPath(import.meta.url)), '../../database/migrations');
 
 export async function runMigrations(database = pool) {
-  await database.query(`
-    CREATE TABLE IF NOT EXISTS schema_migrations (
-      version text PRIMARY KEY,
-      applied_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
   const files = (await readdir(migrationsPath)).filter((file) => file.endsWith('.sql')).sort();
-
-  for (const file of files) {
-    const applied = await database.query('SELECT 1 FROM schema_migrations WHERE version = $1', [file]);
-    if (applied.rows.length) continue;
-    const sql = await readFile(join(migrationsPath, file), 'utf8');
-    const client = await database.connect();
-    try {
-      await client.query('BEGIN');
-      await client.query(sql);
+  const client = await database.connect();
+  try {
+    await client.query('BEGIN');
+    // Serialize schema changes and ledger reads across migration runners.
+    await client.query('SELECT pg_advisory_xact_lock(712439, 1)');
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS schema_migrations (
+        version text PRIMARY KEY,
+        applied_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    const { rows } = await client.query('SELECT version FROM schema_migrations');
+    const applied = new Set(rows.map(({ version }) => version));
+    for (const file of files) {
+      if (applied.has(file)) continue;
+      await client.query(await readFile(join(migrationsPath, file), 'utf8'));
       await client.query('INSERT INTO schema_migrations (version) VALUES ($1)', [file]);
-      await client.query('COMMIT');
-    } catch (error) {
-      await client.query('ROLLBACK').catch(() => {});
-      throw error;
-    } finally {
-      client.release();
     }
+    await client.query('COMMIT');
+  } catch (error) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw error;
+  } finally {
+    client.release();
   }
 }
 

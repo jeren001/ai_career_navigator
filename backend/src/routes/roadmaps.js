@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { optionalAuthentication, requireAuthentication } from '../services/auth.js';
-import { createRoadmap, listRoadmaps, readRoadmap, updateMilestone } from '../services/roadmaps.js';
+import { archiveRoadmap, createRoadmap, deleteRoadmap, listRoadmaps, readRoadmap, updateMilestone } from '../services/roadmaps.js';
 import { skillsError } from '../services/user-skills.js';
 
 export default function createRoadmapsRouter(database) {
@@ -33,9 +33,29 @@ export default function createRoadmapsRouter(database) {
       if (typeof offset !== 'string' || !/^\d+$/.test(offset) || Number(offset) > 2_147_483_647) {
         throw skillsError(400, 'offset must be a nonnegative integer');
       }
-      return response.json(await listRoadmaps(database, request.auth.userId, Number(offset)));
+      const status = request.query.status ?? 'active';
+      if (!['active', 'archived', 'all'].includes(status)) throw skillsError(400, 'Invalid roadmap status');
+      return response.json(await listRoadmaps(database, request.auth.userId, Number(offset), status));
     } catch (error) {
       return next(error);
+    }
+  });
+
+  router.patch('/:id', async (request, response, next) => {
+    try {
+      const roadmap = await archiveRoadmap(database, request.auth.userId, request.params.id, request.body);
+      response.json({ roadmap });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.delete('/:id', async (request, response, next) => {
+    try {
+      await deleteRoadmap(database, request.auth.userId, request.params.id);
+      response.status(204).end();
+    } catch (error) {
+      next(error);
     }
   });
 

@@ -10,14 +10,15 @@ import careerAssistantRouter from './routes/career-assistant.js';
 import careerMatchRouter from './routes/career-match.js';
 import careersRouter from './routes/careers.js';
 import challengesRouter from './routes/challenges.js';
+import dashboardRouter from './routes/dashboard.js';
 import healthRouter from './routes/health.js';
 import interviewsRouter from './routes/interviews.js';
+import learningRouter from './routes/learning.js';
 import profileRouter from './routes/profile.js';
 import resumesRouter from './routes/resumes.js';
 import roadmapsRouter from './routes/roadmaps.js';
 import settingsRouter from './routes/settings.js';
 import skillsRouter from './routes/skills.js';
-import { discoverResources } from './services/challenge-catalog.js';
 
 export function createApp(database = pool, { getAccountMailer } = {}) {
   const app = express();
@@ -42,7 +43,8 @@ export function createApp(database = pool, { getAccountMailer } = {}) {
   app.use('/api/career-assistant', careerAssistantRouter(database));
   app.use('/api/career-match', careerMatchRouter(database));
   app.use('/api/roadmaps', roadmapsRouter(database));
-  app.get('/api/learning/resources', (request, response) => response.json(discoverResources(request.query)));
+  app.use('/api/dashboard', dashboardRouter(database));
+  app.use('/api/learning', learningRouter(database));
   app.use('/api/assessment', assessmentRouter(database));
   app.use('/api/quiz', assessmentRouter(database));
   app.use((request, response) => {

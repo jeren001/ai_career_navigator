@@ -11,7 +11,7 @@ export default function createCareersRouter(database) {
     } = request.query;
 
     for (const [name, value] of [['category', category], ['cluster', cluster]]) {
-      if (value !== undefined && (typeof value !== 'string' || !value.trim())) {
+      if (value !== undefined && (typeof value !== 'string' || !value.trim() || value.includes('\0'))) {
         return response.status(400).json({ error: `${name} must be a non-empty string` });
       }
     }
@@ -55,7 +55,7 @@ export default function createCareersRouter(database) {
   router.get('/:id', async (request, response, next) => {
     const { id } = request.params;
 
-    if (!/^[1-9]\d*$/.test(id) || !Number.isSafeInteger(Number(id))) {
+    if (!/^[1-9]\d*$/.test(id) || Number(id) > 2_147_483_647) {
       return response.status(400).json({ error: 'Career id must be a positive integer' });
     }
 

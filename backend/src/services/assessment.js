@@ -557,7 +557,8 @@ function validateAnswersInternal(rawAnswers, { minimum = 1, maximum = MAX_QUESTI
     if (!question) throw new Error(`Unknown question_id: ${questionId}`);
     if (seen.has(questionId)) throw new Error(`Question answered more than once: ${questionId}`);
     seen.add(questionId);
-    if (customAnswer !== undefined && (typeof customAnswer !== 'string' || !customAnswer.trim() || customAnswer.length > 1000)) {
+    if (customAnswer !== undefined && (typeof customAnswer !== 'string' || !customAnswer.trim() ||
+        customAnswer.length > 1000 || customAnswer.includes('\0') || !customAnswer.isWellFormed())) {
       throw new Error('custom_answer must be a non-empty string with at most 1000 characters');
     }
     if (customAnswer !== undefined && optionId !== undefined) {
@@ -566,7 +567,8 @@ function validateAnswersInternal(rawAnswers, { minimum = 1, maximum = MAX_QUESTI
     if (customAnswer === undefined && !question.options.some((option) => option.id === optionId)) {
       throw new Error(`Invalid option_id for ${questionId}`);
     }
-    if (note !== undefined && (typeof note !== 'string' || note.length > 1000)) {
+    if (note !== undefined && (typeof note !== 'string' || note.length > 1000 ||
+        note.includes('\0') || !note.isWellFormed())) {
       throw new Error('note must be a string with at most 1000 characters');
     }
     return {

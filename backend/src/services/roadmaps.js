@@ -11,7 +11,7 @@ import { skillsBody, skillsError } from './user-skills.js';
 const pageSize = 20;
 const readRoadmaps = `
   SELECT r.id, r.assessment_session_id, r.language, r.profession, r.prioritized_skills,
-         r.personalization, r.weekly_study_minutes, r.created_at,
+         r.personalization, r.weekly_study_minutes, r.created_at, r.archived_at,
          COALESCE(jsonb_agg(to_jsonb(m) - 'roadmap_id' ORDER BY m.position)
            FILTER (WHERE m.id IS NOT NULL), '[]'::jsonb) AS milestones
   FROM roadmaps r LEFT JOIN roadmap_milestones m ON m.roadmap_id = r.id
@@ -46,22 +46,42 @@ export async function readRoadmap(database, userId, id) {
 
 export async function latestRoadmap(database, userId) {
   const { rows: [roadmap] } = await database.query(
-    `${readRoadmaps} WHERE r.user_id = $1 GROUP BY r.id ORDER BY r.created_at DESC, r.id DESC LIMIT 1`,
+    `${readRoadmaps} WHERE r.user_id = $1 AND r.archived_at IS NULL
+     GROUP BY r.id ORDER BY r.created_at DESC, r.id DESC LIMIT 1`,
     [userId],
   );
   return roadmap ? presentRoadmap(roadmap) : undefined;
 }
 
-export async function listRoadmaps(database, userId, offset) {
+export async function listRoadmaps(database, userId, offset, status = 'active') {
   const { rows } = await database.query(
-    `${readRoadmaps} WHERE r.user_id = $1 GROUP BY r.id
+    `${readRoadmaps} WHERE r.user_id = $1
+     AND ($4 = 'all' OR (r.archived_at IS NOT NULL) = ($4 = 'archived')) GROUP BY r.id
      ORDER BY r.created_at DESC, r.id DESC LIMIT $2 OFFSET $3`,
-    [userId, pageSize + 1, offset],
+    [userId, pageSize + 1, offset, status],
   );
   return {
     roadmaps: rows.slice(0, pageSize).map(presentRoadmap),
     next_offset: rows.length > pageSize ? offset + pageSize : null,
   };
+}
+
+export async function archiveRoadmap(database, userId, id, raw) {
+  const { archived } = skillsBody(raw, ['archived']);
+  if (typeof archived !== 'boolean') throw skillsError(400, 'archived must be a boolean');
+  const { rows: [roadmap] } = await database.query(
+    `UPDATE roadmaps
+     SET archived_at = CASE WHEN $3 THEN COALESCE(archived_at, clock_timestamp()) ELSE NULL END
+     WHERE user_id = $1 AND id = $2 RETURNING id, archived_at`,
+    [userId, id, archived],
+  );
+  if (!roadmap) throw skillsError(404, 'Roadmap not found');
+  return roadmap;
+}
+
+export async function deleteRoadmap(database, userId, id) {
+  const { rowCount } = await database.query('DELETE FROM roadmaps WHERE user_id = $1 AND id = $2', [userId, id]);
+  if (!rowCount) throw skillsError(404, 'Roadmap not found');
 }
 
 function validateMinutes(value, minimum, maximum, field) {

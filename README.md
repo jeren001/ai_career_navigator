@@ -69,6 +69,8 @@ psql -d career_compass -c "SELECT count(*) AS active_careers, count(DISTINCT clu
 
 With the backend running on port 3000, open [Swagger UI](http://localhost:3000/api-docs). The [OpenAPI 3 document](http://localhost:3000/api-docs/openapi.json) is also available as JSON.
 
+The [frontend API integration guide](backend/API_INTEGRATION.md) lists module endpoints, persistence and language behavior, and the database upgrade path from `frontend-integration`.
+
 To complete an assessment, execute **POST /api/assessment/start** in Swagger UI. For a guest assessment, copy the returned `access_token` into **Authorize**. In **POST /api/assessment/answer**, submit the same assessment ID and the current question ID with an option ID or custom text. Repeat until `complete` is true. The response shows the clarification source and final personalization status, including the fallback reason when applicable.
 
 ## Career Match API
@@ -351,7 +353,7 @@ Example completed response shape:
 }
 ```
 
-Validation returns HTTP 400 for unknown questions, invalid options, duplicate questions, missing required fields, malformed answer arrays, and notes longer than 1000 characters. Assessment state is process-local until completion, so a restart invalidates unfinished assessments. The persisted completed session remains in PostgreSQL.
+Validation returns HTTP 400 for unknown questions, invalid options, duplicate questions, missing required fields, malformed answer arrays, and notes longer than 1000 characters. PostgreSQL stores drafts and completed results. Use the owner token with `GET /api/assessment/{id}` to resume or recover the result and `GET /api/assessment/history` to list saved results.
 
 Each assessment has one logical AI request for clarification and one for final guidance. The additive guest-budget migration creates `guest_assessment_ai_usage`. A guest can use provider attempts in one assessment per UTC start date, with up to `AI_GUEST_STAGE_ATTEMPTS` attempts each for clarification and final guidance (default 2). A direct `/evaluate` request uses the final allowance for its own assessment. The shared registered-account allowance is `AI_ACCOUNT_DAILY_LIMIT` (default 5). A value of zero disables the corresponding guest or registered-account provider allowance.
 

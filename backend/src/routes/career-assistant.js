@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { optionalAuthentication, requireAuthentication } from '../services/auth.js';
 import {
   addConversationTurn, conversationHistory, createConversation,
-  deleteConversation, listConversations, pageValue,
+  deleteConversation, listBookmarks, listConversations, pageValue, setBookmark, updateConversation,
 } from '../services/career-assistant.js';
 
 export default function createCareerAssistantRouter(database) {
@@ -29,6 +29,17 @@ export default function createCareerAssistantRouter(database) {
     const limit = pageValue(request.query.limit, 'limit', 50, 20);
     const offset = pageValue(request.query.offset, 'offset', 2147483647, 0, 0);
     response.json(await listConversations(database, userId, limit, offset));
+  }));
+  router.get('/bookmarks', handle(async (request, response, userId) => {
+    const limit = pageValue(request.query.limit, 'limit', 50, 20);
+    const offset = pageValue(request.query.offset, 'offset', 2147483647, 0, 0);
+    response.json(await listBookmarks(database, userId, limit, offset));
+  }));
+  router.patch('/conversations/:id', handle(async (request, response, userId) => {
+    response.json(await updateConversation(database, userId, request.params.id, request.body));
+  }));
+  router.put('/conversations/:id/messages/:turnNumber/bookmark', handle(async (request, response, userId) => {
+    response.json(await setBookmark(database, userId, request.params.id, request.params.turnNumber, request.body));
   }));
   router.get('/conversations/:id', handle(async (request, response, userId) => {
     const limit = pageValue(request.query.limit, 'limit', 50, 20);

@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { clearAssessmentSessions } from './assessment.js';
 import { accountMailer } from '../services/account-mail.js';
 import { changeAccountPassword, confirmAccountCode, deleteAccount, limitAccountRequest, requestAccountCode } from '../services/account-security.js';
 import { optionalAuthentication, requireAuthentication } from '../services/auth.js';
@@ -68,7 +67,6 @@ export default function createAccountRouter(database, getMailer = accountMailer)
     if (confirmation !== 'DELETE') throw skillsError(400, 'Confirmation must be DELETE');
     await limitAccountRequest(database, 'delete-account', request.auth.userId, 5, 900);
     await deleteAccount(database, request.auth, validatePassword(password));
-    clearAssessmentSessions(request.auth.userId);
     response.status(204).end();
   }));
 

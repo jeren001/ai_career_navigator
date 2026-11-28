@@ -393,6 +393,10 @@ export const schemas = {
     ['answers'],
   ),
   AssessmentEvaluated: object({ ...result, ...token }, Object.keys(result)),
+  AssessmentEvaluatedEnvelope: object({
+    complete: { ...bool, enum: [true] },
+    result: object({ ...result, clarifications: ref('ClarificationSummary') }, Object.keys(result)),
+  }),
   ClarificationSummary: object({
     status: choices('ai', 'mixed', 'fallback'),
     ai_questions: { ...integer, minimum: 0, maximum: 4 },
@@ -533,6 +537,7 @@ export const schemas = {
     study_plan: object({ estimated_minutes: integer, estimated_weeks: integer }),
     progress: object({ completed_milestones: integer, total_milestones: integer, completed_estimated_minutes: integer }),
     created_at: dateTime,
+    archived_at: { ...dateTime, nullable: true },
     ...resumeGuidance,
   }, ['id', 'assessment_session_id', 'language', 'profession', 'weekly_study_minutes', 'prioritized_skills',
     'personalization', 'milestones', 'study_plan', 'progress', 'created_at']),
