@@ -1,5 +1,6 @@
 import { QUESTIONS } from '../services/assessment.js';
 import { assistantPaths, assistantSchemas } from './career-assistant.js';
+import { supportAndJobsPaths } from './support-and-jobs.js';
 import { array, ref, schemas, string } from './schemas.js';
 
 const optionalBearer = [{}, { bearerAuth: [] }];
@@ -275,9 +276,11 @@ export const openapi = {
     { name: 'Health' }, { name: 'Authentication' }, { name: 'Profile' }, { name: 'Settings' }, { name: 'Dashboard' },
     { name: 'Careers' }, { name: 'Career Match' }, { name: 'Career Assistant' }, { name: 'My Roadmap' }, { name: 'My Skills' }, { name: 'Practical Challenges' }, { name: 'Learning Hub' },
     { name: 'Interview Simulator' }, { name: 'My Resume' }, { name: 'Assessment' }, { name: 'Quiz aliases' },
+    { name: 'Support' }, { name: 'Jobs and Internships' },
   ],
   paths: {
     ...assistantPaths,
+    ...supportAndJobsPaths,
     '/api/dashboard': { get: protectedOperation('Dashboard', 'readDashboard', 'Read account progress and recent activity',
       object({
         language: catalogLanguage.schema,
@@ -518,7 +521,7 @@ export const openapi = {
       ],
       requestBody: { required: true, content: resumeBinary },
       responses: {
-        201: response('Saved resume with text extracted locally.', ref('ResumeResponse')),
+        201: response('Saved resume and structured suggestions for review, extracted locally.', ref('ResumeUploadResponse')),
         ...errors({ ...resumeErrors, 413: 'File exceeds 5 MiB.', 415: 'Unsupported media type or content encoding.',
           422: 'Invalid, protected, or textless document, or an extraction limit was reached.' }),
       },
@@ -544,6 +547,12 @@ export const openapi = {
         responses: { 204: { description: 'Resume, uploaded bytes, and extracted text deleted.' }, ...errors(resumeErrors) },
       },
     },
+    '/api/resumes/{id}/extraction': { get: {
+      tags: ['My Resume'], operationId: 'getResumeExtraction', summary: 'Read structured extraction suggestions',
+      description: 'Uses English and Simplified Chinese headings to suggest fields from the saved document. Review and PATCH accepted fields to the resume.',
+      parameters: [resumeId], security: requireBearer,
+      responses: { 200: response('Local suggestions for review.', ref('ResumeExtractionResponse')), ...errors(resumeErrors) },
+    } },
     '/api/resumes/{id}/file': { get: {
       tags: ['My Resume'], operationId: 'downloadResume', summary: 'Download the original file as an attachment',
       security: requireBearer, parameters: [resumeId],

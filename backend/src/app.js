@@ -13,14 +13,16 @@ import challengesRouter from './routes/challenges.js';
 import dashboardRouter from './routes/dashboard.js';
 import healthRouter from './routes/health.js';
 import interviewsRouter from './routes/interviews.js';
+import jobsRouter from './routes/jobs.js';
 import learningRouter from './routes/learning.js';
 import profileRouter from './routes/profile.js';
 import resumesRouter from './routes/resumes.js';
 import roadmapsRouter from './routes/roadmaps.js';
 import settingsRouter from './routes/settings.js';
 import skillsRouter from './routes/skills.js';
+import supportRouter from './routes/support.js';
 
-export function createApp(database = pool, { getAccountMailer } = {}) {
+export function createApp(database = pool, { getAccountMailer, vacancyProvider } = {}) {
   const app = express();
 
   app.use(cors());
@@ -45,6 +47,8 @@ export function createApp(database = pool, { getAccountMailer } = {}) {
   app.use('/api/roadmaps', roadmapsRouter(database));
   app.use('/api/dashboard', dashboardRouter(database));
   app.use('/api/learning', learningRouter(database));
+  app.use('/api/jobs', jobsRouter(database, vacancyProvider));
+  app.use('/api/support', supportRouter(database));
   app.use('/api/assessment', assessmentRouter(database));
   app.use('/api/quiz', assessmentRouter(database));
   app.use((request, response) => {

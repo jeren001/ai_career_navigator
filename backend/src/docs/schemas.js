@@ -219,12 +219,28 @@ const resumeEntry = object({
 const resumeSectionNames = ['skills', 'education', 'work_experience', 'projects', 'certifications'];
 const resumeSections = Object.fromEntries(resumeSectionNames.map((section) => [section, array(ref('ResumeEntry'), { maxItems: 25 })]));
 const resumeTitle = { ...untrimmed, maxLength: 120 };
+const resumeEditor = {
+  contact: object({ full_name: nullableText, email: nullableText, phone: nullableText, location: nullableText, website: nullableText }, []),
+  styling: object({
+    template: nullableText, font_family: nullableText,
+    accent_color: { ...nullableText, pattern: '^#[0-9a-fA-F]{6}$' },
+    font_size: { ...integer, minimum: 8, maximum: 24, nullable: true },
+  }, []),
+  custom_sections: array(object({
+    title: { ...string, maxLength: 120 }, content: { ...string, maxLength: 4000 },
+  }), { maxItems: 10 }),
+  draft_progress: object({
+    current_step: { ...nullableText, maxLength: 80 },
+    completed_steps: array({ ...string, maxLength: 80 }, { maxItems: 20, uniqueItems: true }),
+  }, []),
+};
 const resumeSummary = {
   id: uuid, title: resumeTitle, language,
   file_media_type: { ...choices('application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', null), nullable: true },
   created_at: dateTime, updated_at: dateTime,
+  draft_progress: resumeEditor.draft_progress,
 };
-const resumeUpdate = { title: resumeTitle, language, sections: ref('ResumeSectionUpdate') };
+const resumeUpdate = { title: resumeTitle, language, sections: ref('ResumeSectionUpdate'), ...resumeEditor };
 const resumeContext = { resume_context: ref('ResumeContext') };
 const resumeGuidance = { resume_guidance: ref('ResumeGuidance') };
 const resumeConsent = { ...bool, enum: [true] };
@@ -265,8 +281,11 @@ export const schemas = {
   ResumeSectionUpdate: { ...object(resumeSections, []), additionalProperties: false },
   ResumeCreate: { ...object(resumeUpdate, ['title']), additionalProperties: false },
   ResumeUpdate: { ...object(resumeUpdate, []), minProperties: 1, additionalProperties: false },
-  Resume: object({ ...resumeSummary, sections: object(resumeSections), extracted_text: { ...nullableText, maxLength: 40000 } }),
+  Resume: object({ ...resumeSummary, ...resumeEditor, sections: object(resumeSections), extracted_text: { ...nullableText, maxLength: 40000 } }),
   ResumeResponse: object({ resume: ref('Resume') }),
+  ResumeExtraction: object({ contact: resumeEditor.contact, sections: ref('ResumeSectionUpdate'), requires_review: { ...bool, enum: [true] } }),
+  ResumeExtractionResponse: object({ extraction: ref('ResumeExtraction') }),
+  ResumeUploadResponse: object({ resume: ref('Resume'), extraction: ref('ResumeExtraction') }),
   ResumeList: object({ resumes: array(object(resumeSummary), { maxItems: 20 }), next_offset: { ...integer, nullable: true } }),
   ResumeAnalyze: {
     ...object({ consent: resumeConsent, target_role: { ...untrimmed, maxLength: 120 } }, ['consent']),
@@ -282,7 +301,7 @@ export const schemas = {
         'tailor_to_role', 'practice_skill', 'prepare_example', 'check_dates'),
       action: string,
       evidence: {
-        ...object({ section: choices(...resumeSectionNames, 'document'), quote: string, source: choices('resume_claim') }),
+        ...object({ section: choices(...resumeSectionNames, 'custom', 'document'), quote: string, source: choices('resume_claim') }),
         nullable: true,
       },
     }), { minItems: 1, maxItems: 4 }),

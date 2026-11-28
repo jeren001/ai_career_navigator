@@ -3,7 +3,7 @@ import { optionalAuthentication, requireAuthentication } from '../services/auth.
 import { resumeAdvice } from '../services/resume-ai.js';
 import { resumeFileLimit, resumeMediaTypes } from '../services/resume-extraction.js';
 import {
-  createResume, deleteResume, downloadResume, listResumes, readResume, resumeUuid, updateResume,
+  createResume, deleteResume, downloadResume, listResumes, readResume, resumeUuid, structuredResumeExtraction, updateResume,
 } from '../services/resumes.js';
 import { skillsBody, skillsError } from '../services/user-skills.js';
 
@@ -50,7 +50,7 @@ export default function createResumesRouter(database) {
         const mediaType = Object.keys(resumeMediaTypes).find((type) => request.is(type));
         if (!mediaType) throw skillsError(415, 'Upload a PDF or DOCX file with its document content type');
         const resume = await createResume(database, request.auth.userId, request.query, { buffer: request.body, mediaType });
-        response.status(201).json({ resume });
+        response.status(201).json({ resume, extraction: structuredResumeExtraction(resume) });
       } catch (error) {
         next(error);
       }
@@ -80,6 +80,15 @@ export default function createResumesRouter(database) {
         .type(file.file_media_type)
         .set('X-Content-Type-Options', 'nosniff')
         .send(file.file_content);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get('/:id/extraction', async (request, response, next) => {
+    try {
+      const resume = await readResume(database, request.auth.userId, request.params.id);
+      response.json({ extraction: structuredResumeExtraction(resume) });
     } catch (error) {
       next(error);
     }

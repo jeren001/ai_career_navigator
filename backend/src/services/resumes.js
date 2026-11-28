@@ -1,9 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { extractResumeText } from './resume-extraction.js';
+import { editorFields, extractResumeFields, resumeEditorFields } from './resume-editor.js';
 import { skillsBody, skillsError } from './user-skills.js';
 
 export const resumeSections = ['skills', 'education', 'work_experience', 'projects', 'certifications'];
-const columns = 'id, title, language, sections, file_media_type, extracted_text, created_at, updated_at';
+const columns = 'id, title, language, sections, file_media_type, extracted_text, created_at, updated_at, contact, styling, custom_sections, draft_progress';
 const emptySections = Object.fromEntries(resumeSections.map((section) => [section, []]));
 
 export function resumeUuid(value) {
@@ -14,7 +15,7 @@ export function resumeUuid(value) {
 }
 
 function resumeText(value, limit, field) {
-  if (typeof value !== 'string' || !value.trim() || value.includes('\0') || [...value].length > limit) {
+  if (typeof value !== 'string' || !value.trim() || value.includes('\0') || !value.isWellFormed() || [...value].length > limit) {
     throw skillsError(400, field + ' must contain 1 to ' + limit + ' characters');
   }
   return value.trim();
@@ -56,41 +57,52 @@ export async function readResume(database, userId, id) {
 
 export async function listResumes(database, userId, offset) {
   const { rows } = await database.query(
-    'SELECT id, title, language, file_media_type, created_at, updated_at FROM resumes ' +
+    'SELECT id, title, language, file_media_type, created_at, updated_at, draft_progress FROM resumes ' +
     'WHERE user_id = $1 ORDER BY created_at DESC, id DESC LIMIT 21 OFFSET $2', [userId, offset],
   );
   return { resumes: rows.slice(0, 20), next_offset: rows.length > 20 ? offset + 20 : null };
 }
 
 export async function createResume(database, userId, raw, upload) {
-  const { title, language, sections } = skillsBody(raw, ['title', 'language', 'sections']);
+  const { title, language, sections } = skillsBody(raw, ['title', 'language', 'sections', ...(upload ? [] : editorFields)]);
+  const editor = resumeEditorFields(raw);
   const selectedLanguage = checkLanguage(language);
   const label = title === undefined && upload ? null : resumeText(title, 120, 'title');
   const data = { ...emptySections, ...readSections(sections) };
   const extractedText = upload ? await extractResumeText(upload.buffer, upload.mediaType) : null;
   const { rows: [resume] } = await database.query(
-    'INSERT INTO resumes (id, user_id, title, language, sections, file_media_type, file_content, extracted_text) ' +
+    'INSERT INTO resumes (id, user_id, title, language, sections, file_media_type, file_content, extracted_text, contact, styling, custom_sections, draft_progress) ' +
     "SELECT $1, id, COALESCE($3, CASE WHEN COALESCE($4, preferred_language) = 'zh-CN' THEN '简历' ELSE 'Resume' END), " +
-    'COALESCE($4, preferred_language), $5::jsonb, $6, $7, $8 FROM users WHERE id = $2 AND NOT is_guest RETURNING ' + columns,
+    'COALESCE($4, preferred_language), $5::jsonb, $6, $7, $8, $9, $10, $11, $12 FROM users WHERE id = $2 AND NOT is_guest RETURNING ' + columns,
     [randomUUID(), userId, label, selectedLanguage ?? null, JSON.stringify(data),
-      upload?.mediaType ?? null, upload?.buffer ?? null, extractedText],
+      upload?.mediaType ?? null, upload?.buffer ?? null, extractedText, JSON.stringify(editor.contact),
+      JSON.stringify(editor.styling), JSON.stringify(editor.custom ?? []), JSON.stringify(editor.progress)],
   );
   if (!resume) throw skillsError(401, 'Authentication required');
   return resume;
 }
 
 export async function updateResume(database, userId, id, raw) {
-  const { title, language, sections } = skillsBody(raw, ['title', 'language', 'sections']);
+  const { title, language, sections } = skillsBody(raw, ['title', 'language', 'sections', ...editorFields]);
+  const editor = resumeEditorFields(raw);
   if (!Object.keys(raw).length) throw skillsError(400, 'Supply at least one resume field');
   const { rows: [resume] } = await database.query(
     'UPDATE resumes SET title = COALESCE($3, title), language = COALESCE($4, language), ' +
-    'sections = sections || $5::jsonb, updated_at = clock_timestamp() ' +
+    'sections = sections || $5::jsonb, contact = jsonb_strip_nulls(contact || $6::jsonb), ' +
+    'styling = jsonb_strip_nulls(styling || $7::jsonb), custom_sections = COALESCE($8::jsonb, custom_sections), ' +
+    'draft_progress = draft_progress || $9::jsonb, updated_at = clock_timestamp() ' +
     'WHERE user_id = $1 AND id = $2 RETURNING ' + columns,
     [userId, id, title === undefined ? null : resumeText(title, 120, 'title'),
-      checkLanguage(language) ?? null, JSON.stringify(readSections(sections))],
+      checkLanguage(language) ?? null, JSON.stringify(readSections(sections)), JSON.stringify(editor.contact),
+      JSON.stringify(editor.styling), editor.custom === undefined ? null : JSON.stringify(editor.custom), JSON.stringify(editor.progress)],
   );
   if (!resume) throw skillsError(404, 'Resume not found');
   return resume;
+}
+
+export function structuredResumeExtraction(resume) {
+  if (!resume.extracted_text) throw skillsError(404, 'Uploaded resume text not found');
+  return extractResumeFields(resume.extracted_text);
 }
 
 export async function downloadResume(database, userId, id) {

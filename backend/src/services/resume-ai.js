@@ -49,15 +49,23 @@ function withoutContact(value) {
 }
 
 export function resumeEvidence(resume) {
+  const contact = Object.values(resume.contact ?? {}).filter((value) => typeof value === 'string' && value.length >= 2);
+  function redact(text) {
+    return withoutContact(contact.reduce((value, field) => value.replaceAll(field, '[…]'), text));
+  }
   const entries = Object.entries(resume.sections).flatMap(([section, items]) => items.slice(0, 5).map((entry) => ({
     section,
-    text: [entry.name, entry.organization, entry.dates, entry.details].filter(Boolean).join(' — ').slice(0, 400),
+    text: redact([entry.name, entry.organization, entry.dates, entry.details].filter(Boolean).join(' — ')).slice(0, 400),
+  })));
+  entries.push(...(resume.custom_sections ?? []).slice(0, 5).map(({ title, content }) => ({
+    section: 'custom', text: redact(title + ' — ' + content).slice(0, 400),
   })));
   if (resume.extracted_text) {
     entries.push(...resume.extracted_text.split(/\n+/u).map((text) => text.trim())
-      .filter((text) => text.length >= 12).slice(0, 30).map((text) => ({ section: 'document', text: text.slice(0, 300) })));
+      .filter((text) => text.length >= 12 && !/^(?:name|姓名|location|地址|住址|phone|tel|电话|手机|email|邮箱)[：:]/iu.test(text))
+      .slice(0, 30).map((text) => ({ section: 'document', text: redact(text).slice(0, 300) })));
   }
-  return entries.map(({ section, text }, index) => ({ id: index + 1, section, text: withoutContact(text) }));
+  return entries.map(({ section, text }, index) => ({ id: index + 1, section, text }));
 }
 
 function outputSchema(ids, actions) {

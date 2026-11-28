@@ -67,7 +67,7 @@ async function skillsContext(database, userId) {
 async function practiceContext(database, userId) {
   const challenges = await challengeProgress(database, userId);
   const { rows: interviews } = await database.query(
-    `SELECT profession->>'title' AS profession, difficulty, evaluation IS NOT NULL AS feedback_available
+    `SELECT profession->>'title' AS profession, difficulty, COALESCE(evaluation->>'status' = 'ai', false) AS feedback_available
      FROM interview_sessions WHERE user_id = $1 ORDER BY created_at DESC, id DESC LIMIT 5`,
     [userId],
   );

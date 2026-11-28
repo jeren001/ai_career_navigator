@@ -39,7 +39,9 @@ function docxFixture(mode) {
     'with ZipFile(buffer, "w", ZIP_DEFLATED) as archive:',
     '    archive.writestr("[Content_Types].xml", \'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>\')',
     '    dtd = "<!DOCTYPE test>" if sys.argv[1] == "dtd" else ""',
-    '    archive.writestr("word/document.xml", dtd + \'<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>公交数据项目</w:t></w:r></w:p></w:body></w:document>\')',
+    '    lines = ["姓名：测试用户", "项目经历", "公交数据项目", "技能：SQL、数据分析"]',
+    '    body = "".join("<w:p><w:r><w:t>" + line + "</w:t></w:r></w:p>" for line in lines)',
+    '    archive.writestr("word/document.xml", dtd + \'<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>\' + body + \'</w:body></w:document>\')',
     '    if sys.argv[1] == "macro":',
     '        archive.writestr("word/vbaProject.bin", b"test")',
     'sys.stdout.buffer.write(buffer.getvalue())',
@@ -96,6 +98,12 @@ test('My Resume handles private documents, verified ownership, consent, AI fallb
       assert.equal(uploadedDocx.status, 201);
       assert.match(uploadedDocx.data.resume.extracted_text, /公交数据项目/u);
       assert.equal(uploadedDocx.data.resume.title, '简历');
+      assert.deepEqual(uploadedDocx.data.extraction.contact, { full_name: '测试用户' });
+      assert.deepEqual(uploadedDocx.data.extraction.sections.projects, [{ name: '公交数据项目' }]);
+      assert.deepEqual(uploadedDocx.data.resume.sections.projects, []);
+      const extractionPath = base + '/' + uploadedDocx.data.resume.id + '/extraction';
+      assert.deepEqual((await request(extractionPath)).data.extraction, uploadedDocx.data.extraction);
+      assert.equal((await request(extractionPath, 'GET', undefined, other)).status, 404);
       const uploadedPdf = await request(base + '/upload?title=Transit', 'POST', pdf, owner, pdfType);
       assert.equal(uploadedPdf.status, 201);
       assert.match(uploadedPdf.data.resume.extracted_text, /Built a transit dashboard/u);
@@ -126,6 +134,18 @@ test('My Resume handles private documents, verified ownership, consent, AI fallb
       assert.equal(updated.status, 200);
       assert.deepEqual(updated.data.resume.sections.certifications, []);
       assert.deepEqual(updated.data.resume.sections.skills, [{ name: 'SQL' }]);
+      const editor = await request(uri, 'PATCH', {
+        contact: { full_name: '测试用户', email: 'editor@example.test' },
+        styling: { font_family: 'Inter', accent_color: '#123456', font_size: 12 },
+        custom_sections: [{ title: '志愿服务', content: '测试用户参与社区公益活动。' }],
+        draft_progress: { current_step: 'style', completed_steps: ['contact', 'sections'] },
+      });
+      assert.equal(editor.status, 200);
+      const draft = await request(uri, 'PATCH', { contact: { email: null }, draft_progress: { current_step: 'review' } });
+      assert.deepEqual(draft.data.resume.contact, { full_name: '测试用户' });
+      assert.deepEqual(draft.data.resume.styling, editor.data.resume.styling);
+      assert.equal(draft.data.resume.custom_sections[0].title, '志愿服务');
+      assert.deepEqual(draft.data.resume.draft_progress, { current_step: 'review', completed_steps: ['contact', 'sections'] });
       const list = (await request(base)).data.resumes;
       assert.equal(list.length, 3);
       assert.equal(list[0].extracted_text, undefined);
@@ -141,9 +161,11 @@ test('My Resume handles private documents, verified ownership, consent, AI fallb
           assert.match(contents, /Simplified Chinese/u);
           assert.match(contents, /Transit dashboard/u);
           assert.doesNotMatch(contents, /test@example.test/u);
+          assert.doesNotMatch(contents, /测试用户|editor@example.test/u);
           const input = JSON.parse(contents.split('\n').at(-1));
           assert.equal(input.context.target_role, 'Analyst');
           const project = input.evidence.find(({ section }) => section === 'projects');
+          assert.ok(input.evidence.some(({ section, text }) => section === 'custom' && text.includes('志愿服务')));
           return JSON.stringify({ suggestions: [{ evidence_id: project.id, action_id: 'clarify_result', degree: 'Invented' }] });
         },
       }]);

@@ -38,7 +38,7 @@ function fallbackReply(language, message) {
 
 function validateReply(value, language) {
   const reply = typeof value?.reply === 'string' ? value.reply.trim() : '';
-  if (!reply || reply.length > MAX_MESSAGE_LENGTH || /[<>\0]|https?:\/\/|\bwww\./iu.test(reply)) return undefined;
+  if (!reply || reply.length > MAX_MESSAGE_LENGTH || !reply.isWellFormed() || /[<>\0]|https?:\/\/|\bwww\./iu.test(reply)) return undefined;
   if (language === 'zh-CN' && !/\p{Script=Han}/u.test(reply)) return undefined;
   // Guard against common fabricated salary formats even if a provider ignores the prompt.
   if (/[\p{Sc}]\s*\d|\d[\d,.\s]*\s*(?:USD|CNY|RMB|EUR|GBP|人民币|元\s*[\/／]|万元)/iu.test(reply)) return undefined;
@@ -181,7 +181,7 @@ export async function addConversationTurn(database, userId, id, raw) {
   const { message, context: sources = [], revision, resume_context: resumeContext } =
     skillsBody(raw, ['message', 'context', 'revision', 'resume_context']);
   const content = typeof message === 'string' ? message.trim() : '';
-  if (!content || content.length > MAX_MESSAGE_LENGTH || content.includes('\0')) {
+  if (!content || content.length > MAX_MESSAGE_LENGTH || content.includes('\0') || !content.isWellFormed()) {
     throw skillsError(400, 'message must be nonempty text of at most 2000 characters');
   }
   if (!Array.isArray(sources) || sources.length > contextSources.length ||
