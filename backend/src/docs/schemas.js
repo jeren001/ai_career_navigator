@@ -260,7 +260,7 @@ export const schemas = {
   },
   NotificationList: object({
     notifications: array(object({
-      id, kind: choices('career_recommendations', 'roadmap_created', 'roadmap_completed'),
+      id, kind: choices('career_recommendations', 'roadmap_created', 'roadmap_completed', 'cv_analysis_completed'),
       message: string, related_id: string, created_at: dateTime, read_at: { ...dateTime, nullable: true },
     }), { maxItems: 20 }),
     next_before: { ...id, nullable: true },

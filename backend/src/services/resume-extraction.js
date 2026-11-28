@@ -11,6 +11,10 @@ const extractor = fileURLToPath(new URL('../lib/extract-resume.py', import.meta.
 let activeExtractions = 0;
 
 export async function extractResumeText(data, mediaType) {
+  return (await extractResumeDocument(data, mediaType)).text;
+}
+
+export async function extractResumeDocument(data, mediaType, { inspect = false } = {}) {
   const format = Object.hasOwn(resumeMediaTypes, mediaType) ? resumeMediaTypes[mediaType] : null;
   if (!format) throw skillsError(415, 'Upload a PDF or DOCX file with its document content type');
   if (!Buffer.isBuffer(data) || !data.length) throw skillsError(400, 'Upload a nonempty document');
@@ -22,9 +26,10 @@ export async function extractResumeText(data, mediaType) {
   if (activeExtractions >= 2) throw skillsError(503, 'Document extraction is busy. Retry shortly');
   activeExtractions += 1;
   try {
+    const inspectDocx = inspect && format === 'docx';
     const output = await new Promise((resolve, reject) => {
-      const child = execFile('python3', ['-I', extractor, format], {
-        timeout: 5500, killSignal: 'SIGKILL', maxBuffer: 160000, encoding: 'utf8',
+      const child = execFile('python3', ['-I', extractor, format, ...(inspectDocx ? ['--inspect'] : [])], {
+        timeout: 5500, killSignal: 'SIGKILL', maxBuffer: 250000, encoding: 'utf8',
         // Document parsers do not need the backend's credentials.
         env: { PATH: process.env.PATH, LANG: 'C.UTF-8' },
       }, (error, stdout) => {
@@ -39,11 +44,12 @@ export async function extractResumeText(data, mediaType) {
       child.stdin.on('error', () => {});
       child.stdin.end(data);
     });
-    const text = output.replaceAll('\0', '').replace(/\r\n?/g, '\n').trim();
+    const document = inspectDocx ? JSON.parse(output) : { text: output, layout: null };
+    const text = document.text.replaceAll('\0', '').replace(/\r\n?/g, '\n').trim();
     if (!text || [...text].length > 40000) {
       throw skillsError(422, 'The document must contain extractable text within 40000 characters');
     }
-    return text;
+    return { text, layout: document.layout };
   } finally {
     activeExtractions -= 1;
   }

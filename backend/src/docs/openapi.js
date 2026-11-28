@@ -1,5 +1,6 @@
 import { QUESTIONS } from '../services/assessment.js';
 import { assistantPaths, assistantSchemas } from './career-assistant.js';
+import { cvAnalysisPaths, cvAnalysisSchemas } from './cv-analysis.js';
 import { supportAndJobsPaths } from './support-and-jobs.js';
 import { array, ref, schemas, string } from './schemas.js';
 
@@ -276,10 +277,11 @@ export const openapi = {
     { name: 'Health' }, { name: 'Authentication' }, { name: 'Profile' }, { name: 'Settings' }, { name: 'Dashboard' },
     { name: 'Careers' }, { name: 'Career Match' }, { name: 'Career Assistant' }, { name: 'My Roadmap' }, { name: 'My Skills' }, { name: 'Practical Challenges' }, { name: 'Learning Hub' },
     { name: 'Interview Simulator' }, { name: 'My Resume' }, { name: 'Assessment' }, { name: 'Quiz aliases' },
-    { name: 'Support' }, { name: 'Jobs and Internships' },
+    { name: 'Support' }, { name: 'Jobs and Internships' }, { name: 'Analyze CV' },
   ],
   paths: {
     ...assistantPaths,
+    ...cvAnalysisPaths,
     ...supportAndJobsPaths,
     '/api/dashboard': { get: protectedOperation('Dashboard', 'readDashboard', 'Read account progress and recent activity',
       object({
@@ -830,6 +832,6 @@ export const openapi = {
         description: 'Paste the access_token returned by guest creation, assessment start, registration, or login.',
       },
     },
-    schemas: { ...schemas, ...assistantSchemas },
+    schemas: { ...schemas, ...assistantSchemas, ...cvAnalysisSchemas },
   },
 };

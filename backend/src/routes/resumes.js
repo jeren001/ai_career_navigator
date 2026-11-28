@@ -1,4 +1,5 @@
 import express, { Router } from 'express';
+import createCvAnalysisRouter from './cv-analysis.js';
 import { optionalAuthentication, requireAuthentication } from '../services/auth.js';
 import { resumeAdvice } from '../services/resume-ai.js';
 import { resumeFileLimit, resumeMediaTypes } from '../services/resume-extraction.js';
@@ -15,6 +16,7 @@ export default function createResumesRouter(database) {
   }, optionalAuthentication(database), requireAuthentication);
   // Allow larger structured resumes than the application's default JSON parser.
   router.use(express.json({ limit: '512kb' }));
+  router.use('/analyses', createCvAnalysisRouter(database));
   router.param('id', (request, response, next, id) => {
     try {
       resumeUuid(id);

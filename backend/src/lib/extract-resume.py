@@ -1,5 +1,6 @@
-"""Read a bounded resume from stdin and emit plain UTF-8 text."""
+"""Read a bounded resume from stdin and emit text or DOCX structure observations."""
 import io
+import json
 import os
 import resource
 import sys
@@ -26,7 +27,7 @@ def parse_xml(data, start, end=None, text=None):
     parser.Parse(data, True)
 
 
-def docx_text(data):
+def docx_text(data, inspect=False):
     with ZipFile(io.BytesIO(data)) as archive:
         entries = archive.infolist()
         names = {entry.filename: entry for entry in entries}
@@ -59,6 +60,7 @@ def docx_text(data):
         depth = 0
         text_depth = None
         word_ns = None
+        layout = {"tables": 0, "text_boxes": 0, "graphics": 0, "multi_column_sections": 0}
 
         def append(value):
             nonlocal size
@@ -67,7 +69,7 @@ def docx_text(data):
                 raise ValueError("Extracted text size")
             parts.append(value)
 
-        def start(name, _attributes):
+        def start(name, attributes):
             nonlocal depth, word_ns, text_depth
             depth += 1
             if depth > 128:
@@ -78,6 +80,14 @@ def docx_text(data):
                     raise ValueError("Document root")
             if name == word_ns + " t":
                 text_depth = depth
+            if name == word_ns + " tbl":
+                layout["tables"] += 1
+            if name == word_ns + " txbxContent":
+                layout["text_boxes"] += 1
+            if name in (word_ns + " drawing", word_ns + " pict", word_ns + " object"):
+                layout["graphics"] += 1
+            if name == word_ns + " cols" and attributes.get(word_ns + " num", "1") != "1":
+                layout["multi_column_sections"] += 1
             if name in (word_ns + " tab", word_ns + " br", word_ns + " cr"):
                 append("\t" if name.endswith(" tab") else "\n")
 
@@ -94,7 +104,8 @@ def docx_text(data):
                 append(value)
 
         parse_xml(read_member("word/document.xml", 2 * 1024 * 1024), start, end, character_data)
-        return "".join(parts)
+        text = "".join(parts)
+        return json.dumps({"text": text, "layout": layout}, ensure_ascii=False) if inspect else text
 
 
 def main():
@@ -105,7 +116,7 @@ def main():
     data = sys.stdin.buffer.read(5242881)
     if len(data) > 5242880:
         raise ValueError("Upload size")
-    sys.stdout.buffer.write(docx_text(data).encode("utf-8"))
+    sys.stdout.buffer.write(docx_text(data, inspect="--inspect" in sys.argv[2:]).encode("utf-8"))
 
 
 if __name__ == "__main__":

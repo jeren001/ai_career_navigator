@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { once } from 'node:events';
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import { createApp } from '../src/app.js';
 import pool from '../src/db/pool.js';
 import { resetGeminiStateForTests, setAiProvidersForTests } from '../src/services/assessment-ai.js';
@@ -9,6 +9,7 @@ import { createAccessToken } from '../src/services/auth.js';
 
 const pdfType = 'application/pdf';
 const docxType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+after(() => pool.end());
 
 function pdfFixture() {
   const content = 'BT /F1 12 Tf 72 740 Td (Built a transit dashboard.) Tj ET\n';
@@ -41,6 +42,7 @@ function docxFixture(mode) {
     '    dtd = "<!DOCTYPE test>" if sys.argv[1] == "dtd" else ""',
     '    lines = ["姓名：测试用户", "项目经历", "公交数据项目", "技能：SQL、数据分析"]',
     '    body = "".join("<w:p><w:r><w:t>" + line + "</w:t></w:r></w:p>" for line in lines)',
+    '    body += "<w:tbl><w:tr><w:tc><w:p/></w:tc></w:tr></w:tbl>"',
     '    archive.writestr("word/document.xml", dtd + \'<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>\' + body + \'</w:body></w:document>\')',
     '    if sys.argv[1] == "macro":',
     '        archive.writestr("word/vbaProject.bin", b"test")',
@@ -241,6 +243,125 @@ test('My Resume handles private documents, verified ownership, consent, AI fallb
       if (server) await new Promise((resolve) => server.close(resolve));
       await database.query('ROLLBACK');
       database.release();
-      await pool.end();
+    }
+  });
+
+test('Analyze CV accepts bilingual uploads and owned résumés and saves only on request',
+  { skip: process.env.RUN_SKILLS_POSTGRES_TEST !== '1', timeout: 20_000 }, async () => {
+    const database = await pool.connect();
+    let server;
+    try {
+      await database.query('BEGIN');
+      const { rows: [owner, other, guest] } = await database.query(
+        `INSERT INTO users (is_guest, preferred_language, notification_settings) VALUES
+          (false, 'zh-CN', '{"cv_analysis_completed":true}'), (false, 'en', '{}'), (true, 'en', '{}')
+          RETURNING id, is_guest`,
+      );
+      server = createApp(database).listen(0, '127.0.0.1');
+      await once(server, 'listening');
+      const origin = 'http://127.0.0.1:' + server.address().port;
+      const base = '/api/resumes/analyses';
+      async function request(path, method = 'GET', body, user = owner, media = 'application/json') {
+        const response = await fetch(origin + path, {
+          method,
+          headers: {
+            ...(user && { authorization: 'Bearer ' + createAccessToken(user) }),
+            ...(body !== undefined && { 'content-type': media }),
+          },
+          body: body === undefined || Buffer.isBuffer(body) ? body : JSON.stringify(body),
+        });
+        return { status: response.status, data: response.status === 204 ? null : await response.json() };
+      }
+      process.env.AI_MIN_REQUEST_INTERVAL_MS = '0';
+      let calls = 0;
+      let invalid = false;
+      setAiProvidersForTests([{
+        id: 'gemini', model: 'cv-fixture',
+        async generate({ contents }) {
+          calls += 1;
+          const { settings, evidence, criteria } = JSON.parse(contents);
+          assert.equal(settings.target_job_title, '数据分析师');
+          assert.equal(settings.career_level, 'student');
+          assert.equal(settings.language, 'zh-CN');
+          assert.doesNotMatch(contents, /secret@example.test|李小明/u);
+          assert.ok(evidence.some(({ text }) => text.includes('公交')));
+          const evidence_id = evidence[0].id;
+          return JSON.stringify({
+            criteria: criteria.map(({ id, max_points }) => ({ id, points: invalid ? 101 : max_points, evidence_id })),
+            recommendations: [{ code: 'show_outcome', evidence_id, priority: 'high', rewritten: 'Invented metric' }],
+            overall: 1,
+          });
+        },
+      }]);
+      const { data: created } = await request('/api/resumes', 'POST', {
+        title: '简历', language: 'zh-CN', contact: { email: 'secret@example.test', full_name: '李小明' },
+        sections: { skills: [{ name: 'SQL' }], projects: [{ name: '公交数据项目', details: '李小明整理了公交数据。' }] },
+      });
+      const resumeId = created.resume.id;
+      const settings = { resume_id: resumeId, target_job_title: '数据分析师', career_level: 'student', target_country: 'CN' };
+      assert.equal((await request(base, 'POST', settings, guest)).status, 401);
+      assert.equal((await request(base, 'POST', { ...settings, consent: true }, other)).status, 404);
+      assert.equal((await request(base, 'POST', { ...settings, consent: 'true' })).status, 400);
+      const local = await request(base, 'POST', settings);
+      assert.equal(local.status, 200);
+      assert.equal(local.data.report.ai.reason, 'consent_not_given');
+      assert.equal(local.data.report.overall.score, null);
+      assert.equal(calls, 0);
+      assert.deepEqual((await request(base)).data.reports, []);
+      const evaluated = await request(base, 'POST', { ...settings, consent: true });
+      assert.equal(evaluated.status, 200, JSON.stringify(evaluated.data));
+      const { report, save_token, resume_id } = evaluated.data;
+      assert.equal(report.ai.status, 'ai');
+      assert.equal(report.categories.length, 6);
+      assert.equal(report.overall.score, 100);
+      assert.equal(report.overall.status, 'partial');
+      assert.equal(report.categories[0].criteria[0].status, 'not_applicable');
+      assert.equal(report.categories[1].criteria[0].source, 'ai');
+      assert.equal(report.categories[3].criteria[0].max_points, 30);
+      assert.match(report.recommendations[0].improvement, /真实成果/u);
+      assert.doesNotMatch(JSON.stringify(report), /Invented metric|李小明|secret@example.test/u);
+      const payload = { report, save_token, resume_id };
+      assert.equal((await request(base + '/save', 'POST', payload, other)).status, 400);
+      assert.equal((await request(base + '/save', 'POST', { ...payload, report: { ...report, rubric_version: 'fake' } })).status, 400);
+      const saved = await request(base + '/save', 'POST', payload);
+      assert.equal(saved.status, 201, JSON.stringify(saved.data));
+      const reportPath = base + '/' + saved.data.id;
+      assert.deepEqual((await request(reportPath)).data.report, report);
+      assert.equal((await request(reportPath, 'GET', undefined, other)).status, 404);
+      assert.equal((await request(reportPath, 'DELETE', undefined, other)).status, 404);
+      assert.equal((await request(base)).data.reports[0].id, saved.data.id);
+      assert.equal((await request('/api/notifications')).data.notifications[0].kind, 'cv_analysis_completed');
+      assert.equal(calls, 1);
+
+      invalid = true;
+      const fallback = await request(base, 'POST', { ...settings, consent: true });
+      assert.equal(fallback.data.report.ai.status, 'fallback');
+      assert.equal(fallback.data.report.ai.reason, 'invalid_response');
+      assert.equal(fallback.data.report.overall.score, null);
+      assert.equal(fallback.data.report.categories[0].score, 100);
+
+      const docx = await request(base + '/upload?language=zh-CN&save=true', 'POST', docxFixture('clean'), owner, docxType);
+      assert.equal(docx.status, 201, JSON.stringify(docx.data));
+      assert.equal(docx.data.resume_id, null);
+      assert.equal(docx.data.report.document_observations.tables, 1);
+      assert.equal(docx.data.report.categories[0].criteria.find(({ id }) => id === 'reading_order').points, 8);
+      assert.equal(docx.data.report.sections.find(({ id }) => id === 'projects').status, 'detected');
+      const pdf = await request(base + '/upload?language=en', 'POST', pdfFixture(), other, pdfType);
+      assert.equal(pdf.status, 200, JSON.stringify(pdf.data));
+      assert.equal(pdf.data.report.settings.language, 'en');
+      assert.equal(pdf.data.report.document_observations, null);
+      assert.equal(pdf.data.report.categories[0].criteria.find(({ id }) => id === 'reading_order').status, 'unavailable');
+      assert.equal((await request(base + '/upload', 'POST', Buffer.from('%PDF-bad'), owner, pdfType)).status, 422);
+      assert.equal((await request(base + '/upload', 'POST', docxFixture('macro'), owner, docxType)).status, 422);
+      assert.equal((await request(base + '/upload', 'POST', Buffer.from('bad'), owner, 'text/plain')).status, 415);
+      assert.equal((await request('/api/resumes/' + resumeId, 'DELETE')).status, 204);
+      assert.equal((await request(reportPath)).status, 404);
+      assert.equal((await request(base + '/' + docx.data.id, 'DELETE')).status, 204);
+    } finally {
+      delete process.env.AI_MIN_REQUEST_INTERVAL_MS;
+      resetGeminiStateForTests();
+      if (server) await new Promise((resolve) => server.close(resolve));
+      await database.query('ROLLBACK');
+      database.release();
     }
   });

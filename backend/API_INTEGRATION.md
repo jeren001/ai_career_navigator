@@ -13,6 +13,7 @@ Use the operation schemas at `/api-docs/openapi.json`. In development, `/api-doc
 | AI Career Match | `GET /api/career-match`, `POST /api/career-match/refresh` | The authenticated owner can read the latest completed assessment, including a guest. Refresh requires an account. GET uses stored results and current skill gaps with zero AI attempts. |
 | My Roadmap | `GET/POST /api/roadmaps`, `GET/PATCH/DELETE /api/roadmaps/{id}`, `PATCH /api/roadmaps/{id}/milestones/{milestoneId}` | Archiving preserves milestones. Deletion removes the roadmap and milestones. |
 | My Resume | `GET/POST /api/resumes`, `POST /api/resumes/upload`, `GET/PATCH/DELETE /api/resumes/{id}`, `GET /api/resumes/{id}/{file,extraction}`, `POST /api/resumes/{id}/analyze` | PostgreSQL saves editor fields, draft progress, and original files. Upload accepts a raw PDF or DOCX up to 5 MiB and returns local extraction suggestions. Analysis guidance is request-scoped. |
+| Analyze CV | `GET/POST /api/resumes/analyses`, `POST /api/resumes/analyses/{upload,save}`, `GET/DELETE /api/resumes/analyses/{reportId}` | Evaluate an uploaded or saved CV and optionally save an account-owned report. |
 | Learning Hub | `GET /api/learning/resources`, `GET /api/learning/progress`, `PATCH /api/learning/progress/{resourceId}`, plus challenge discovery and submission APIs | Catalog discovery is public. Accounts can save resource bookmarks and report completion. |
 | Interview Simulator | `GET/POST /api/interviews`, `GET /api/interviews/{id}`, `POST /api/interviews/{id}/{answers,evaluate}` | Sessions, answers and evaluations persist. Evaluation can return 202 with the current session. Poll the session while processing. |
 | Job and Internship Finder | `GET /api/jobs/search`, `GET/POST /api/jobs/saved`, `GET/PATCH/DELETE /api/jobs/saved/{id}` | Accounts can track jobs by URL, application date, status, and notes. Vacancy search accepts a server-configured provider. |
@@ -41,6 +42,26 @@ Completed Career Test results feed Career Match, which combines the saved rankin
 
 Assistant title and bookmark operations use separate metadata from the message revision. Each reply can use the selected account context and up to four previous exchanges. Replies generated with résumé context are omitted from later prompts. Other prior replies can contain information provided in earlier turns. After a 409 or an interrupted request, reload conversation history and use the returned revision before sending again.
 
+## Analyze CV
+
+Send a registered account bearer token. Set `consent: true` to allow the shared AI service to evaluate bounded, redacted excerpts. Otherwise the service runs local checks. The existing `POST /api/resumes/{id}/analyze` continues to return request-scoped résumé guidance.
+
+| Operation | Input and response |
+| --- | --- |
+| `POST /api/resumes/analyses` | Send `resume_id` and optional settings as JSON. A saved CV with an original file uses that file's extracted text. A CV created in the builder uses its structured sections. |
+| `POST /api/resumes/analyses/upload` | Send a raw PDF or DOCX body up to 5 MiB with its document media type. Pass settings as query parameters. The upload is used for analysis without creating a My Resume entry. |
+| `POST /api/resumes/analyses/save` | Send `resume_id`, `report`, and `save_token` unchanged from the preview. The token is bound to the account and expires in 30 minutes. Saving a preview uses zero AI requests. |
+| `GET /api/resumes/analyses?offset=0` | List summaries with `next_offset` pagination. |
+| `GET /api/resumes/analyses/{reportId}` and `DELETE /api/resumes/analyses/{reportId}` | Read or delete an owned report. Deleting its source My Resume record also deletes linked reports. |
+
+The analysis endpoints return HTTP 200 with a preview and `save_token` by default. Pass `save: true` with the initial request for HTTP 201 and immediate persistence. A saved report can generate an in-app notification when `notification_settings.cv_analysis_completed` is enabled.
+
+Optional settings are `language` (`en` or `zh-CN`), `target_job_title`, `industry`, `specialization`, `career_level`, and `target_country`. Career levels are `student`, `fresh_graduate`, `entry_level`, `mid_level`, `senior_level`, and `executive`. The backend accepts the client's industry and specialization labels and an uppercase two-letter country code. The canonical CV Builder catalogs were unavailable in this checkout. The report locale defaults to the saved CV's language or the uploader's account preference. AI evaluates grammar in the language of the excerpts.
+
+The backend applies versioned rubric `1.0.0`. Category weights are ATS compatibility 25%, content quality 20%, structure and formatting 15%, skills and keywords 15%, professional impact 15%, and grammar and language 10%. Each criterion identifies `rule_based` or `ai` as its source and declares `scored`, `not_applicable`, or `unavailable`. The report includes original weights and scored coverage. A partial category score describes its observed criteria. Genuine exclusions are redistributed. A whole unavailable applicable category leaves the overall score null. The display classification uses the rounded overall score. Recommendations can include a redacted excerpt and a labeled template with placeholders for verified facts.
+
+ATS checks cover text extractability, recognized section labels, common contact patterns, and accepted file formats. For DOCX, the parser also checks main-body tables, text boxes, drawings, and multi-column markup. The result is an estimate based on those observations. PDF analysis uses the text layer from up to the first 30 pages. Visual reading order for PDF, visual consistency, page length, and local recruiting conventions remain unscored when they cannot be verified. The rubric and classification thresholds have yet to be empirically calibrated.
+
 ## Support and applications
 
 Support requests accept `subject`, `message` and optional `language`, which defaults to the account preference. Ticket states are `open`, `in_progress`, `resolved` and `closed`. The detail route returns an ordered history. The queue and status update routes require membership in `support_staff`, which a database administrator provisions. A status update can include an account-visible message. The service stores tickets in PostgreSQL and exposes them through the queue.
@@ -58,5 +79,7 @@ The older branch's `010_career_assistant.sql` and the backend's `008_career_assi
 Migration `015_personal_progress.sql` adds draft and learning progress tables, optional result snapshots for existing assessment history, and optional title, pin, bookmark and archive fields. It preserves existing rows.
 
 Migration `016_resume_editor_support_jobs.sql` adds résumé editor columns with empty defaults, ticket and status history tables, staff membership, and saved-job and application history tables. Existing résumé files, text, sections, and IDs are preserved.
+
+Migration `017_cv_analysis_reports.sql` adds owned CV analysis reports and extends the accepted in-app notification kinds. It preserves existing resumes, analysis guidance, and notification rows.
 
 Run `RUN_SKILLS_POSTGRES_TEST=1 npm test` on a disposable, migrated and seeded PostgreSQL database to include ownership, persistence, concurrency and localization coverage. Configure `DOTENV_CONFIG_PATH=/dev/null` and an explicit `DATABASE_URL` to target the disposable database.

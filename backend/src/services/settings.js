@@ -5,11 +5,13 @@ export const privacyFields = [
 ];
 export const notificationFields = [
   'career_recommendations', 'job_alerts', 'learning_reminders', 'roadmap_updates', 'platform_updates', 'email_notifications',
+  'cv_analysis_completed',
 ];
 const notificationCopy = {
   career_recommendations: ['Your career recommendations are ready.', '你的职业推荐已生成。'],
   roadmap_created: ['Your career roadmap is ready.', '你的职业路线图已生成。'],
   roadmap_completed: ['You completed a roadmap milestone.', '你已完成一个路线图里程碑。'],
+  cv_analysis_completed: ['Your CV analysis report is ready.', '你的简历分析报告已生成。'],
 };
 
 const settingsColumns = 'preferred_language, privacy_settings, notification_settings';
